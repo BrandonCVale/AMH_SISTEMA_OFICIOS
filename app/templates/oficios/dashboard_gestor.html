@@ -28,6 +28,7 @@
             </div>
             <a href="{{ url_for('oficios.crear_oficio') }}" class="boton-primario">+ Nueva Solicitud De Oficio</a>
         </div>
+        {# KPIs #}
         <div class="grid-metricas">
             <div class="tarjeta-metrica borde-violeta">
                 <div class="metrica-titulo">Total Enviados</div>
@@ -44,32 +45,61 @@
         </div>
         <h2 class="texto-subtitulo titulo-seccion">Historial de Oficios</h2>
         <div class="tarjeta-tabla">
+            {# TABLA CON DATOS DE LOS OFICIOS #}
             <table class="tabla-moderna">
+                {# ENCABEZADOS #}
                 <thead>
                     <tr>
                         <th>Folio</th>
                         <th>Asunto</th>
-                        <th>Área Destino</th>
-                        <th>Fecha Envío</th>
+                        <th>Destinatario</th>
+                        <th>Respuesta</th>
+                        <th>Fecha De Respuesta</th>
+                        <th>Fecha De Creación</th>
                         <th>Estatus</th>
+                        <th>Acciones</th>
                         <th class="texto-derecha">Acciones</th>
                     </tr>
                 </thead>
+                {# DATOS #}
                 <tbody>
-                    <tr>
-                        <td>
-                            <strong>OF-2024-001</strong>
-                        </td>
-                        <td>Solicitud de Insumos</td>
-                        <td>Recursos Materiales</td>
-                        <td>02/10/2024</td>
-                        <td>
-                            <span class="badge badge-amarillo">En Revisión</span>
-                        </td>
-                        <td class="texto-derecha">
-                            <button class="btn-accion">Ver Detalles</button>
-                        </td>
-                    </tr>
+                    {% for oficio in oficios %}
+                        <tr>
+                            {# <td>{{ oficio.id_oficio }}</td> #}
+                            <td>{{ oficio.folio_interno }}</td>
+                            <td>{{ oficio.asunto }}</td>
+                            <td>{{ oficio.destinatario }}</td>
+                            <td>{{ oficio.texto_respuesta | default('Aún no se responde', true) }}</td>
+                            <td>
+                                {% if oficio.fecha_respuesta %}
+                                    {{ oficio.fecha_respuesta.strftime("%d/%m/%Y") }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>{{ oficio.fecha_creacion.strftime("%d/%m/%Y") }}</td>
+                            <td>
+                                {# If para estados de la columna estatus #}
+                                {% if oficio.estatus == 'EN_REVISION' %}
+                                    <span class="badge badge-amarillo">En Revisión</span>
+                                {% elif oficio.estatus == 'ASIGNADO' %}
+                                    <span class="badge badge-azul">Asignado</span>
+                                {% elif oficio.estatus == 'ATENDIDO' %}
+                                    <span class="badge badge-azul">Atendido</span>
+                                {% elif oficio.estatus == 'FINALIZADO' %}
+                                    <span class="badge badge-verde">Finalizado</span>
+                                {% elif oficio.estatus == 'RECHAZADO' %}
+                                    <span class="badge badge-rojo">Rechazado</span>
+                                {% else %}
+                                    <span class="badge badge-gris">{{ oficio.estatus }}</span>
+                                {% endif %}
+                            </td>
+                            {# ACCIONES - BTNS #}
+                            <td class="texto-derecha">
+                                <button class="btn-accion">Ver detalles</button>
+                            </td>
+                        </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
