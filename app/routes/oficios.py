@@ -2,7 +2,11 @@ from flask import Blueprint, jsonify, redirect, render_template, request, url_fo
 from flask_login import login_required, current_user
 from app.models.catalogo import obtener_areas_activas
 from app.services.oficio_service import ServicioOficio
-from app.models.oficio import obtener_oficios_del_gestor
+from app.models.oficio import (
+    obtener_oficios_del_gestor,
+    obtener_bandeja_entrada_subdirector,
+    obtener_documentos_de_un_oficio,
+)
 
 
 # Creamos el Blueprint
@@ -20,15 +24,20 @@ def panel_control():
     if current_user.es_gestor:
         # Obtenemos los oficios del gestor para pasarselos a la tabla en su html
         mis_oficios = obtener_oficios_del_gestor(current_user.id)
-        
-        return render_template("oficios/dashboard_gestor.html",
-                               usuario=current_user,
-                               oficios = mis_oficios)
+
+        return render_template(
+            "oficios/dashboard_gestor.html", usuario=current_user, oficios=mis_oficios
+        )
 
     # 2. Verificación para SUBDIRECTOR
     elif current_user.es_subdirector:
+        # BUSCAR LOS OFICIOS DE SU AREA
+        mis_oficios = obtener_bandeja_entrada_subdirector(current_user.id_area)
+
         return render_template(
-            "oficios/dashboard_subdirector.html", usuario=current_user
+            "oficios/dashboard_subdirector.html",
+            usuario=current_user,
+            oficios=mis_oficios,
         )
 
     # 3. Verificación para JUD

@@ -1,107 +1,105 @@
 {% extends "base.html" %}
 {% block titulo %}
-    Panel del Gestor - Sistema de Oficios
+Panel del Gestor - Sistema de Oficios
 {% endblock titulo %}
 {% block css_adicional %}
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/panel.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/panel.css') }}">
 {% endblock css_adicional %}
 <!-- CONTENIDO PRINCIPAL -->
 {% block contenido_principal %}
-    <nav class="barra-navegacion">
-        <div class="marca-sistema">
-            <span>📂 Gestión de Oficios</span>
+<nav class="barra-navegacion">
+    <div class="marca-sistema">
+        <span>📂 Gestión de Oficios</span>
+    </div>
+    <div class="usuario-menu">
+        <div class="texto-usuario">
+            Hola, <strong>{{ usuario.nombre_completo }}</strong>
+            <span class="rol-usuario">(Gestor)</span>
         </div>
-        <div class="usuario-menu">
-            <div class="texto-usuario">
-                Hola, <strong>{{ usuario.nombre_completo }}</strong>
-                <span class="rol-usuario">(Gestor)</span>
-            </div>
-            <a href="{{ url_for('auth.logout') }}" class="boton-primario btn-salir">Salir</a>
+        <a href="{{ url_for('auth.logout') }}" class="boton-primario btn-salir">Salir</a>
+    </div>
+</nav>
+<div class="contenedor-principal">
+    <div class="header-seccion">
+        <div>
+            <h1 class="titulo-panel">Panel de Control</h1>
+            <p class="subtitulo-panel">Resumen de actividad reciente</p>
         </div>
-    </nav>
-    <div class="contenedor-principal">
-        <div class="header-seccion">
-            <div>
-                <h1 class="titulo-panel">Panel de Control</h1>
-                <p class="subtitulo-panel">Resumen de actividad reciente</p>
-            </div>
-            <a href="{{ url_for('oficios.crear_oficio') }}" class="boton-primario">+ Nueva Solicitud De Oficio</a>
+        <a href="{{ url_for('oficios.crear_oficio') }}" class="boton-primario">+ Nueva Solicitud De Oficio</a>
+    </div>
+    {# KPIs #}
+    <div class="grid-metricas">
+        <div class="tarjeta-metrica borde-violeta">
+            <div class="metrica-titulo">Total Enviados</div>
+            <div class="metrica-numero">0</div>
         </div>
-        {# KPIs #}
-        <div class="grid-metricas">
-            <div class="tarjeta-metrica borde-violeta">
-                <div class="metrica-titulo">Total Enviados</div>
-                <div class="metrica-numero">0</div>
-            </div>
-            <div class="tarjeta-metrica borde-naranja">
-                <div class="metrica-titulo">En Revisión</div>
-                <div class="metrica-numero">0</div>
-            </div>
-            <div class="tarjeta-metrica borde-verde">
-                <div class="metrica-titulo">Finalizados</div>
-                <div class="metrica-numero">0</div>
-            </div>
+        <div class="tarjeta-metrica borde-naranja">
+            <div class="metrica-titulo">En Revisión</div>
+            <div class="metrica-numero">0</div>
         </div>
-        <h2 class="texto-subtitulo titulo-seccion">Historial de Oficios</h2>
-        <div class="tarjeta-tabla">
-            {# TABLA CON DATOS DE LOS OFICIOS #}
-            <table class="tabla-moderna">
-                {# ENCABEZADOS #}
-                <thead>
-                    <tr>
-                        <th>Folio</th>
-                        <th>Asunto</th>
-                        <th>Destinatario</th>
-                        <th>Respuesta</th>
-                        <th>Fecha De Respuesta</th>
-                        <th>Fecha De Creación</th>
-                        <th>Estatus</th>
-                        <th>Acciones</th>
-                        <th class="texto-derecha">Acciones</th>
-                    </tr>
-                </thead>
-                {# DATOS #}
-                <tbody>
-                    {% for oficio in oficios %}
-                        <tr>
-                            {# <td>{{ oficio.id_oficio }}</td> #}
-                            <td>{{ oficio.folio_interno }}</td>
-                            <td>{{ oficio.asunto }}</td>
-                            <td>{{ oficio.destinatario }}</td>
-                            <td>{{ oficio.texto_respuesta | default('Aún no se responde', true) }}</td>
-                            <td>
-                                {% if oficio.fecha_respuesta %}
-                                    {{ oficio.fecha_respuesta.strftime("%d/%m/%Y") }}
-                                {% else %}
-                                    -
-                                {% endif %}
-                            </td>
-                            <td>{{ oficio.fecha_creacion.strftime("%d/%m/%Y") }}</td>
-                            <td>
-                                {# If para estados de la columna estatus #}
-                                {% if oficio.estatus == 'EN_REVISION' %}
-                                    <span class="badge badge-amarillo">En Revisión</span>
-                                {% elif oficio.estatus == 'ASIGNADO' %}
-                                    <span class="badge badge-azul">Asignado</span>
-                                {% elif oficio.estatus == 'ATENDIDO' %}
-                                    <span class="badge badge-azul">Atendido</span>
-                                {% elif oficio.estatus == 'FINALIZADO' %}
-                                    <span class="badge badge-verde">Finalizado</span>
-                                {% elif oficio.estatus == 'RECHAZADO' %}
-                                    <span class="badge badge-rojo">Rechazado</span>
-                                {% else %}
-                                    <span class="badge badge-gris">{{ oficio.estatus }}</span>
-                                {% endif %}
-                            </td>
-                            {# ACCIONES - BTNS #}
-                            <td class="texto-derecha">
-                                <button class="btn-accion">Ver detalles</button>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <div class="tarjeta-metrica borde-verde">
+            <div class="metrica-titulo">Finalizados</div>
+            <div class="metrica-numero">0</div>
         </div>
     </div>
+    <h2 class="texto-subtitulo titulo-seccion">Historial de Oficios</h2>
+    <div class="tarjeta-tabla">
+        {# TABLA CON DATOS DE LOS OFICIOS #}
+        <table class="tabla-moderna">
+            {# ENCABEZADOS #}
+            <thead>
+                <tr>
+                    <th>Folio</th>
+                    <th>Asunto</th>
+                    <th>Destinatario</th>
+                    <th>Respuesta</th>
+                    <th>Fecha De Respuesta</th>
+                    <th>Fecha De Creación</th>
+                    <th>Estatus</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            {# DATOS #}
+            <tbody>
+                {% for oficio in oficios %}
+                <tr>
+                    {# <td>{{ oficio.id_oficio }}</td> #}
+                    <td>{{ oficio.folio_interno }}</td>
+                    <td>{{ oficio.asunto }}</td>
+                    <td>{{ oficio.destinatario }}</td>
+                    <td>{{ oficio.texto_respuesta | default('Aún no se responde', true) }}</td>
+                    <td>
+                        {% if oficio.fecha_respuesta %}
+                        {{ oficio.fecha_respuesta.strftime("%d/%m/%Y") }}
+                        {% else %}
+                        -
+                        {% endif %}
+                    </td>
+                    <td>{{ oficio.fecha_creacion.strftime("%d/%m/%Y") }}</td>
+                    <td>
+                        {# If para estados de la columna estatus #}
+                        {% if oficio.estatus == 'EN_REVISION' %}
+                        <span class="badge badge-amarillo">En Revisión</span>
+                        {% elif oficio.estatus == 'ASIGNADO' %}
+                        <span class="badge badge-azul">Asignado</span>
+                        {% elif oficio.estatus == 'ATENDIDO' %}
+                        <span class="badge badge-azul">Atendido</span>
+                        {% elif oficio.estatus == 'FINALIZADO' %}
+                        <span class="badge badge-verde">Finalizado</span>
+                        {% elif oficio.estatus == 'RECHAZADO' %}
+                        <span class="badge badge-rojo">Rechazado</span>
+                        {% else %}
+                        <span class="badge badge-gris">{{ oficio.estatus }}</span>
+                        {% endif %}
+                    </td>
+                    {# ACCIONES - BTNS #}
+                    <td class="texto-derecha">
+                        <button class="btn-accion">Ver detalles</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endblock contenido_principal %}

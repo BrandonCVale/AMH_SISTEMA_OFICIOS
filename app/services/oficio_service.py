@@ -16,6 +16,10 @@ from app.models.oficio import (
 from app.models.usuario import obtener_subdirector_por_area
 
 
+# EXTENSIONES PERMITIDAS
+EXTENSIONES_PERMITIDAS = {"pdf", "doc", "docx", "xls", "xlsx"}
+
+
 class ServicioOficio:
 
     def procesar_nuevo_oficio(
@@ -61,6 +65,13 @@ class ServicioOficio:
 
                 # B. Guardar Archivo Principal (Físico + BD)
                 if archivo_principal:
+                    # Validamos extensión antes de guardar
+                    if not self._archivo_es_permitido(archivo_principal.filename):
+                        # Forzamos rollback manual o lanzamos excepción para que el catch la capture
+                        raise Exception(
+                            f"El archivo principal '{archivo_principal.filename}' no tiene una extensión permitida."
+                        )
+
                     # Guardamos en disco duro y obtenemos la ruta
                     ruta, nombre = self._guardar_archivo_en_disco(
                         archivo_principal, id_oficio
@@ -73,6 +84,12 @@ class ServicioOficio:
                 # C. Guardar Anexos (Físico + BD)
                 for anexo in lista_anexos:
                     if anexo.filename != "":
+                        if not self._archivo_es_permitido(anexo.filename):
+                            # Nota: Podrías decidir ignorar el archivo o cancelar todo el proceso. Aquí cancelamos todo.
+                            raise Exception(
+                                f"El anexo '{anexo.filename}' no tiene una extensión permitida."
+                            )
+
                         ruta, nombre = self._guardar_archivo_en_disco(anexo, id_oficio)
                         guardar_documento_db(
                             cursor,
@@ -133,3 +150,10 @@ class ServicioOficio:
         # Retornamos la ruta relativa para la BD (ej: uploads/45/uuid_archivo.pdf)
         ruta_bd = f"uploads/{id_oficio}/{nombre_unico}"
         return ruta_bd, nombre_seguro
+
+    def _archivo_es_permitido(self, nombre_archivo):
+        """Verifica si un archivo tiene una extensión permitida."""
+        return (
+            "." in nombre_archivo
+            and nombre_archivo.rsplit(".", 1)[1].lower() in EXTENSIONES_PERMITIDAS
+        )

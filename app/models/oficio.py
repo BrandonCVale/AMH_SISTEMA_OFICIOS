@@ -22,6 +22,7 @@ def crear_oficio_db(cursor, datos):
          id_usuario_asignado, id_area_asignada, id_estatus_actual)
         VALUES (%s, %s, %s, %s, %s, %s, %s)
     """
+    
     cursor.execute(
         sql,
         (
@@ -66,6 +67,26 @@ def registrar_historial_db(cursor, id_oficio, id_usuario, id_estatus_nuevo, come
     cursor.execute(sql, (id_oficio, id_usuario, id_estatus_nuevo, comentario))
 
 
+def obtener_documentos_de_un_oficio(id_oficio):
+    """Recupera todos los documentos de un oficio"""
+    conexion = obtener_conexion()
+
+    sql = """
+        SELECT
+            id_usuario_subio,
+            nombre_archivo_original,
+            tipo_documento,
+            fecha_subida
+            
+        FROM documentos_oficio
+        WHERE id_oficio = %s
+        ORDER BY nombre_archivo_original DESC;
+    """
+    with conexion.cursor() as cursor:
+        cursor.execute(sql, (id_oficio,))
+        return cursor.fetchall()
+
+
 def obtener_oficios_del_gestor(id_usuario_gestor):
     """Recupera todos los oficios creados por un usuario gestor"""
     conexion = obtener_conexion()
@@ -96,10 +117,41 @@ def obtener_oficios_del_gestor(id_usuario_gestor):
         WHERE o.id_usuario_creador = %s
         ORDER BY o.fecha_creacion DESC;
     """
-    
+
     with conexion.cursor() as cursor:
         cursor.execute(sql, (id_usuario_gestor,))
         return cursor.fetchall()
 
 
+def obtener_bandeja_entrada_subdirector(id_area):
+    """
+    Trae los oficios que han llegado al área del Subdirector.
+    Muestra quién lo mandó (Gestor) y cuándo.
+    """
+    conexion = obtener_conexion()
 
+    sql = """
+        SELECT
+            o.id_oficio,
+            o.descripcion_solicitud, 
+            o.fecha_creacion,
+            o.folio_interno,
+            o.asunto,
+            
+            -- ALIAS
+            u.nombre_completo AS remitente,
+            e.nombre AS estatus
+            
+        FROM oficios o
+        
+        -- UNIMOS PARA OBTENER LOS VALORES EN VEZ DE IDs
+        JOIN usuarios u ON o.id_usuario_creador = u.id_usuario
+        JOIN cat_estatus e ON o.id_estatus_actual = e.id_estatus
+        
+        WHERE o.id_area_asignada = %s
+        ORDER BY o.fecha_creacion DESC;
+    """
+
+    with conexion.cursor() as cursor:
+        cursor.execute(sql, (id_area,))
+        return cursor.fetchall()
