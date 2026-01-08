@@ -1,0 +1,51 @@
+/* app/static/css/login.css */
+
+/* 1. El Contenedor de Pantalla Completa */
+.pantalla-login {
+    display: flex;           /* Activa el modo flexible */
+    justify-content: center; /* Centra horizontalmente */
+    align-items: center;     /* Centra verticalmente */
+    min-height: 100vh;       /* Fuerza que ocupe toda la altura de la ventana */
+    background-color: #f3f4f6; /* El color de fondo gris suave */
+    padding: 20px;           /* Espacio interno para evitar bordes pegados en móviles */
+    box-sizing: border-box;  /* Asegura que el padding no aumente el tamaño total */
+}
+
+/* 2. La Tarjeta Blanca Flotante */
+.tarjeta-login {
+    background-color: white; /* Fondo blanco para la tarjeta */
+    width: 100%;             /* Ocupa todo el ancho disponible hasta el max-width */
+    max-width: 420px;        /* Ancho máximo para que no se vea gigante */
+    padding: 40px;           /* Espacio interno */
+    border-radius: 16px;     /* Bordes redondeados */
+    /* Sombra suave y moderna */
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 
+                0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    text-align: center;      /* Centra el texto y elementos inline internos */
+}
+
+/* 3. Estilos internos */
+.logo-login {
+    width: 120px;            /* Define el tamaño del logo */
+    margin-bottom: 15px;     /* Espacio debajo del logo */
+    display: inline-block;   /* Comportamiento de bloque en línea */
+}
+
+.texto-titulo {
+    font-size: 1.5rem;       /* Tamaño de fuente grande para el título */
+    font-weight: 600;        /* Grosor de fuente semi-negrita */
+    color: #111827;          /* Color de texto oscuro casi negro */
+    margin-bottom: 30px;     /* Separación con el formulario */
+}
+
+/* Botón de ancho completo */
+.btn-full {
+    width: 100%;             /* Botón que ocupa todo el ancho del contenedor */
+    margin-top: 10px;        /* Separación superior */
+    padding: 12px;           /* Relleno interno para hacerlo más clicable */
+    font-size: 1rem;         /* Tamaño de texto legible */
+}
+
+.grupo-formulario {
+    text-align: left;
+}

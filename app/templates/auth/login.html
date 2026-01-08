@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block titulo %}
+    Iniciar Sesión
+{% endblock titulo %}
+{% block css_adicional %}
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/login.css') }}">
+{% endblock css_adicional %}
+{% block contenido_principal %}
+    <div class="pantalla-login">
+        <div class="tarjeta-login">
+            <img src="{{ url_for('static', filename='img/logo_amh.png') }}"
+                 alt="Logo"
+                 class="logo-login">
+            <h1 class="texto-titulo">Iniciar Sesión</h1>
+            {% with lista_mensajes = get_flashed_messages() %}
+                {% if lista_mensajes %}
+                    {% for mensaje in lista_mensajes %}<div class="alerta alerta-advertencia">{{ mensaje }}</div>{% endfor %}
+                {% endif %}
+            {% endwith %}
+            <form method="POST">
+                <div class="grupo-formulario">
+                    <label class="etiqueta-campo">Correo institucional</label>
+                    <input type="email"
+                           name="email"
+                           class="entrada-texto"
+                           placeholder="usuario@ejemplo.gob.mx"
+                           required>
+                </div>
+                <div class="grupo-formulario">
+                    <label class="etiqueta-campo">Contraseña</label>
+                    <input type="password"
+                           name="password"
+                           class="entrada-texto"
+                           placeholder="••••••••"
+                           required>
+                </div>
+                <button type="submit" class="boton-primario btn-full">Ingresar</button>
+            </form>
+        </div>
+    </div>
+{% endblock contenido_principal %}

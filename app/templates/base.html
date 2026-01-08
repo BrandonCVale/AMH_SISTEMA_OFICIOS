@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      {% block titulo %}
+        Sistema de Oficios
+      {% endblock titulo %}
+    </title>
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/base.css') }}" />
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/normalize.css') }}" />
+    {% block css_adicional %}{% endblock css_adicional %}
+  </head>
+  <body>
+    <div class="contenedor-central">
+      {% block contenido_principal %}
+      {% endblock contenido_principal %}
+    </div>
+  </body>
+</html>

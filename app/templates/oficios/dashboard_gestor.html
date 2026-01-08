@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block titulo %}
+    Panel del Gestor - Sistema de Oficios
+{% endblock titulo %}
+{% block css_adicional %}
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/panel.css') }}">
+{% endblock css_adicional %}
+<!-- CONTENIDO PRINCIPAL -->
+{% block contenido_principal %}
+    <nav class="barra-navegacion">
+        <div class="marca-sistema">
+            <span>📂 Gestión de Oficios</span>
+        </div>
+        <div class="usuario-menu">
+            <div class="texto-usuario">
+                Hola, <strong>{{ usuario.nombre_completo }}</strong>
+                <span class="rol-usuario">(Gestor)</span>
+            </div>
+            <a href="{{ url_for('auth.logout') }}" class="boton-primario btn-salir">Salir</a>
+        </div>
+    </nav>
+    <div class="contenedor-principal">
+        <div class="header-seccion">
+            <div>
+                <h1 class="titulo-panel">Panel de Control</h1>
+                <p class="subtitulo-panel">Resumen de actividad reciente</p>
+            </div>
+            <a href="{{ url_for('oficios.crear_oficio') }}" class="boton-primario">+ Nueva Solicitud De Oficio</a>
+        </div>
+        <div class="grid-metricas">
+            <div class="tarjeta-metrica borde-violeta">
+                <div class="metrica-titulo">Total Enviados</div>
+                <div class="metrica-numero">0</div>
+            </div>
+            <div class="tarjeta-metrica borde-naranja">
+                <div class="metrica-titulo">En Revisión</div>
+                <div class="metrica-numero">0</div>
+            </div>
+            <div class="tarjeta-metrica borde-verde">
+                <div class="metrica-titulo">Finalizados</div>
+                <div class="metrica-numero">0</div>
+            </div>
+        </div>
+        <h2 class="texto-subtitulo titulo-seccion">Historial de Oficios</h2>
+        <div class="tarjeta-tabla">
+            <table class="tabla-moderna">
+                <thead>
+                    <tr>
+                        <th>Folio</th>
+                        <th>Asunto</th>
+                        <th>Área Destino</th>
+                        <th>Fecha Envío</th>
+                        <th>Estatus</th>
+                        <th class="texto-derecha">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <strong>OF-2024-001</strong>
+                        </td>
+                        <td>Solicitud de Insumos</td>
+                        <td>Recursos Materiales</td>
+                        <td>02/10/2024</td>
+                        <td>
+                            <span class="badge badge-amarillo">En Revisión</span>
+                        </td>
+                        <td class="texto-derecha">
+                            <button class="btn-accion">Ver Detalles</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock contenido_principal %}

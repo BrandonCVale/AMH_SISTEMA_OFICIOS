@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block titulo %}Nuevo Oficio - Sistema de Oficios{% endblock titulo %}
+
+{% block css_adicional %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/panel.css') }}">
+{% endblock css_adicional %}
+
+{% block contenido_principal %}
+
+<nav class="barra-navegacion">
+    <div class="marca-sistema">
+        <span>📂 Gestión de Oficios</span>
+    </div>
+    <div class="usuario-menu">
+        <div class="texto-usuario">
+            Hola, <strong>{{ usuario.nombre_completo }}</strong>
+        </div>
+        <a href="{{ url_for('oficios.panel_control') }}" class="boton-primario btn-gris">
+            Volver al Panel
+        </a>
+    </div>
+</nav>
+
+<div class="contenedor-formulario">
+
+    <div class="header-seccion">
+        <h1 class="titulo-panel">Nueva solicitud de oficio</h1>
+    </div>
+
+    <div class="tarjeta tarjeta-destacada">
+        
+        <form method="POST" enctype="multipart/form-data">
+            
+            {# --- SECCIÓN 1: ÁREA --- #}
+            <div class="grupo-formulario">
+                <label for="area_destino" class="etiqueta-campo">Área Destino (Departamento)</label>
+                <select name="id_area" id="area_destino" class="entrada-texto" required>
+                    <option value="" disabled selected>-- Seleccione un área --</option>
+                    {% for area in areas %}
+                        <option value="{{ area.id_area }}">{{ area.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            {# --- SECCIÓN 2: SUBDIRECTOR (AUTOMÁTICO) --- #}
+            <div id="datos_destinatario">
+                <span class="titulo-automatico">
+                    Datos del Subdirector
+                </span>
+
+                <div class="formulario-grid-2">
+                    <div class="grupo-formulario">
+                        <label class="etiqueta-campo">Nombre del titular</label>
+                        <input type="text" id="auto_nombre" class="entrada-texto campo-automatico" readonly>
+                    </div>
+
+                    <div class="grupo-formulario">
+                        <label class="etiqueta-campo">Puesto</label>
+                        <input type="text" id="auto_puesto" class="entrada-texto campo-automatico" readonly>
+                    </div>
+                </div>
+
+                <div class="grupo-formulario sin-margen-inferior">
+                    <label class="etiqueta-campo">Correo Electrónico</label>
+                    <input type="text" id="auto_correo" class="entrada-texto campo-automatico" readonly>
+                </div>
+            </div>
+
+            {# --- SECCIÓN 3: DATOS DEL OFICIO --- #}
+            <div class="grupo-formulario">
+                <label for="folio" class="etiqueta-campo">Folio de Oficio</label>
+                <input type="text" name="folio" id="folio" class="entrada-texto" placeholder="Ej: DGA/2024/001" required>
+            </div>
+
+            <div class="grupo-formulario">
+                <label for="asunto" class="etiqueta-campo">Asunto del Oficio</label>
+                <input type="text" name="asunto" id="asunto" class="entrada-texto" placeholder="Ej: Solicitud de requerimiento" required>
+            </div>
+
+            <div class="grupo-formulario">
+                <label for="descripcion_solicitud" class="etiqueta-campo">Descripción de la Solicitud</label>
+                <textarea name="descripcion_solicitud" id="descripcion_solicitud" rows="8" class="entrada-texto" placeholder="Describa detalladamente lo que se solicita..." required></textarea>
+            </div>
+
+            <div class="grupo-formulario">
+                <label for="archivo" class="etiqueta-campo">Documento Principal (PDF/Word/Excel)</label>
+                <input type="file" name="archivo" id="archivo" class="entrada-texto" accept=".pdf,.docx,.doc,.xls,.xlsx" required>
+                <small class="texto-ayuda">Formatos permitidos: .pdf, .docx, .xlsx (Máx 5MB)</small>
+            </div>
+
+            <div class="grupo-formulario">
+                <label>Anexos de la solicitud</label>
+                <input type="file" name="anexos" id="anexos" class="entrada-texto" accept=".pdf,.docx,.doc,.xls,.xlsx" multiple>
+                <small class="texto-ayuda">Formatos permitidos: .pdf, .docx, .xlsx (Máx 5MB)</small>
+            </div>
+
+            <hr class="separador-horizontal">
+
+            <div class="acciones-formulario">
+                <a href="{{ url_for('oficios.panel_control') }}" class="btn-cancelar">
+                    Cancelar
+                </a>
+                <button type="submit" class="boton-primario">
+                    Enviar Solicitud
+                </button>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+
+{# --- JAVASCRIPT EXTERNO --- #}
+<script src="{{ url_for('static', filename='js/formulario.js') }}"></script>
+
+{% endblock contenido_principal %}
