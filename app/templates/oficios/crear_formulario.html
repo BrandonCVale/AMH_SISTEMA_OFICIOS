@@ -3,7 +3,7 @@
 {% block titulo %}Nuevo Oficio - Sistema de Oficios{% endblock titulo %}
 
 {% block css_adicional %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/panel.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/panel.css') }}">
 {% endblock css_adicional %}
 
 {% block contenido_principal %}
@@ -29,20 +29,20 @@
     </div>
 
     <div class="tarjeta tarjeta-destacada">
-        
+
         <form method="POST" enctype="multipart/form-data">
-            
+
             {# --- SECCIÓN 1: ÁREA --- #}
             <div class="grupo-formulario">
                 <label for="area_destino" class="etiqueta-campo">Área Destino (Departamento)</label>
                 <select name="id_area" id="area_destino" class="entrada-texto" required>
                     <option value="" disabled selected>-- Seleccione un área --</option>
                     {% for area in areas %}
-                        <option value="{{ area.id_area }}">{{ area.nombre }}</option>
+                    <option value="{{ area.id_area }}">{{ area.nombre }}</option>
                     {% endfor %}
                 </select>
             </div>
-            
+
             {# --- SECCIÓN 2: SUBDIRECTOR (AUTOMÁTICO) --- #}
             <div id="datos_destinatario">
                 <span class="titulo-automatico">
@@ -68,30 +68,43 @@
             </div>
 
             {# --- SECCIÓN 3: DATOS DEL OFICIO --- #}
+            {# CORREO #}
+            <div class="grupo-formulario">
+                <label for="correo_copia" class="etiqueta-campo">Correo Adicional</label>
+                <input type="email" name="correo_copia" id="correo_copia" class="entrada-texto"
+                    placeholder="ejemplo@correo.com" required>
+                <small class="texto-ayuda">Se enviará una notificación a este correo y al Subdirector.</small>
+            </div>
+
             <div class="grupo-formulario">
                 <label for="folio" class="etiqueta-campo">Folio de Oficio</label>
-                <input type="text" name="folio" id="folio" class="entrada-texto" placeholder="Ej: DGA/2024/001" required>
+                <input type="text" name="folio" id="folio" class="entrada-texto" placeholder="Ej: DGA/2024/001"
+                    required>
             </div>
 
             <div class="grupo-formulario">
                 <label for="asunto" class="etiqueta-campo">Asunto del Oficio</label>
-                <input type="text" name="asunto" id="asunto" class="entrada-texto" placeholder="Ej: Solicitud de requerimiento" required>
+                <input type="text" name="asunto" id="asunto" class="entrada-texto"
+                    placeholder="Ej: Solicitud de requerimiento" required>
             </div>
 
             <div class="grupo-formulario">
                 <label for="descripcion_solicitud" class="etiqueta-campo">Descripción de la Solicitud</label>
-                <textarea name="descripcion_solicitud" id="descripcion_solicitud" rows="8" class="entrada-texto" placeholder="Describa detalladamente lo que se solicita..." required></textarea>
+                <textarea name="descripcion_solicitud" id="descripcion_solicitud" rows="8" class="entrada-texto"
+                    placeholder="Describa detalladamente lo que se solicita..." required></textarea>
             </div>
 
             <div class="grupo-formulario">
                 <label for="archivo" class="etiqueta-campo">Documento Principal (PDF/Word/Excel)</label>
-                <input type="file" name="archivo" id="archivo" class="entrada-texto" accept=".pdf,.docx,.doc,.xls,.xlsx" required>
+                <input type="file" name="archivo" id="archivo" class="entrada-texto" accept=".pdf,.docx,.doc,.xls,.xlsx"
+                    required>
                 <small class="texto-ayuda">Formatos permitidos: .pdf, .docx, .xlsx (Máx 5MB)</small>
             </div>
 
             <div class="grupo-formulario">
                 <label>Anexos de la solicitud</label>
-                <input type="file" name="anexos" id="anexos" class="entrada-texto" accept=".pdf,.docx,.doc,.xls,.xlsx" multiple>
+                <input type="file" name="anexos" id="anexos" class="entrada-texto" accept=".pdf,.docx,.doc,.xls,.xlsx"
+                    multiple>
                 <small class="texto-ayuda">Formatos permitidos: .pdf, .docx, .xlsx (Máx 5MB)</small>
             </div>
 
