@@ -21,6 +21,7 @@ def crear_aplicacion(nombre_configuracion="default"):
 
     # 1. Iniciamos Flask-Login y Flask_Mail
     login_manager.init_app(app)
+    mail.init_app(app)
 
 
     # 2. Registramos el Blueprint de Auth, Oficios

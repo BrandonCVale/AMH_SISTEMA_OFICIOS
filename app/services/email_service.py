@@ -26,9 +26,9 @@ def enviar_notificacion_de_nuevo_oficio(datos, correo_subdirector, correo_adicio
 
             DETALLES DEL OFICIO:
             --------------------------------------
-            Folio:    {datos['folio']}
-            Asunto:   {datos['asunto']}
-            Área:     {datos['area']}
+            Folio:    {datos['folio']}\n
+            Asunto:   {datos['asunto']}\n
+            Área:     {datos['area']}\n
             --------------------------------------
             """
             

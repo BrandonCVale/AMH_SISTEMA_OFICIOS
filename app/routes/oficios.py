@@ -64,7 +64,7 @@ def crear_oficio():
             "id_area": request.form["id_area"],
             "asunto": request.form["asunto"],
             "descripcion_solicitud": request.form["descripcion_solicitud"],
-            "correo_adicional": request.form['correo_adicional']
+            "correo_adicional": request.form["correo_adicional"],
         }
 
         # Recolectamos los archivos

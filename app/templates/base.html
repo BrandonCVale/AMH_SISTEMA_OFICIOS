@@ -12,12 +12,34 @@
           href="{{ url_for('static', filename='css/base.css') }}" />
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/normalize.css') }}" />
-    {% block css_adicional %}{% endblock css_adicional %}
+    {% block css_adicional %}
+    {% endblock css_adicional %}
   </head>
   <body>
     <div class="contenedor-central">
+      {# ALERTAS EN LA PAGINA ACTUAL #}
+      <div class="contenedor-alertas">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              {% if category == 'error' %}
+                <div class="alerta alerta-roja">
+                  <strong>Error:</strong> {{ message }}
+                </div>
+              {% elif category == 'success' %}
+                <div class="alerta alerta-verde">
+                  <strong>Éxito:</strong> {{ message }}
+                </div>
+              {% else %}
+                <div class="alerta">{{ message }}</div>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+      </div>
       {% block contenido_principal %}
       {% endblock contenido_principal %}
     </div>
+    <script src="{{ url_for('static', filename='js/notificaciones.js') }}"></script>
   </body>
 </html>
