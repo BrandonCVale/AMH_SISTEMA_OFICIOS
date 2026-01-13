@@ -4,9 +4,13 @@ from app.config import config
 from app.db import configurar_base_datos
 from flask_mail import Mail
 
+
+mail = Mail()
+
 # Inicializamos el gestor de login
 login_manager = LoginManager()
 login_manager.login_view = "auth.login"
+
 
 
 def crear_aplicacion(nombre_configuracion="default"):
@@ -17,7 +21,6 @@ def crear_aplicacion(nombre_configuracion="default"):
 
     # 1. Iniciamos Flask-Login y Flask_Mail
     login_manager.init_app(app)
-    mail = Mail(app)
 
 
     # 2. Registramos el Blueprint de Auth, Oficios

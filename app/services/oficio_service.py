@@ -15,6 +15,8 @@ from app.models.oficio import (
 )
 from app.models.usuario import obtener_subdirector_por_area
 
+from app.services.email_service import enviar_notificacion_de_nuevo_oficio
+
 
 # EXTENSIONES PERMITIDAS
 EXTENSIONES_PERMITIDAS = {"pdf", "doc", "docx", "xls", "xlsx"}
@@ -112,7 +114,30 @@ class ServicioOficio:
             # --- PASO 3: CONFIRMAR CAMBIOS (COMMIT) ---
             # Si llegamos aquí sin errores, guardamos todo permanentemente.
             conexion.commit()
-            return True, f"Oficio {folio_manual} registrado exitosamente."
+
+            try:
+                # Preparamos los datos para el email
+                datos_email = {
+                    "folio": folio_manual,
+                    "asunto": formulario["asunto"],
+                    "area": f"Area ID {formulario['id_area']}",
+                }
+                # Preparammos los correos
+                correo_sub = subdirector["correo_electronico"]
+                correo_adicional = formulario["correo_adicional"]
+
+                # Lo enviamos con la funcion del service
+                enviar_notificacion_de_nuevo_oficio(datos_email, correo_sub, correo_adicional)
+                
+                return True, f"Oficio {folio_manual} creado y notificado correctamente."
+
+            except Exception as e_mail:
+                # Si falla el correo, NO hacemos rollback (el oficio ya se guardó y es válido)
+                print(f"Oficio guardado pero falló el envío del mail: {e_mail}")
+                return (
+                    True,
+                    f"Oficio creado (Advertencia: No se pudo enviar el correo, verifique configuración).",
+                )
 
         except IntegrityError as e:
             conexion.rollback()  # ¡Deshacemos todo!
