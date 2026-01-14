@@ -155,3 +155,9 @@ def obtener_bandeja_entrada_subdirector(id_area):
     with conexion.cursor() as cursor:
         cursor.execute(sql, (id_area,))
         return cursor.fetchall()
+
+
+def obtener_oficios_por_id(id_oficio):
+    conn = obtener_conexion()
+    
+    sql = """"""

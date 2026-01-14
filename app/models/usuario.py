@@ -16,16 +16,18 @@ class Usuario(UserMixin):
         correo_electronico: str,
         id_rol: int,
         contrasena_hash: str,
+        id_area: int,
     ):
         self.id = id_usuario  # Flask-Login exige que se llame 'id'
         self.nombre_completo = nombre_completo
         self.correo_electronico = correo_electronico
         self.id_rol = id_rol
         self.contrasena_hash = contrasena_hash
+        self.id_area = id_area
 
     @property
     def es_gestor(self):
-        # Retorna True si el id_rol es 1 (Ajusta este número a tu BD)
+        # Retorna True si el id_rol es 1
         return self.id_rol == 1
 
     @property
@@ -42,7 +44,7 @@ class Usuario(UserMixin):
 def buscar_usuario_por_email(email: str) -> Optional[Usuario]:
     conexion = obtener_conexion()
     sql = """
-        SELECT id_usuario, nombre_completo, correo_electronico, id_rol, contrasena_hash 
+        SELECT id_usuario, nombre_completo, correo_electronico, id_rol, contrasena_hash, id_area
         FROM usuarios 
         WHERE correo_electronico = %s AND activo = 1
     """
@@ -58,6 +60,7 @@ def buscar_usuario_por_email(email: str) -> Optional[Usuario]:
                 datos["correo_electronico"],
                 datos["id_rol"],
                 datos["contrasena_hash"],
+                datos["id_area"],
             )
     return None
 
@@ -65,7 +68,7 @@ def buscar_usuario_por_email(email: str) -> Optional[Usuario]:
 def buscar_usuario_por_id(id_usuario: int) -> Optional[Usuario]:
     conexion = obtener_conexion()
     sql = """
-        SELECT id_usuario, nombre_completo, correo_electronico, id_rol, contrasena_hash 
+        SELECT id_usuario, nombre_completo, correo_electronico, id_rol, contrasena_hash, id_area 
         FROM usuarios 
         WHERE id_usuario = %s AND activo = 1
     """
@@ -80,6 +83,7 @@ def buscar_usuario_por_id(id_usuario: int) -> Optional[Usuario]:
                 datos["correo_electronico"],
                 datos["id_rol"],
                 datos["contrasena_hash"],
+                datos["id_area"],
             )
     return None
 
@@ -96,3 +100,31 @@ def obtener_subdirector_por_area(id_area):
     with conn.cursor() as cursor:
         cursor.execute(sql, (id_area,))
         return cursor.fetchone()
+
+
+def obtener_juds_por_area(id_area):
+    """Devuelve una lista de diccionarios con todos los usarios con rol jud,
+    que pertenezcan a un area seleccionada."""
+
+    conn = obtener_conexion()
+
+    sql = """
+    SELECT
+        u.id_usuario,
+        u.nombre_completo,
+        u.correo_electronico,
+        u.id_rol,
+        u.id_area,
+        u.activo
+    FROM
+        usuarios u
+    WHERE
+        (u.id_area = %s)
+        AND u.id_rol = 3
+        AND u.activo = 1
+    ORDER BY
+        u.nombre_completo ASC;
+    """
+    with conn.cursor() as cursor:
+        cursor.execute(sql, (id_area,))
+        return cursor.fetchall()
