@@ -241,7 +241,8 @@
 .tarjeta-destacada {
     border-top: 5px solid #4f46e5;
     /* Violeta */
-    padding-top: 25px; /* Espacio interno entre el borde de color y el contenido */
+    padding-top: 25px;
+    /* Espacio interno entre el borde de color y el contenido */
 }
 
 /* Texto pequeño de ayuda (ej: formatos permitidos) */
@@ -303,7 +304,8 @@
 
 /* La caja que contiene los datos del subdirector (inicia oculta) */
 #datos_destinatario {
-    display: none; /* Se muestra vía JS */
+    display: none;
+    /* Se muestra vía JS */
     background-color: #f9fafb;
     padding: 20px;
     border-radius: 8px;
@@ -316,7 +318,8 @@
     background-color: #f3f4f6;
     color: #6b7280;
     border-color: #e5e7eb;
-    cursor: default; /* El cursor no cambia a texto */
+    cursor: default;
+    /* El cursor no cambia a texto */
     font-weight: 500;
 }
 
@@ -329,4 +332,35 @@
     color: #4f46e5;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+}
+
+/* --- AGREGADOS PARA EL SUBDIRECTOR --- */
+
+/* Estilo tipo código para el Folio */
+.dato-folio {
+    font-family: "Courier New", Courier, monospace;
+    font-weight: 700;
+    color: #4f46e5; /* Color violeta del sistema */
+    background-color: #eef2ff;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+}
+
+/* Botón primario (Relleno de color) para acciones principales */
+.btn-primario {
+    background-color: #4f46e5;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    text-decoration: none;
+    border: 1px solid transparent;
+    transition: background 0.2s;
+    display: inline-block;
+}
+
+.btn-primario:hover {
+    background-color: #4338ca;
+    color: white;
 }

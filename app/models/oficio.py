@@ -22,7 +22,7 @@ def crear_oficio_db(cursor, datos):
          id_usuario_asignado, id_area_asignada, id_estatus_actual)
         VALUES (%s, %s, %s, %s, %s, %s, %s)
     """
-    
+
     cursor.execute(
         sql,
         (
@@ -87,6 +87,8 @@ def obtener_documentos_de_un_oficio(id_oficio):
         return cursor.fetchall()
 
 
+# MODELS QUE USA EL GESTOR
+# -- AQUI EMPIEZA
 def obtener_oficios_del_gestor(id_usuario_gestor):
     """Recupera todos los oficios creados por un usuario gestor"""
     conexion = obtener_conexion()
@@ -123,41 +125,99 @@ def obtener_oficios_del_gestor(id_usuario_gestor):
         return cursor.fetchall()
 
 
+def obtener_kpis_gestor(id_usuario):
+    """Cuenta los oficios creados por el Gestor para sus KPIs."""
+
+    conexion = obtener_conexion()
+    conteo_kpis = {"enviados": 0, "en revision": 0, "finalizados": 0, "rechazados": 0}
+
+    with conexion.cursor() as cursor:
+        # 1. Total de enviados
+        sql_enviados = """
+        SELECT
+            COUNT(*) AS total_enviados
+        FROM
+            oficios
+        WHERE
+            id_usuario_creador = %s;
+        """
+        cursor.execute(sql, (id_usuario,))
+        conteo_kpis["enviados"] = cursor.fetchone()["total_enviados"]
+
+        # 2. En revision
+        sql_en_revision = """
+        SELECT
+            COUNT (*) AS en_revision
+        FROM
+            oficios
+        WHERE
+            id_usuario_creador = %s
+            AND id_estatus_actual IN (1, 2, 3);
+        """
+        cursor.execute(sql_en_revision, (id_usuario,))
+        conteo_kpis["en revision"] = cursor.fetchone()["en_revision"]
+
+        # 3. Finalizados
+        sql_finalizados = """
+        SELECT
+            COUNT (*) AS finalizados
+        FROM
+            oficios
+        WHERE
+            id_usuario_creador = %s
+            AND id_estatus_actual = 4;
+        """
+        cursor.execute(sql_finalizados, (id_usuario,))
+        conteo_kpis["finalizados"] = cursor.fetchone()["finalizados"]
+
+        # 4. Rechazados
+        sql_rechazados = """
+        SELECT
+            COUNT (*) AS rechazados
+        FROM
+            oficios
+        WHERE
+            id_usuario_creador = %s
+            AND id_estatus_actual = 5;
+        """
+        cursor.execute(sql_rechazados, (id_usuario,))
+        conteo_kpis["rechazados"] = cursor.fetchone()["rechazados"]
+
+    return conteo_kpis
+
+
+# -- AQUI TERMINA
+
+
 def obtener_bandeja_entrada_subdirector(id_area):
     """
-    Trae los oficios que han llegado al área del Subdirector.
-    Muestra quién lo mandó (Gestor) y cuándo.
+    Devuelve una lista de dccionarios con los oficios con estatus
+    'EN REVISION' del area.
     """
     conexion = obtener_conexion()
 
     sql = """
-        SELECT
-            o.id_oficio,
-            o.descripcion_solicitud, 
-            o.fecha_creacion,
-            o.folio_interno,
-            o.asunto,
-            
-            -- ALIAS
-            u.nombre_completo AS remitente,
-            e.nombre AS estatus
-            
-        FROM oficios o
-        
-        -- UNIMOS PARA OBTENER LOS VALORES EN VEZ DE IDs
-        JOIN usuarios u ON o.id_usuario_creador = u.id_usuario
-        JOIN cat_estatus e ON o.id_estatus_actual = e.id_estatus
-        
-        WHERE o.id_area_asignada = %s
-        ORDER BY o.fecha_creacion DESC;
+    SELECT
+        o.id_oficio,
+        u.nombre_completo AS remitente,
+        o.fecha_creacion,
+        o.folio_interno,
+        o.asunto,
+        o.descripcion_solicitud,
+        e.nombre AS estatus
+    FROM
+        oficios o
+    JOIN cat_estatus e ON
+        o.id_estatus_actual = e.id_estatus
+    JOIN usuarios u ON
+        o.id_usuario_creador = u.id_usuario
+    WHERE
+        o.id_area_asignada = %s
+        AND o.id_estatus_actual = 1
+    ORDER BY
+        o.fecha_creacion ASC;
     """
 
     with conexion.cursor() as cursor:
         cursor.execute(sql, (id_area,))
         return cursor.fetchall()
-
-
-def obtener_oficios_por_id(id_oficio):
-    conn = obtener_conexion()
-    
-    sql = """"""

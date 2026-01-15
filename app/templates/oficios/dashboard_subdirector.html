@@ -1,9 +1,59 @@
 {% extends "base.html" %}
 {% block titulo %}
-    Panel Subdirector
+    Bandeja de Entrada - Subdirector
 {% endblock titulo %}
-
+{% block css_adicional %}
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/panel.css') }}">
+{% endblock css_adicional %}
 {% block contenido_principal %}
-    <h1>Bandeja de Entrada del Subdirector</h1>
-    <p>Aquí verás los oficios por asignar.</p>
+    <div class="contenedor-principal">
+        {# ENCABEZADO (Usando tus clases .header-seccion y .titulo-panel) #}
+        <div class="header-seccion">
+            <div>
+                <h1 class="titulo-panel">Bandeja de Entrada</h1>
+                <p class="subtitulo-panel">Oficios pendientes de asignación para tu área.</p>
+            </div>
+        </div>
+        {# TABLA (Usando tus clases .tarjeta-tabla y .tabla-moderna) #}
+        <div class="tarjeta-tabla">
+            <table class="tabla-moderna">
+                <thead>
+                    <tr>
+                        <th>Folio</th>
+                        <th>Remitente</th>
+                        <th>Asunto</th>
+                        <th>Fecha</th>
+                        <th class="texto-centro">Estatus</th>
+                        <th class="texto-derecha">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for oficio in oficios %}
+                        <tr>
+                            <td>
+                                <span class="dato-folio">{{ oficio.folio_interno }}</span>
+                            </td>
+                            <td>
+                                <div>{{ oficio.remitente }}</div>
+                            </td>
+                            <td>{{ oficio.asunto }}</td>
+                            <td>{{ oficio.fecha_creacion }}</td>
+                            <td class="texto-centro">
+                                <span class="badge badge-amarillo">{{ oficio.estatus }}</span>
+                            </td>
+                            <td class="texto-derecha">
+                                <a href="{{ url_for('oficios.reasignar_oficio', id_oficio=oficio.id_oficio) }}"
+                                   class="btn-primario">Revisar y Turnar</a>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="fila-vacia">No hay oficios pendientes por asignar.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 {% endblock contenido_principal %}

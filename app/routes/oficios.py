@@ -94,6 +94,12 @@ def crear_oficio():
     )
 
 
+@bp_oficios.route("/reasignar_oficio/<int:id_oficio>", methods=["GET", "POST"])
+@login_required
+def reasignar_oficio(id_oficio):
+    return f"Pantalla de revisión para el oficio ID: {id_oficio} (En construcción)"
+
+
 @bp_oficios.route("/api/subdirector/<int:id_area>")
 @login_required
 def api_obtener_subdirector(id_area):
