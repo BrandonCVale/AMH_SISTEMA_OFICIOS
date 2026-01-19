@@ -6,8 +6,11 @@ from app.models.oficio import (
     obtener_oficios_del_gestor,
     obtener_bandeja_entrada_subdirector,
     obtener_documentos_de_un_oficio,
+    obtener_kpis_gestor,
+    obtener_kpis_subdirector,
+    obtenter_los_detalles_de_un_oficio,
 )
-
+from app.models.usuario import obtener_juds_por_area
 
 # Creamos el Blueprint
 bp_oficios = Blueprint("oficios", __name__, url_prefix="/oficios")
@@ -24,20 +27,26 @@ def panel_control():
     if current_user.es_gestor:
         # Obtenemos los oficios del gestor para pasarselos a la tabla en su html
         mis_oficios = obtener_oficios_del_gestor(current_user.id)
+        mis_kpis = obtener_kpis_gestor(current_user.id)
 
         return render_template(
-            "oficios/dashboard_gestor.html", usuario=current_user, oficios=mis_oficios
+            "oficios/dashboard_gestor.html",
+            usuario=current_user,
+            oficios=mis_oficios,
+            kpis=mis_kpis,
         )
 
     # 2. Verificación para SUBDIRECTOR
     elif current_user.es_subdirector:
         # BUSCAR LOS OFICIOS DE SU AREA
         mis_oficios = obtener_bandeja_entrada_subdirector(current_user.id_area)
+        mis_kpis = obtener_kpis_subdirector(current_user.id_area)
 
         return render_template(
             "oficios/dashboard_subdirector.html",
             usuario=current_user,
             oficios=mis_oficios,
+            kpis=mis_kpis,
         )
 
     # 3. Verificación para JUD
@@ -97,7 +106,29 @@ def crear_oficio():
 @bp_oficios.route("/reasignar_oficio/<int:id_oficio>", methods=["GET", "POST"])
 @login_required
 def reasignar_oficio(id_oficio):
-    return f"Pantalla de revisión para el oficio ID: {id_oficio} (En construcción)"
+
+    # Solo los subdirectores pueden entrar
+    if not current_user.es_subdirector:
+        flash("No tienes permisos para acceder a esta zona.", "error")
+        return redirect(url_for("oficios.panel_control"))
+
+    # 1. Obtener los detalles de un oficio
+    detalles_oficio = obtenter_los_detalles_de_un_oficio(id_oficio)
+
+    if not detalles_oficio:
+        flash("El oficio no existe o no se pudo cargar.", "error")
+        return redirect(url_for("oficios.panel_control"))
+
+    # 2. Obtener a los juds del area
+    mis_juds = obtener_juds_por_area(current_user.id_area)
+
+    if not mis_juds:
+        flash("No hay JUDs registrados en tu área para asignar.", "warning")
+
+    # 3. Renderizar la plantilla
+    return render_template(
+        "oficios/revisar_asignar.html", oficio=detalles_oficio, juds=mis_juds
+    )
 
 
 @bp_oficios.route("/api/subdirector/<int:id_area>")

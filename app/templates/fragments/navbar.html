@@ -1,0 +1,22 @@
+<nav class="barra-navegacion">
+    <div class="marca-sistema">
+        <span>Gestión de Oficios</span>
+    </div>
+    <div class="usuario-menu">
+        <div class="texto-usuario">
+            Hola, <strong>{{ current_user.nombre_completo }}</strong>
+            <span class="rol-usuario">
+                {% if current_user.es_gestor %}
+                    (Gestor)
+                {% elif current_user.es_subdirector %}
+                    (Subdirector)
+                {% elif current_user.es_jud %}
+                    (JUD)
+                {% elif current_user.is_admin %}
+                    (Admin)
+                {% endif %}
+            </span>
+        </div>
+        <a href="{{ url_for('auth.logout') }}" class="boton-primario btn-salir">Salir</a>
+    </div>
+</nav>

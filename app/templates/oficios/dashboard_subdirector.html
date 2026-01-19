@@ -6,8 +6,17 @@
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/panel.css') }}">
 {% endblock css_adicional %}
+{# BODY #}
 {% block contenido_principal %}
     <div class="contenedor-principal">
+        {# KPIs #}
+        {% with
+            titulo1="Recibidos", valor1 = kpis['Recibidos'],
+            titulo2="Por Asignar", valor2 = kpis['Por Asignar'],
+            titulo3="En Proceso", valor3 = kpis['En Proceso']
+            %}
+            {% include "fragments/kpis.html" %}
+        {% endwith %}
         {# ENCABEZADO (Usando tus clases .header-seccion y .titulo-panel) #}
         <div class="header-seccion">
             <div>

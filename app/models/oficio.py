@@ -87,6 +87,35 @@ def obtener_documentos_de_un_oficio(id_oficio):
         return cursor.fetchall()
 
 
+def obtenter_los_detalles_de_un_oficio(id_oficio):
+    """Recupera todos los detalles de informacion de un oficio"""
+    conexion = obtener_conexion()
+
+    sql = """
+        SELECT
+            o.id_oficio,
+            o.folio_interno,
+            o.asunto,
+            o.descripcion_solicitud,
+            o.fecha_respuesta,
+            o.texto_respuesta,
+            -- SELECT DE LOS JOINS
+            u.nombre_completo AS destinatario,
+            ce.nombre AS estatus
+        FROM
+            oficios o
+        JOIN usuarios u ON
+            o.id_usuario_asignado = u.id_usuario
+        JOIN cat_estatus ce ON
+            o.id_estatus_actual = ce.id_estatus
+        WHERE
+            o.id_oficio = %s;
+    """
+    with conexion.cursor() as cursor:
+        cursor.execute(sql, (id_oficio,))
+        return cursor.fetchone()
+
+
 # MODELS QUE USA EL GESTOR
 # -- AQUI EMPIEZA
 def obtener_oficios_del_gestor(id_usuario_gestor):
@@ -129,7 +158,7 @@ def obtener_kpis_gestor(id_usuario):
     """Cuenta los oficios creados por el Gestor para sus KPIs."""
 
     conexion = obtener_conexion()
-    conteo_kpis = {"enviados": 0, "en revision": 0, "finalizados": 0, "rechazados": 0}
+    conteo_kpis = {"Enviados": 0, "En Revisión": 0, "Finalizados": 0}
 
     with conexion.cursor() as cursor:
         # 1. Total de enviados
@@ -141,13 +170,13 @@ def obtener_kpis_gestor(id_usuario):
         WHERE
             id_usuario_creador = %s;
         """
-        cursor.execute(sql, (id_usuario,))
-        conteo_kpis["enviados"] = cursor.fetchone()["total_enviados"]
+        cursor.execute(sql_enviados, (id_usuario,))
+        conteo_kpis["Enviados"] = cursor.fetchone()["total_enviados"]
 
         # 2. En revision
         sql_en_revision = """
         SELECT
-            COUNT (*) AS en_revision
+            COUNT(*) AS en_revision
         FROM
             oficios
         WHERE
@@ -155,12 +184,12 @@ def obtener_kpis_gestor(id_usuario):
             AND id_estatus_actual IN (1, 2, 3);
         """
         cursor.execute(sql_en_revision, (id_usuario,))
-        conteo_kpis["en revision"] = cursor.fetchone()["en_revision"]
+        conteo_kpis["En Revisión"] = cursor.fetchone()["en_revision"]
 
         # 3. Finalizados
         sql_finalizados = """
         SELECT
-            COUNT (*) AS finalizados
+            COUNT(*) AS finalizados
         FROM
             oficios
         WHERE
@@ -168,25 +197,61 @@ def obtener_kpis_gestor(id_usuario):
             AND id_estatus_actual = 4;
         """
         cursor.execute(sql_finalizados, (id_usuario,))
-        conteo_kpis["finalizados"] = cursor.fetchone()["finalizados"]
-
-        # 4. Rechazados
-        sql_rechazados = """
-        SELECT
-            COUNT (*) AS rechazados
-        FROM
-            oficios
-        WHERE
-            id_usuario_creador = %s
-            AND id_estatus_actual = 5;
-        """
-        cursor.execute(sql_rechazados, (id_usuario,))
-        conteo_kpis["rechazados"] = cursor.fetchone()["rechazados"]
+        conteo_kpis["Finalizados"] = cursor.fetchone()["finalizados"]
 
     return conteo_kpis
 
 
 # -- AQUI TERMINA
+
+
+def obtener_kpis_subdirector(id_area):
+    """Cuenta los oficios creados por el Subdirector para sus KPIs."""
+
+    conexion = obtener_conexion()
+    conteo_kpis = {"Recibidos": 0, "Por Asignar": 0, "En Proceso": 0}
+
+    with conexion.cursor() as cursor:
+        # 1. Recibidos
+        sql_recibidos = """
+        SELECT
+            COUNT(*) AS recibidos
+        FROM
+            oficios
+        WHERE
+            id_area_asignada = %s;
+        """
+        cursor.execute(sql_recibidos, (id_area,))
+        conteo_kpis["Recibidos"] = cursor.fetchone()["recibidos"]
+
+        # 2. Por asignar
+        sql_por_asignar = """
+        SELECT
+            COUNT(*) AS por_asignar
+        FROM
+            oficios
+        WHERE 
+            id_area_asignada = %s
+            AND id_estatus_actual = 1;
+        """
+
+        cursor.execute(sql_por_asignar, (id_area,))
+        conteo_kpis["Por Asignar"] = cursor.fetchone()["por_asignar"]
+
+        # 3. En Proceso
+        sql_en_proceso = """
+        SELECT
+            COUNT(*) AS en_proceso
+        FROM
+            oficios
+        WHERE
+            id_area_asignada =%s
+            AND id_estatus_actual = 2;
+        """
+        cursor.execute(sql_en_proceso, (id_area,))
+        conteo_kpis["En Proceso"] = cursor.fetchone()["en_proceso"]
+
+    return conteo_kpis
 
 
 def obtener_bandeja_entrada_subdirector(id_area):

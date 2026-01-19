@@ -16,6 +16,10 @@
     {% endblock css_adicional %}
   </head>
   <body>
+    {# CONFIGURACION DEL NAVBAR #}
+    {% if current_user.is_authenticated %}
+      {% include "fragments/navbar.html" %}
+    {% endif %}
     <div class="contenedor-central">
       {# ALERTAS EN LA PAGINA ACTUAL #}
       <div class="contenedor-alertas">

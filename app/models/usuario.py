@@ -113,17 +113,21 @@ def obtener_juds_por_area(id_area):
         u.id_usuario,
         u.nombre_completo,
         u.correo_electronico,
-        u.id_rol,
-        u.id_area,
-        u.activo
+        u.puesto,
+        u.activo,
+        -- JOINS
+        cr.nombre AS rol,
+        ca.nombre as area
     FROM
         usuarios u
+    JOIN cat_roles cr ON
+        u.id_rol = cr.id_rol
+    JOIN cat_areas ca ON
+        u.id_area = ca.id_area
     WHERE
-        (u.id_area = %s)
-        AND u.id_rol = 3
+        u.id_rol = 3
         AND u.activo = 1
-    ORDER BY
-        u.nombre_completo ASC;
+        AND u.id_area = %s;
     """
     with conn.cursor() as cursor:
         cursor.execute(sql, (id_area,))

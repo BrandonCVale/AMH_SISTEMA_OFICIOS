@@ -8,18 +8,6 @@
 {% endblock css_adicional %}
 <!-- CONTENIDO PRINCIPAL -->
 {% block contenido_principal %}
-    <nav class="barra-navegacion">
-        <div class="marca-sistema">
-            <span>📂 Gestión de Oficios</span>
-        </div>
-        <div class="usuario-menu">
-            <div class="texto-usuario">
-                Hola, <strong>{{ usuario.nombre_completo }}</strong>
-                <span class="rol-usuario">(Gestor)</span>
-            </div>
-            <a href="{{ url_for('auth.logout') }}" class="boton-primario btn-salir">Salir</a>
-        </div>
-    </nav>
     <div class="contenedor-principal">
         <div class="header-seccion">
             <div>
@@ -30,11 +18,11 @@
         </div>
         {# KPIs #}
         {% with
-            titulo1="Enviados",    valor1=kpis.enviados,
-            titulo2="En Revisión",     valor2=kpis.revision,
-            titulo3="Finalizados",     valor3=kpis.finalizados
+            titulo1="Total Enviados", valor1=kpis['Enviados'],
+            titulo2="En Revisión",    valor2=kpis['En Revisión'],
+            titulo3="Finalizados",    valor3=kpis['Finalizados']
             %}
-            {% include "fragmentos/kpis.html" %}
+            {% include "fragments/kpis.html" %}
         {% endwith %}
         <h2 class="texto-subtitulo titulo-seccion">Historial de Oficios</h2>
         <div class="tarjeta-tabla">

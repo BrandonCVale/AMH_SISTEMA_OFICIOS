@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block titulo %}
+    Revisión y Asignación
+{% endblock titulo %}
+{% block css_adicional %}
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/panel.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/detalle_oficio.css') }}">
+{% endblock css_adicional %}
+{% block contenido_principal %}
+    <div class="contenedor-principal">
+        <div class="header-detalle">
+            <div>
+                <h1 class="titulo-panel">Revisar y Turnar</h1>
+                <p class="subtitulo-panel">
+                    Folio: <span class="folio-destacado">{{ oficio.folio_interno }}</span>
+                </p>
+            </div>
+            <a href="{{ url_for('oficios.panel_control') }}" class="btn-gris">⬅ Volver al Tablero</a>
+        </div>
+        <div class="grid-detalle">
+            <div class="columna-documento">
+                <div class="tarjeta-blanca visor-documento">
+                    <h3 class="titulo-tarjeta">Documento Adjunto</h3>
+                    {% if oficio.nombre_archivo %}
+                        {% if oficio.nombre_archivo.lower().endswith('.pdf') %}
+                            <div class="contenedor-pdf">
+                                <iframe src="{{ url_for('static', filename='uploads/' + oficio.nombre_archivo) }}"
+                                        width="100%"
+                                        height="500px">
+                                </iframe>
+                            </div>
+                        {% else %}
+                            <div class="descarga-archivo">
+                                <div class="icono-archivo">📄</div>
+                                <p>Este archivo no tiene vista previa ({{ oficio.nombre_archivo }})</p>
+                                <a href="{{ url_for('static', filename='uploads/' + oficio.nombre_archivo) }}"
+                                   class="btn-primario"
+                                   download>Descargar Archivo</a>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="sin-archivo">Este oficio no tiene archivo adjunto.</div>
+                    {% endif %}
+                </div>
+                <div class="tarjeta-blanca">
+                    <h3 class="titulo-tarjeta">Detalles de la Solicitud</h3>
+                    <div class="lista-detalles">
+                        <div class="item-detalle">
+                            <strong>Remitente:</strong> {{ oficio.remitente }}
+                        </div>
+                        <div class="item-detalle">
+                            <strong>Fecha Recepción:</strong> {{ oficio.fecha_creacion }}
+                        </div>
+                        <div class="item-detalle">
+                            <strong>Asunto:</strong> {{ oficio.asunto }}
+                        </div>
+                        <div class="item-detalle descripcion-larga">
+                            <strong>Descripción:</strong>
+                            <p>{{ oficio.descripcion_solicitud }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="columna-acciones">
+                <div class="tarjeta-blanca tarjeta-destacada">
+                    <h3 class="titulo-tarjeta">Turnar a JUD</h3>
+                    <p class="texto-ayuda">Selecciona al responsable de atender este oficio.</p>
+                    <form action="{{ url_for('oficios.reasignar_oficio') }}"
+                          method="POST"
+                          id="form-asignar">
+                        <input type="hidden" name="id_oficio" value="{{ oficio.id_oficio }}">
+                        <div class="grupo-formulario">
+                            <label for="id_jud" class="etiqueta">Seleccionar JUD:</label>
+                            <select name="id_jud" id="id_jud" class="input-select" required>
+                                <option value="" disabled selected>-- Elige un JUD --</option>
+                                {% for jud in juds %}
+                                    <option value="{{ jud.id_usuario }}">{{ jud.nombre_completo }} ({{ jud.puesto }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="grupo-formulario">
+                            <label for="instrucciones" class="etiqueta">Instrucciones (Opcional):</label>
+                            <textarea name="instrucciones"
+                                      class="input-area"
+                                      rows="3"
+                                      placeholder="Ej: Atender con prioridad..."></textarea>
+                        </div>
+                        <button type="submit" class="btn-primario btn-full">Confirmar Asignación ✅</button>
+                    </form>
+                </div>
+                <div class="tarjeta-blanca">
+                    <h3 class="titulo-tarjeta">Estado Actual</h3>
+                    <div class="estado-contenedor">
+                        <span class="badge badge-grande badge-amarillo">{{ oficio.estatus }}</span>
+                    </div>
+                    <hr class="separador">
+                    <h4 class="subtitulo-pequeno">Respuesta del JUD</h4>
+                    {% if oficio.texto_respuesta %}
+                        <p class="texto-respuesta">{{ oficio.texto_respuesta }}</p>
+                        <small class="fecha-respuesta">Respondido el: {{ oficio.fecha_respuesta }}</small>
+                    {% else %}
+                        <p class="texto-gris">Aún no hay respuesta registrada.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock contenido_principal %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/asignacion.js') }}"></script>{% endblock %}
