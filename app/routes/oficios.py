@@ -112,8 +112,9 @@ def reasignar_oficio(id_oficio):
         flash("No tienes permisos para acceder a esta zona.", "error")
         return redirect(url_for("oficios.panel_control"))
 
-    # 1. Obtener los detalles de un oficio
+    # 1. Obtener los detalles y archivos de un oficio
     detalles_oficio = obtenter_los_detalles_de_un_oficio(id_oficio)
+    archivos = obtener_documentos_de_un_oficio(id_oficio)
 
     if not detalles_oficio:
         flash("El oficio no existe o no se pudo cargar.", "error")
@@ -127,7 +128,10 @@ def reasignar_oficio(id_oficio):
 
     # 3. Renderizar la plantilla
     return render_template(
-        "oficios/revisar_asignar.html", oficio=detalles_oficio, juds=mis_juds
+        "oficios/revisar_asignar.html",
+        oficio=detalles_oficio,
+        juds=mis_juds,
+        archivos_del_oficio=archivos,
     )
 
 

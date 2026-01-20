@@ -75,6 +75,7 @@ def obtener_documentos_de_un_oficio(id_oficio):
         SELECT
             id_usuario_subio,
             nombre_archivo_original,
+            ruta_almacenamiento,
             tipo_documento,
             fecha_subida
             

@@ -10,6 +10,7 @@
 {% endblock css_adicional %}
 {% block contenido_principal %}
     <div class="contenedor-principal">
+        {# 1. ENCABEZADO #}
         <div class="header-detalle">
             <div>
                 <h1 class="titulo-panel">Revisar y Turnar</h1>
@@ -17,33 +18,14 @@
                     Folio: <span class="folio-destacado">{{ oficio.folio_interno }}</span>
                 </p>
             </div>
-            <a href="{{ url_for('oficios.panel_control') }}" class="btn-gris">⬅ Volver al Tablero</a>
+            <div>
+                <a href="{{ url_for('oficios.panel_control') }}" class="btn-gris">⬅ Volver al Tablero</a>
+            </div>
         </div>
         <div class="grid-detalle">
+            {# COLUMNA IZQUIERDA #}
             <div class="columna-documento">
-                <div class="tarjeta-blanca visor-documento">
-                    <h3 class="titulo-tarjeta">Documento Adjunto</h3>
-                    {% if oficio.nombre_archivo %}
-                        {% if oficio.nombre_archivo.lower().endswith('.pdf') %}
-                            <div class="contenedor-pdf">
-                                <iframe src="{{ url_for('static', filename='uploads/' + oficio.nombre_archivo) }}"
-                                        width="100%"
-                                        height="500px">
-                                </iframe>
-                            </div>
-                        {% else %}
-                            <div class="descarga-archivo">
-                                <div class="icono-archivo">📄</div>
-                                <p>Este archivo no tiene vista previa ({{ oficio.nombre_archivo }})</p>
-                                <a href="{{ url_for('static', filename='uploads/' + oficio.nombre_archivo) }}"
-                                   class="btn-primario"
-                                   download>Descargar Archivo</a>
-                            </div>
-                        {% endif %}
-                    {% else %}
-                        <div class="sin-archivo">Este oficio no tiene archivo adjunto.</div>
-                    {% endif %}
-                </div>
+                {# 1. PRIMERO: DATOS DEL OFICIO (LO QUE PIDIÓ CAMBIAR) #}
                 <div class="tarjeta-blanca">
                     <h3 class="titulo-tarjeta">Detalles de la Solicitud</h3>
                     <div class="lista-detalles">
@@ -56,18 +38,52 @@
                         <div class="item-detalle">
                             <strong>Asunto:</strong> {{ oficio.asunto }}
                         </div>
+                        {# Descripción destacada #}
                         <div class="item-detalle descripcion-larga">
                             <strong>Descripción:</strong>
                             <p>{{ oficio.descripcion_solicitud }}</p>
                         </div>
                     </div>
                 </div>
+                {# 2. SEGUNDO: VISOR DE DOCUMENTOS #}
+                <div class="tarjeta-blanca visor-documento">
+                    <h3 class="titulo-tarjeta">Documentos Adjuntos</h3>
+                    {% if archivos_del_oficio %}
+                        {% for archivo in archivos_del_oficio %}
+                            <div class="contenedor-archivo">
+                                <p class="nombre-archivo">
+                                    <strong>{{ archivo.tipo_documento }}:</strong> {{ archivo.nombre_archivo_original }}
+                                </p>
+                                {% if archivo.nombre_archivo_original.lower().endswith('.pdf') %}
+                                    <div class="contenedor-pdf">
+                                        <iframe src="{{ url_for('static', filename=archivo.ruta_almacenamiento) }}"
+                                                width="100%"
+                                                height="500px">
+                                        </iframe>
+                                    </div>
+                                {% else %}
+                                    <div class="descarga-archivo">
+                                        <p>Este formato no tiene vista previa.</p>
+                                        <a href="{{ url_for('static', filename=archivo.ruta_almacenamiento) }}"
+                                           class="btn-primario"
+                                           download>Descargar {{ archivo.nombre_archivo_original }} ⬇️</a>
+                                    </div>
+                                {% endif %}
+                                <hr class="separador-archivos">
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="sin-archivo">Este oficio no tiene archivos adjuntos.</div>
+                    {% endif %}
+                </div>
             </div>
+            {# COLUMNA DERECHA (SIN CAMBIOS) #}
             <div class="columna-acciones">
+                {# FORMULARIO DE ASIGNACIÓN #}
                 <div class="tarjeta-blanca tarjeta-destacada">
                     <h3 class="titulo-tarjeta">Turnar a JUD</h3>
                     <p class="texto-ayuda">Selecciona al responsable de atender este oficio.</p>
-                    <form action="{{ url_for('oficios.reasignar_oficio') }}"
+                    <form action="{{ url_for('oficios.reasignar_oficio', id_oficio=oficio.id_oficio) }}"
                           method="POST"
                           id="form-asignar">
                         <input type="hidden" name="id_oficio" value="{{ oficio.id_oficio }}">
@@ -84,12 +100,13 @@
                             <label for="instrucciones" class="etiqueta">Instrucciones (Opcional):</label>
                             <textarea name="instrucciones"
                                       class="input-area"
-                                      rows="3"
+                                      rows="4"
                                       placeholder="Ej: Atender con prioridad..."></textarea>
                         </div>
-                        <button type="submit" class="btn-primario btn-full">Confirmar Asignación ✅</button>
+                        <button type="submit" class="btn-primario btn-full">Confirmar Asignación</button>
                     </form>
                 </div>
+                {# ESTADO ACTUAL #}
                 <div class="tarjeta-blanca">
                     <h3 class="titulo-tarjeta">Estado Actual</h3>
                     <div class="estado-contenedor">
