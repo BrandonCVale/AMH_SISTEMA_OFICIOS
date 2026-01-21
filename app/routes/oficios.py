@@ -9,6 +9,7 @@ from app.models.oficio import (
     obtener_kpis_gestor,
     obtener_kpis_subdirector,
     obtenter_los_detalles_de_un_oficio,
+    marcar_oficio_como_visto,
 )
 from app.models.usuario import obtener_juds_por_area
 
@@ -119,6 +120,9 @@ def reasignar_oficio(id_oficio):
     if not detalles_oficio:
         flash("El oficio no existe o no se pudo cargar.", "error")
         return redirect(url_for("oficios.panel_control"))
+
+    # Marcamos la hora de lectura (Solo si es la primera vez que lo abre)
+    marcar_oficio_como_visto(id_oficio, current_user.id)
 
     # 2. Obtener a los juds del area
     mis_juds = obtener_juds_por_area(current_user.id_area)

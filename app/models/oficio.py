@@ -55,6 +55,26 @@ def guardar_documento_db(cursor, id_oficio, id_usuario, nombre_real, ruta, tipo)
     cursor.execute(sql, (id_oficio, id_usuario, nombre_real, ruta, extension, tipo))
 
 
+def marcar_oficio_como_visto(id_oficio, id_usuario):
+    """
+    Registra la fecha y hora en que el usuario responsable abrió el oficio.
+    """
+    conexion = obtener_conexion()
+    sql = """
+        UPDATE oficios 
+        SET fecha_lectura = NOW() 
+        WHERE id_oficio = %s 
+          AND id_usuario_asignado = %s 
+          AND fecha_lectura IS NULL;
+    """
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute(sql, (id_oficio, id_usuario))
+        conexion.commit()
+    except Exception as e:
+        print(f"Error al marcar un oficio como visto: {e}")
+
+
 def registrar_historial_db(cursor, id_oficio, id_usuario, id_estatus_nuevo, comentario):
     """
     Inserta en 'historial_oficios'.
@@ -95,18 +115,23 @@ def obtenter_los_detalles_de_un_oficio(id_oficio):
     sql = """
         SELECT
             o.id_oficio,
+            ur.nombre_completo AS remitente,
             o.folio_interno,
             o.asunto,
             o.descripcion_solicitud,
             o.fecha_respuesta,
             o.texto_respuesta,
+            o.fecha_recepcion ,
+            o.fecha_lectura,
             -- SELECT DE LOS JOINS
-            u.nombre_completo AS destinatario,
+            ud.nombre_completo AS destinatario,
             ce.nombre AS estatus
         FROM
             oficios o
-        JOIN usuarios u ON
-            o.id_usuario_asignado = u.id_usuario
+        JOIN usuarios ur ON 
+            o.id_usuario_creador = ur.id_usuario
+        JOIN usuarios ud ON
+            o.id_usuario_asignado = ud.id_usuario
         JOIN cat_estatus ce ON
             o.id_estatus_actual = ce.id_estatus
         WHERE
