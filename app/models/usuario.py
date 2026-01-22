@@ -1,6 +1,7 @@
 from typing import Optional
 from flask_login import UserMixin
 from app.db import obtener_conexion
+from werkzeug.security import generate_password_hash
 
 
 class Usuario(UserMixin):
@@ -39,6 +40,116 @@ class Usuario(UserMixin):
     def es_jud(self):
         # Retorna True si el id_rol es 3
         return self.id_rol == 3
+
+    @property
+    def es_administrador(self):
+        # Retorna True si el id_rol es 4
+        return self.id_rol == 4
+
+
+# ---- INICIO DE FUNCIONES DE ADMINISTRADOR ----
+def crear_nuevo_usuario(datos):
+    """Funcion de administrador para insertar un nuevo usuario en la DB"""
+    conexion = obtener_conexion()
+
+    # Hashear la contrasena
+    hasheo = generate_password_hash(datos["contrasena_hash"])
+
+    sql = """
+    INSERT INTO usuarios
+	(nombre_completo, correo_electronico, contrasena_hash, puesto, id_rol, id_area, activo)
+    VALUES (%s, %s, %s, %s, %s, %s, 1);
+    """
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute(
+                sql,
+                (
+                    datos["nombre_completo"],
+                    datos["correo_electronico"],
+                    hasheo,
+                    datos["puesto"],
+                    datos["id_rol"],
+                    datos["id_area"],
+                ),
+            )
+        conexion.commit()
+        return True
+    except Exception as e:
+        print(f"Error al crear un nuevo usuario: {e}")
+        conexion.rollback()
+        return False
+
+
+def eliminar_usuario(id_usuario):
+    """Funcion de administrador para eliminar un usuario en la DB
+    Desactiva un usuario (Soft Delete) para no romper historiales"""
+    conexion = obtener_conexion()
+    sql = "UPDATE usuarios SET activo = 0 WHERE id_usuario = %s"
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute(sql, (id_usuario,))
+        conexion.commit()
+        return True
+    except Exception:
+        conexion.rollback()
+        return False
+
+
+def obtener_todos_los_usuarios():
+    """Funcion de administrador para obtener a los usuarios activos y mostrarlos en la tabla"""
+    conexion = obtener_conexion()
+    sql = """
+    SELECT
+        u.id_usuario ,
+        u.nombre_completo ,
+        u.correo_electronico,
+        u.puesto ,
+        cr.nombre AS rol,
+        ca.nombre AS area
+    FROM
+        usuarios u
+    JOIN cat_roles cr ON
+        u.id_rol = cr.id_rol
+    JOIN cat_areas ca ON
+        u.id_area = ca.id_area
+    WHERE
+        u.activo = 1;
+    """
+    with conexion.cursor() as cursor:
+        cursor.execute(sql)
+        return cursor.fetchall()
+
+
+def obtener_roles():
+    """Obtiene todos los roles existentes en la BD"""
+    conexion = obtener_conexion()
+    sql = """
+    SELECT
+        nombre
+    FROM
+        cat_roles;
+    """
+    with conexion.cursor() as cursor:
+        cursor.execute(sql)
+        return cursor.fetchall()
+
+
+def obtener_areas():
+    """Obtiene todas las áreas existentes en la BD"""
+    conexion = obtener_conexion()
+    sql = """
+    SELECT
+        nombre
+    FROM
+        cat_areas;
+    """
+    with conexion.cursor() as cursor:
+        cursor.execute(sql)
+        return cursor.fetchall()
+
+
+# ---- FIN DE FUNCIONES DE ADMINISTRADOR ----
 
 
 def buscar_usuario_por_email(email: str) -> Optional[Usuario]:

@@ -10,7 +10,6 @@ bp_auth = Blueprint("auth", __name__, url_prefix="/auth")
 def login():
     if request.method == "POST":
         email = request.form["email"]
-        # email = request.form.get("email")
         password = request.form["password"]
 
         servicio = ServicioAutenticacion()

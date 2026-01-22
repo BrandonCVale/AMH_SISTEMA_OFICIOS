@@ -12,7 +12,6 @@ login_manager = LoginManager()
 login_manager.login_view = "auth.login"
 
 
-
 def crear_aplicacion(nombre_configuracion="default"):
     app = Flask(__name__)
     app.config.from_object(config[nombre_configuracion])
@@ -23,13 +22,14 @@ def crear_aplicacion(nombre_configuracion="default"):
     login_manager.init_app(app)
     mail.init_app(app)
 
-
     # 2. Registramos el Blueprint de Auth, Oficios
     from app.routes.auth import bp_auth
     from app.routes.oficios import bp_oficios
+    from app.routes.admin import bp_admin
 
     app.register_blueprint(bp_auth)
     app.register_blueprint(bp_oficios)
+    app.register_blueprint(bp_admin)
 
     @app.route("/")
     def inicio():

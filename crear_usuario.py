@@ -10,7 +10,3 @@ print(f"Hash generado:\n{password_hash}")
 # Intentamos con la correcta
 es_correcta = check_password_hash(password_hash, "123")
 print(f"¿Es correcta?: {es_correcta}")  # True
-
-# Intentamos con una incorrecta
-es_incorrecta = check_password_hash(password_hash, "12345")
-print(f"¿Es correcta?: {es_incorrecta}")  # False

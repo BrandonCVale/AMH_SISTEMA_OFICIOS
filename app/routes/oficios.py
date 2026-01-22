@@ -54,6 +54,11 @@ def panel_control():
     elif current_user.es_jud:
         return render_template("oficios/dashboard_jud.html", usuario=current_user)
 
+    # 4. Verificacion para administrador
+    elif current_user.es_administrador:
+
+        return redirect(url_for("admin.panel_de_administrador"))
+
     # 4. Fallback (Por si alguien no tiene rol)
     else:
         return "Acceso no identificado", 403
