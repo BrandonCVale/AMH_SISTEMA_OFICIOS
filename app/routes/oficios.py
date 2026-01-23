@@ -10,6 +10,7 @@ from app.models.oficio import (
     obtener_kpis_subdirector,
     obtenter_los_detalles_de_un_oficio,
     marcar_oficio_como_visto,
+    asignar_oficio_a_jud_db,
 )
 from app.models.usuario import obtener_juds_por_area
 
@@ -40,8 +41,8 @@ def panel_control():
     # 2. Verificación para SUBDIRECTOR
     elif current_user.es_subdirector:
         # BUSCAR LOS OFICIOS DE SU AREA
-        mis_oficios = obtener_bandeja_entrada_subdirector(current_user.id_area)
-        mis_kpis = obtener_kpis_subdirector(current_user.id_area)
+        mis_oficios = obtener_bandeja_entrada_subdirector(current_user.id)
+        mis_kpis = obtener_kpis_subdirector(current_user.id)
 
         return render_template(
             "oficios/dashboard_subdirector.html",
@@ -131,7 +132,7 @@ def reasignar_oficio(id_oficio):
 
     # 2. Obtener a los juds del area
     mis_juds = obtener_juds_por_area(current_user.id_area)
-
+    
     if not mis_juds:
         flash("No hay JUDs registrados en tu área para asignar.", "warning")
 
@@ -142,6 +143,24 @@ def reasignar_oficio(id_oficio):
         juds=mis_juds,
         archivos_del_oficio=archivos,
     )
+
+
+@bp_oficios.route("/turnar_oficio_a_jud/<int:id_oficio>", methods=["POST"])
+@login_required
+def turnar_oficio_a_jud(id_oficio):
+    # Seguridad: Solo subdirectores
+    if not current_user.es_subdirector:
+        return redirect(url_for("oficios.panel_control"))
+
+    # Obtenemos el ID del JUD desde el <select> del formulario
+    id_jud_seleccionado = request.form.get("id_jud")
+
+    if asignar_oficio_a_jud_db(id_oficio, id_jud_seleccionado, current_user.id):
+        flash("Oficio asignado al JUD correctamente.", "success")
+    else:
+        flash("Ocurrió un error al intentar asignar el oficio.", "error")
+
+    return redirect(url_for("oficios.panel_control"))
 
 
 @bp_oficios.route("/api/subdirector/<int:id_area>")

@@ -126,6 +126,7 @@ def obtener_roles():
     conexion = obtener_conexion()
     sql = """
     SELECT
+        id_rol,
         nombre
     FROM
         cat_roles;
@@ -140,6 +141,7 @@ def obtener_areas():
     conexion = obtener_conexion()
     sql = """
     SELECT
+        id_area,
         nombre
     FROM
         cat_areas;
@@ -225,16 +227,9 @@ def obtener_juds_por_area(id_area):
         u.nombre_completo,
         u.correo_electronico,
         u.puesto,
-        u.activo,
-        -- JOINS
-        cr.nombre AS rol,
-        ca.nombre as area
+        u.activo
     FROM
         usuarios u
-    JOIN cat_roles cr ON
-        u.id_rol = cr.id_rol
-    JOIN cat_areas ca ON
-        u.id_area = ca.id_area
     WHERE
         u.id_rol = 3
         AND u.activo = 1

@@ -231,7 +231,7 @@ def obtener_kpis_gestor(id_usuario):
 # -- AQUI TERMINA
 
 
-def obtener_kpis_subdirector(id_area):
+def obtener_kpis_subdirector(id_usuario):
     """Cuenta los oficios creados por el Subdirector para sus KPIs."""
 
     conexion = obtener_conexion()
@@ -245,9 +245,9 @@ def obtener_kpis_subdirector(id_area):
         FROM
             oficios
         WHERE
-            id_area_asignada = %s;
+            id_usuario_asignado = %s;
         """
-        cursor.execute(sql_recibidos, (id_area,))
+        cursor.execute(sql_recibidos, (id_usuario,))
         conteo_kpis["Recibidos"] = cursor.fetchone()["recibidos"]
 
         # 2. Por asignar
@@ -257,11 +257,11 @@ def obtener_kpis_subdirector(id_area):
         FROM
             oficios
         WHERE 
-            id_area_asignada = %s
+            id_usuario_asignado = %s
             AND id_estatus_actual = 1;
         """
 
-        cursor.execute(sql_por_asignar, (id_area,))
+        cursor.execute(sql_por_asignar, (id_usuario,))
         conteo_kpis["Por Asignar"] = cursor.fetchone()["por_asignar"]
 
         # 3. En Proceso
@@ -271,16 +271,16 @@ def obtener_kpis_subdirector(id_area):
         FROM
             oficios
         WHERE
-            id_area_asignada =%s
+            id_usuario_asignado = %s
             AND id_estatus_actual = 2;
         """
-        cursor.execute(sql_en_proceso, (id_area,))
+        cursor.execute(sql_en_proceso, (id_usuario,))
         conteo_kpis["En Proceso"] = cursor.fetchone()["en_proceso"]
 
     return conteo_kpis
 
 
-def obtener_bandeja_entrada_subdirector(id_area):
+def obtener_bandeja_entrada_subdirector(id_usuario):
     """
     Devuelve una lista de dccionarios con los oficios con estatus
     'EN REVISION' del area.
@@ -303,12 +303,48 @@ def obtener_bandeja_entrada_subdirector(id_area):
     JOIN usuarios u ON
         o.id_usuario_creador = u.id_usuario
     WHERE
-        o.id_area_asignada = %s
+        o.id_usuario_asignado = %s
         AND o.id_estatus_actual = 1
     ORDER BY
         o.fecha_creacion ASC;
     """
 
     with conexion.cursor() as cursor:
-        cursor.execute(sql, (id_area,))
+        cursor.execute(sql, (id_usuario,))
         return cursor.fetchall()
+
+
+def asignar_oficio_a_jud_db(id_oficio, id_jud, id_subdirector):
+    """
+    Asigna el oficio a un JUD, cambia el estatus a 'En Proceso' (2)
+    y registra el historial.
+    """
+    conexion = obtener_conexion()
+    conexion.begin()
+    try:
+        with conexion.cursor() as cursor:
+            # 1. Actualizar el oficio
+            sql_update = """
+                UPDATE oficios 
+                SET id_usuario_asignado = %s, 
+                    id_estatus_actual = 2, 
+                    fecha_lectura = NULL  
+                WHERE id_oficio = %s
+            """
+            cursor.execute(sql_update, (id_jud, id_oficio))
+
+            # 2. Registrar en el historial
+            registrar_historial_db(
+                cursor,
+                id_oficio,
+                id_subdirector,
+                2,
+                "Oficio asignado al JUD para su atención.",
+            )
+
+        conexion.commit()
+        return True
+    except Exception as e:
+        print(f"Error al asignar oficio: {e}")
+        conexion.rollback()
+        return False

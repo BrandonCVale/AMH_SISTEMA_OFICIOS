@@ -11,13 +11,13 @@
 {% block contenido_principal %}
     <div class="contenedor-principal">
         <div class="header-seccion">
-            <h1 class="titulo-panel">🛡️ Panel de Administración</h1>
+            <h1 class="titulo-panel">Panel de Administración</h1>
             <p class="subtitulo-panel">Gestión de Usuarios y Accesos</p>
         </div>
         <div class="grid-admin">
             <div class="columna-formulario">
                 <div class="tarjeta-blanca">
-                    <h3 class="titulo-tarjeta">👤 Registrar Nuevo Usuario</h3>
+                    <h3 class="titulo-tarjeta">Registrar Nuevo Usuario</h3>
                     <form action="{{ url_for('admin.crear_usuario') }}"
                           method="POST"
                           autocomplete="off">
@@ -62,18 +62,18 @@
                         </div>
                         <div class="grupo-formulario">
                             <label class="etiqueta">Área Asignada:</label>
-                            <select name="id_area" class="input-select" required>
+                            <select name="id_area" class="input-select">
                                 <option value="" disabled selected>-- Selecciona un Área --</option>
                                 {% for area in areas %}<option value="{{ area.id_area }}">{{ area.nombre }}</option>{% endfor %}
                             </select>
                         </div>
-                        <button type="submit" class="btn-primario btn-full margen-superior">Guardar Usuario 💾</button>
+                        <button type="submit" class="btn-primario btn-full margen-superior">Guardar Usuario</button>
                     </form>
                 </div>
             </div>
             <div class="columna-lista">
                 <div class="tarjeta-blanca">
-                    <h3 class="titulo-tarjeta">📋 Usuarios Activos ({{ usuarios|length }})</h3>
+                    <h3 class="titulo-tarjeta">Usuarios Activos ({{ usuarios|length }})</h3>
                     <div class="table-responsive">
                         <table class="tabla-usuarios">
                             <thead>
@@ -105,7 +105,7 @@
                                                 <form action="{{ url_for('admin.eliminar_usuario', id_usuario=usuario.id_usuario) }}"
                                                       method="POST"
                                                       onsubmit="return confirm('¿Estás SEGURO de eliminar a {{ usuario.nombre_completo }}?');">
-                                                    <button type="submit" class="btn-eliminar">🗑️ Eliminar</button>
+                                                    <button type="submit" class="btn-eliminar">Eliminar</button>
                                                 </form>
                                             {% else %}
                                                 <span class="texto-gris-pequeno">(Tú)</span>
@@ -114,7 +114,7 @@
                                     </tr>
                                 {% else %}
                                     <tr>
-                                        <td colspan="4" style="text-align: center; padding: 20px;">No hay usuarios registrados.</td>
+                                        <td colspan="4">No hay usuarios registrados.</td>
                                     </tr>
                                 {% endfor %}
                             </tbody>

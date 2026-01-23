@@ -39,29 +39,41 @@ def panel_de_administrador():
 @bp_admin.route("/crear_usuario", methods=["GET", "POST"])
 @login_required
 def crear_usuario():
-    # 1. Verificar que el usuario tenga id_rol de administrador.
+    # 1. Verificar permisos
     if not current_user.es_administrador:
         flash("No tienes permisos para acceder a esta zona.", "error")
         return redirect(url_for("auth.login"))
 
-    # Si es administrador, recibimos los datos del formulario
+    # Si es POST, procesamos el formulario
     if request.method == "POST":
-        datos = {
-            "nombre_completo": request.form["nombre_completo"],
-            "correo_electronico": request.form["correo_electronico"],
-            "contrasena_hash": request.form["contrasena_hash"],
-            "puesto": request.form["puesto"],
-            "id_rol": request.form["id_rol"],
-            "id_area": request.form["id_area"],
-        }
-        # Pasarle los datos al model
-        nuevo_usuario = crear_nuevo_usuario(datos)
+        # A. Capturamos los valores (como texto)
+        rol_seleccionado = request.form.get("id_rol")
+        area_seleccionada = request.form.get("id_area")
 
-        if nuevo_usuario:
-            flash("Usuario creado correctamente.", "success")
-            return redirect(url_for("admin.crear_usuario"))
-        else:
-            flash("Error al crear el usuario.", "error")
+        if not rol_seleccionado or not area_seleccionada:
+            flash("Debes seleccionar un rol y un área válidos.", "error")
+            return redirect(url_for("admin.panel_de_administrador"))
+
+        try:
+            datos = {
+                "nombre_completo": request.form["nombre_completo"],
+                "correo_electronico": request.form["correo_electronico"],
+                "contrasena_hash": request.form["contrasena_hash"],
+                "puesto": request.form["puesto"],
+                "id_rol": int(rol_seleccionado),
+                "id_area": int(area_seleccionada),
+            }
+
+            # D. Guardar
+            if crear_nuevo_usuario(datos):
+                flash("Usuario creado correctamente.", "success")
+            else:
+                flash("Error al crear el usuario (¿Correo duplicado?).", "error")
+
+        except ValueError:
+            flash("Error técnico: Los roles o áreas no son números.", "error")
+
+    # Al final, siempre regresamos al panel principal
     return redirect(url_for("admin.panel_de_administrador"))
 
 
