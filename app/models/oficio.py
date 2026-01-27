@@ -115,6 +115,7 @@ def obtenter_los_detalles_de_un_oficio(id_oficio):
     sql = """
         SELECT
             o.id_oficio,
+            o.fecha_creacion,
             ur.nombre_completo AS remitente,
             o.folio_interno,
             o.asunto,
@@ -140,6 +141,36 @@ def obtenter_los_detalles_de_un_oficio(id_oficio):
     with conexion.cursor() as cursor:
         cursor.execute(sql, (id_oficio,))
         return cursor.fetchone()
+
+
+def obtener_historial_de_un_oficio(id_oficio):
+    """Recupera el historial de movimientos de un oficio"""
+    conexion = obtener_conexion()
+
+    sql = """
+        SELECT
+            h.id_historial,
+            h.id_oficio,
+            u.nombre_completo AS usuario_accion,
+            ce.nombre AS nuevo_estatus,
+            ce2.nombre AS estatus_anterior,
+            h.fecha_movimiento
+        FROM
+            historial_oficios h
+        JOIN usuarios u ON
+            h.id_usuario_accion = u.id_usuario
+        JOIN cat_estatus ce ON
+            ce.id_estatus = h.id_estatus_nuevo
+        LEFT JOIN cat_estatus ce2 ON
+            ce2.id_estatus = h.id_estatus_anterior
+        WHERE
+            h.id_oficio = %s
+        ORDER BY h.fecha_movimiento ASC;
+    """
+
+    with conexion.cursor() as cursor:
+        cursor.execute(sql, (id_oficio,))
+        return cursor.fetchall()
 
 
 # MODELS QUE USA EL GESTOR

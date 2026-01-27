@@ -1,0 +1,405 @@
+/* app/static/css/detalle_oficio.css */
+
+/* =========================================
+   1. MAQUETACIÓN Y GRID
+   ========================================= */
+.grid-detalle {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    /* Izquierda ancha (2 partes), Derecha angosta (1 parte) */
+    gap: 25px;
+    margin-top: 20px;
+}
+
+/* Responsivo: En celulares se vuelve una sola columna */
+@media (max-width: 900px) {
+    .grid-detalle {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* =========================================
+   2. TARJETAS Y CONTENEDORES
+   ========================================= */
+.tarjeta-blanca {
+    background-color: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    margin-bottom: 25px;
+    /* Espacio vertical entre tarjetas */
+    overflow: hidden;
+}
+
+/* Tarjeta destacada para la acción principal (ej: Formulario) */
+.tarjeta-destacada {
+    border-top: 4px solid #4f46e5;
+    /* Borde violeta superior */
+}
+
+/* =========================================
+   3. TIPOGRAFÍA Y DETALLES
+   ========================================= */
+.titulo-tarjeta {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+    color: #111827;
+    border-bottom: 1px solid #f3f4f6;
+    padding-bottom: 10px;
+}
+
+.lista-detalles {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.item-detalle {
+    font-size: 0.95rem;
+    color: #374151;
+}
+
+.item-detalle strong {
+    color: #4b5563;
+    /* Gris más oscuro para las etiquetas */
+    margin-right: 5px;
+    font-weight: 600;
+}
+
+.descripcion-larga {
+    background-color: #f9fafb;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    margin-top: 8px;
+    line-height: 1.5;
+    color: #4b5563;
+}
+
+/* =========================================
+   4. VISOR DE ARCHIVOS
+   ========================================= */
+.contenedor-archivo {
+    margin-bottom: 20px;
+}
+
+.nombre-archivo {
+    margin-bottom: 10px;
+    color: #4f46e5;
+    font-weight: 500;
+}
+
+.contenedor-pdf {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+/* Clase para controlar el iframe sin usar style inline */
+.visor-pdf {
+    width: 100%;
+    height: 500px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background-color: #f3f4f6;
+}
+
+.descarga-archivo {
+    background-color: #f3f4f6;
+    padding: 20px;
+    text-align: center;
+    border-radius: 8px;
+    border: 1px dashed #d1d5db;
+}
+
+.separador-archivos {
+    border: 0;
+    border-top: 1px dashed #e5e7eb;
+    margin: 20px 0;
+}
+
+/* =========================================
+   5. FORMULARIOS
+   ========================================= */
+.grupo-formulario {
+    margin-bottom: 15px;
+}
+
+.etiqueta {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: #374151;
+}
+
+.input-select,
+.input-area {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    background-color: #fff;
+    box-sizing: border-box;
+    /* Asegura que el padding no rompa el ancho */
+}
+
+.input-area {
+    resize: vertical;
+    /* Permite redimensionar solo verticalmente */
+    min-height: 80px;
+}
+
+.texto-ayuda {
+    color: #6b7280;
+    font-size: 0.85rem;
+    margin-bottom: 15px;
+}
+
+/* Botón ancho completo */
+.btn-full {
+    width: 100%;
+    text-align: center;
+    margin-top: 10px;
+    padding: 12px;
+    cursor: pointer;
+}
+
+/* =========================================
+   6. ESTADOS Y RESPUESTAS (Visual)
+   ========================================= */
+.badge-grande {
+    font-size: 1rem;
+    padding: 8px 16px;
+}
+
+/* Estilo para la respuesta del JUD */
+.texto-respuesta {
+    background-color: #ecfdf5;
+    /* Verde muy claro */
+    color: #065f46;
+    /* Verde oscuro texto */
+    padding: 12px;
+    border-radius: 6px;
+    border-left: 4px solid #10b981;
+    /* Borde verde izquierdo */
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+
+.titulo-automatico {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    color: #6b7280;
+    font-weight: 700;
+    margin-top: 15px;
+    margin-bottom: 5px;
+}
+
+/* =========================================
+   7. CLASES DE UTILIDAD (Para evitar style inline)
+   ========================================= */
+
+/* Centra contenido horizontalmente (usado para el badge de estado) */
+.contenido-centrado {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Mensaje cuando no hay datos */
+.fila-vacia {
+    text-align: center;
+    color: #9ca3af;
+    font-style: italic;
+    padding: 20px;
+}
+
+/* ... (MANTÉN TU CÓDIGO ANTERIOR DE GRID Y TARJETAS) ... */
+
+/* =========================================
+   8. NUEVO: ESTILOS PARA VISTA DE DETALLES
+   ========================================= */
+
+/* --- ENCABEZADO FLEXIBLE --- */
+.flex-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 600px) {
+    .flex-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+}
+
+/* --- BANNER DE ESTADO --- */
+.banner-estado {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 25px;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    border-left-width: 6px;
+    border-left-style: solid;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.badge-estado-lg {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 1rem;
+    margin-top: 5px;
+}
+
+.dato-texto {
+    font-size: 1.1rem;
+    color: #1f2937;
+}
+
+/* Colores de Borde para el Banner */
+.borde-verde {
+    border-left-color: #10b981;
+}
+
+.borde-amarillo {
+    border-left-color: #f59e0b;
+}
+
+.borde-azul {
+    border-left-color: #3b82f6;
+}
+
+/* Fondos de Badges */
+.bg-verde {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.bg-amarillo {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.bg-azul {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+/* --- LÍNEA DE TIEMPO (TIMELINE) --- */
+.timeline {
+    position: relative;
+    padding-left: 20px;
+    border-left: 2px solid #e5e7eb;
+    margin-left: 10px;
+    margin-top: 10px;
+}
+
+.evento {
+    position: relative;
+    margin-bottom: 30px;
+}
+
+/* El punto (bolita) en la línea */
+.evento::before {
+    content: '';
+    position: absolute;
+    left: -27px;
+    top: 4px;
+    width: 12px;
+    height: 12px;
+    background: #3b82f6;
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 0 0 1px #e5e7eb;
+}
+
+.fecha-evento {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    margin-bottom: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.titulo-evento {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #1f2937;
+}
+
+.detalle-evento {
+    font-size: 0.9rem;
+    color: #4b5563;
+    margin-bottom: 5px;
+}
+
+.comentario-evento {
+    font-size: 0.85rem;
+    color: #4b5563;
+    margin-top: 6px;
+    background: #f9fafb;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border-left: 3px solid #9ca3af;
+    font-style: italic;
+}
+
+/* --- TEXTOS UTILITARIOS --- */
+.texto-etiqueta {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+}
+
+.texto-gris-pequeno {
+    color: #6b7280;
+    font-size: 0.85rem;
+}
+
+.info-archivo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+    color: #374151;
+}
+
+.btn-descargar {
+    color: #4f46e5;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.btn-descargar:hover {
+    background-color: #eef2ff;
+}
+
+.item-archivo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.lista-archivos {
+    padding: 0;
+    list-style: none;
+    margin: 0;
+}

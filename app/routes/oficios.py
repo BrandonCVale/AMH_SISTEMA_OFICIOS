@@ -11,6 +11,7 @@ from app.models.oficio import (
     obtenter_los_detalles_de_un_oficio,
     marcar_oficio_como_visto,
     asignar_oficio_a_jud_db,
+    obtener_historial_de_un_oficio,
 )
 from app.models.usuario import obtener_juds_por_area
 
@@ -110,6 +111,23 @@ def crear_oficio():
     )
 
 
+@bp_oficios.route("/ver_detalles_oficio/<int:id_oficio>")
+@login_required
+def ver_detalles_oficio(id_oficio):
+    # 1. Obtener los detalles y archivos de un oficio
+    detalles = obtenter_los_detalles_de_un_oficio(id_oficio)
+    archivos = obtener_documentos_de_un_oficio(id_oficio)
+    historial = obtener_historial_de_un_oficio(id_oficio)
+
+    # 2. Renderizar la plantilla
+    return render_template(
+        "oficios/ver_detalles.html",
+        oficio=detalles,
+        archivos_del_oficio=archivos,
+        historial=historial,
+    )
+
+
 @bp_oficios.route("/reasignar_oficio/<int:id_oficio>", methods=["GET", "POST"])
 @login_required
 def reasignar_oficio(id_oficio):
@@ -132,7 +150,7 @@ def reasignar_oficio(id_oficio):
 
     # 2. Obtener a los juds del area
     mis_juds = obtener_juds_por_area(current_user.id_area)
-    
+
     if not mis_juds:
         flash("No hay JUDs registrados en tu área para asignar.", "warning")
 

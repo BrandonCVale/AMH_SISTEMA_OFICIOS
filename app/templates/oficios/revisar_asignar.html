@@ -10,12 +10,11 @@
 {% endblock css_adicional %}
 {% block contenido_principal %}
     <div class="contenedor-principal">
-        {# 1. ENCABEZADO #}
-        <div class="header-detalle">
+        <div class="header-seccion">
             <div>
                 <h1 class="titulo-panel">Revisar y Turnar</h1>
                 <p class="subtitulo-panel">
-                    Folio: <span class="folio-destacado">{{ oficio.folio_interno }}</span>
+                    Folio: <span class="dato-folio">{{ oficio.folio_interno }}</span>
                 </p>
             </div>
             <div>
@@ -23,9 +22,7 @@
             </div>
         </div>
         <div class="grid-detalle">
-            {# COLUMNA IZQUIERDA #}
             <div class="columna-documento">
-                {# 1. PRIMERO: DATOS DEL OFICIO (LO QUE PIDIÓ CAMBIAR) #}
                 <div class="tarjeta-blanca">
                     <h3 class="titulo-tarjeta">Detalles de la Solicitud</h3>
                     <div class="lista-detalles">
@@ -35,57 +32,54 @@
                         <div class="item-detalle">
                             <strong>Fecha Recepción:</strong> {{ oficio.fecha_recepcion }}
                         </div>
-                        <div class="item-detalle">
-                            <strong>Fecha y Hora en la que este oficio fue visto:</strong> {{ oficio.fecha_lectura }}
-                        </div>
+                        {% if oficio.fecha_lectura %}
+                            <div class="item-detalle">
+                                <strong>Visto por última vez:</strong> {{ oficio.fecha_lectura }}
+                            </div>
+                        {% endif %}
                         <div class="item-detalle">
                             <strong>Asunto:</strong> {{ oficio.asunto }}
                         </div>
-                        {# Descripción destacada #}
-                        <div class="item-detalle descripcion-larga">
+                        <div class="item-detalle">
                             <strong>Descripción:</strong>
-                            <p>{{ oficio.descripcion_solicitud }}</p>
+                            <div class="descripcion-larga">{{ oficio.descripcion_solicitud }}</div>
                         </div>
                     </div>
                 </div>
-                {# 2. SEGUNDO: VISOR DE DOCUMENTOS #}
                 <div class="tarjeta-blanca visor-documento">
                     <h3 class="titulo-tarjeta">Documentos Adjuntos</h3>
                     {% if archivos_del_oficio %}
                         {% for archivo in archivos_del_oficio %}
                             <div class="contenedor-archivo">
                                 <p class="nombre-archivo">
-                                    <strong>{{ archivo.tipo_documento }}:</strong> {{ archivo.nombre_archivo_original }}
+                                    <strong>Documento:</strong> {{ archivo.nombre_archivo_original }}
                                 </p>
                                 {% if archivo.nombre_archivo_original.lower().endswith('.pdf') %}
                                     <div class="contenedor-pdf">
                                         <iframe src="{{ url_for('static', filename=archivo.ruta_almacenamiento) }}"
-                                                width="100%"
-                                                height="500px">
+                                                class="visor-pdf">
                                         </iframe>
                                     </div>
                                 {% else %}
                                     <div class="descarga-archivo">
-                                        <p>Este formato no tiene vista previa.</p>
+                                        <p>Vista previa no disponible.</p>
                                         <a href="{{ url_for('static', filename=archivo.ruta_almacenamiento) }}"
                                            class="btn-primario"
-                                           download>Descargar {{ archivo.nombre_archivo_original }}</a>
+                                           download>Descargar Archivo ⬇</a>
                                     </div>
                                 {% endif %}
                                 <hr class="separador-archivos">
                             </div>
                         {% endfor %}
                     {% else %}
-                        <div class="sin-archivo">Este oficio no tiene archivos adjuntos.</div>
+                        <p class="fila-vacia">Este oficio no tiene archivos adjuntos.</p>
                     {% endif %}
                 </div>
             </div>
-            {# COLUMNA DERECHA (SIN CAMBIOS) #}
             <div class="columna-acciones">
-                {# FORMULARIO DE ASIGNACIÓN #}
                 <div class="tarjeta-blanca tarjeta-destacada">
                     <h3 class="titulo-tarjeta">Turnar a JUD</h3>
-                    <p class="texto-ayuda">Selecciona al responsable de atender este oficio.</p>
+                    <p class="texto-ayuda">Selecciona al responsable.</p>
                     <form action="{{ url_for('oficios.turnar_oficio_a_jud', id_oficio=oficio.id_oficio) }}"
                           method="POST"
                           id="form-asignar">
@@ -109,19 +103,15 @@
                         <button type="submit" class="btn-primario btn-full">Confirmar Asignación</button>
                     </form>
                 </div>
-                {# ESTADO ACTUAL #}
                 <div class="tarjeta-blanca">
                     <h3 class="titulo-tarjeta">Estado Actual</h3>
-                    <div class="estado-contenedor">
+                    <div class="contenido-centrado">
                         <span class="badge badge-grande badge-amarillo">{{ oficio.estatus }}</span>
                     </div>
-                    <hr class="separador">
-                    <h4 class="subtitulo-pequeno">Respuesta del JUD</h4>
                     {% if oficio.texto_respuesta %}
-                        <p class="texto-respuesta">{{ oficio.texto_respuesta }}</p>
-                        <small class="fecha-respuesta">Respondido el: {{ oficio.fecha_respuesta }}</small>
-                    {% else %}
-                        <p class="texto-gris">Aún no hay respuesta registrada.</p>
+                        <h4 class="titulo-automatico">Respuesta del JUD</h4>
+                        <div class="texto-respuesta">{{ oficio.texto_respuesta }}</div>
+                        <div class="rol-usuario">Respondido el: {{ oficio.fecha_respuesta }}</div>
                     {% endif %}
                 </div>
             </div>
