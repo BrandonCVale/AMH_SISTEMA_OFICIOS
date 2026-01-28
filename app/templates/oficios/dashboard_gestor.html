@@ -15,6 +15,7 @@
             </div>
             <a href="{{ url_for('oficios.crear_oficio') }}" class="btn-primario">+ Nueva Solicitud</a>
         </div>
+        {# KPIs #}
         {% with
             titulo1="Total Enviados", valor1=kpis['Enviados'],
             titulo2="En Revisión",    valor2=kpis['En Revisión'],

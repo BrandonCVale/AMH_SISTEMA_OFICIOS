@@ -12,6 +12,7 @@ from app.models.oficio import (
     marcar_oficio_como_visto,
     asignar_oficio_a_jud_db,
     obtener_historial_de_un_oficio,
+    obtener_oficios_asignados_a_un_jud,
 )
 from app.models.usuario import obtener_juds_por_area
 
@@ -54,7 +55,12 @@ def panel_control():
 
     # 3. Verificación para JUD
     elif current_user.es_jud:
-        return render_template("oficios/dashboard_jud.html", usuario=current_user)
+        # 1. Traer los oficios del jud
+        mis_oficios = obtener_oficios_asignados_a_un_jud(current_user.id)
+
+        return render_template(
+            "oficios/dashboard_jud.html", usuario=current_user, oficios=mis_oficios
+        )
 
     # 4. Verificacion para administrador
     elif current_user.es_administrador:
@@ -179,6 +185,16 @@ def turnar_oficio_a_jud(id_oficio):
         flash("Ocurrió un error al intentar asignar el oficio.", "error")
 
     return redirect(url_for("oficios.panel_control"))
+
+
+@bp_oficios.route("atender_oficio/<int:id_oficio>", methods=["GET", "POST"])
+@login_required
+def atender_oficio(id_oficio):
+    # Seguridad para que solo entren JUDs
+    if not current_user.es_jud:
+        return redirect(url_for("oficios.panel_control"))
+
+    return render_template("oficios/atender.html", id_oficio=id_oficio)
 
 
 @bp_oficios.route("/api/subdirector/<int:id_area>")

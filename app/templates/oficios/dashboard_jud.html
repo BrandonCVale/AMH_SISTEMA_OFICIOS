@@ -1,9 +1,56 @@
 {% extends "base.html" %}
 {% block titulo %}
-    Panel JUD
+    Pandel JUD
 {% endblock titulo %}
-
+{% block css_adicional %}
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/panel.css') }}">
+{% endblock css_adicional %}
 {% block contenido_principal %}
-    <h1>Mis Tareas Asignadas (JUD)</h1>
-    <p>Aquí verás los oficios que debes responder.</p>
+    <div class="contenedor-principal">
+        <div class="header-seccion">
+            <div>
+                <h1 class="titulo-panel">Mis asignaciones</h1>
+                <p class="subtitulo-panel">Oficios asignados para su atencion</p>
+            </div>
+        </div>
+        {# KPIs -- INICIO #}
+        {% with
+            titulo1="Pendientes",
+            titulo2="Atendidos"
+            %}
+            {% include "fragments/kpis.html" %}
+        {% endwith %}
+        {# KPIs -- FIN#}
+        {# TABLA -- INICIO#}
+        <h2 class="titulo-seccion">Oficios</h2>
+        <div class="tarjeta-tabla">
+            <table class="tabla-moderna">
+                <thead>
+                    <tr>
+                        <th>Folio</th>
+                        <th>Asunto</th>
+                        <th>Descripcion</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for oficio in oficios %}
+                        <tr>
+                            <td>
+                                <span class="dato-folio">{{ oficio.folio_interno }}</span>
+                            </td>
+                            <td>{{ oficio.asunto }}</td>
+                            <td>{{ oficio.descripcion_solicitud }}</td>
+                            <td>
+                                <a href="{{ url_for('oficios.atender_oficio', id_oficio=oficio.id_oficio) }}"
+                                   class="btn-accion">Atender</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {# TABLA -- FIN#}
+    </div>
 {% endblock contenido_principal %}

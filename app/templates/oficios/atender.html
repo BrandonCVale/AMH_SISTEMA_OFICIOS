@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block titulo %}
+    Atender Oficio
+{% endblock titulo %}
+{% block css_adicional %}
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/panel.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/detalle_oficio.css') }}">
+{% endblock css_adicional %}
+{% block contenido_principal %}
+    <div class="contenedor-principal">
+        <div class="header-seccion">
+            <h1 class="titulo-panel">Atender Oficio</h1>
+            
+        </div>
+    </div>
+{% endblock contenido_principal %}

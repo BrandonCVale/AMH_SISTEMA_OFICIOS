@@ -311,6 +311,32 @@ def obtener_kpis_subdirector(id_usuario):
     return conteo_kpis
 
 
+def obtener_kpis_jud(id_usuario):
+    """Cuenta los oficios del JUD para sus KPIs."""
+    conexion = obtener_conexion()
+    conteo_kpis = {"Pendientes": 0, "Atendidos": 0}
+
+    with conexion.cursor() as cursor:
+        # 1. Pendientes
+        sql_pendientes = """
+        SELECT
+            COUNT(*) AS pendientes
+        FROM
+            oficios o
+        WHERE
+            o.id_usuario_asignado = %s;
+        """
+        cursor.execute(sql_pendientes, (id_usuario,))
+        conteo_kpis["Pendientes"] = cursor.fetchone()["pendientes"]
+
+        # 2. Atendidos
+        sql_atendidos = """
+        
+        """
+
+        return conteo_kpis
+
+
 def obtener_bandeja_entrada_subdirector(id_usuario):
     """
     Devuelve una lista de dccionarios con los oficios con estatus
@@ -379,3 +405,26 @@ def asignar_oficio_a_jud_db(id_oficio, id_jud, id_subdirector):
         print(f"Error al asignar oficio: {e}")
         conexion.rollback()
         return False
+
+
+def obtener_oficios_asignados_a_un_jud(id_jud):
+    """Recupera todos los oficios asignados a un JUD"""
+    conexion = obtener_conexion()
+
+    sql = """
+        SELECT
+            o.id_oficio ,
+            o.folio_interno ,
+            o.asunto ,
+            o.descripcion_solicitud
+        FROM
+            oficios o
+        WHERE
+            o.id_usuario_asignado = %s
+        ORDER BY
+            o.fecha_recepcion DESC;
+    """
+
+    with conexion.cursor() as cursor:
+        cursor.execute(sql, (id_jud,))
+        return cursor.fetchall()
