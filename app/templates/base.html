@@ -45,5 +45,7 @@
       {% endblock contenido_principal %}
     </div>
     <script src="{{ url_for('static', filename='js/notificaciones.js') }}"></script>
+    {% block script_adicional %}
+    {% endblock script_adicional %}
   </body>
 </html>
