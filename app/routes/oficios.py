@@ -194,7 +194,7 @@ def atender_oficio(id_oficio):
     if not current_user.es_jud:
         return redirect(url_for("oficios.panel_control"))
 
-    return render_template("oficios/atender.html", id_oficio=id_oficio)
+    return render_template("oficios/atender.html", id_oficio=id_oficio, oficio=[])
 
 
 @bp_oficios.route("/api/subdirector/<int:id_area>")
