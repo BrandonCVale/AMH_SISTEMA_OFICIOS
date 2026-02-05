@@ -7,6 +7,8 @@ from app.models.usuario import (
     obtener_roles,
     obtener_areas,
 )
+from app.models.oficio import obtener_todos_los_oficios_admin
+from app.services.oficio_service import ServicioOficio
 
 # Creamos el Blueprint
 bp_admin = Blueprint("admin", __name__, url_prefix="/admin")
@@ -25,6 +27,7 @@ def panel_de_administrador():
     lista_usuarios = obtener_todos_los_usuarios()
     lista_roles = obtener_roles()
     lista_areas = obtener_areas()
+    lista_oficios = obtener_todos_los_oficios_admin()
 
     # 3. Las enviamos al html
     return render_template(
@@ -32,6 +35,7 @@ def panel_de_administrador():
         usuarios=lista_usuarios,
         roles=lista_roles,
         areas=lista_areas,
+        oficios=lista_oficios
     )
 
 
@@ -92,4 +96,21 @@ def eliminar_usuario(id_usuario):
             return redirect(url_for("admin.panel_de_administrador"))
         else:
             flash("Error al eliminar el usuario.", "error")
+    return redirect(url_for("admin.panel_de_administrador"))
+
+
+@bp_admin.route("/eliminar_oficio/<int:id_oficio>", methods=["POST"])
+@login_required
+def eliminar_oficio(id_oficio):
+    if not current_user.es_administrador:
+        return redirect(url_for("auth.login"))
+    
+    servicio = ServicioOficio()
+    exito, mensaje = servicio.eliminar_oficio_total(id_oficio)
+    
+    if exito:
+        flash(mensaje, "success")
+    else:
+        flash(mensaje, "error")
+        
     return redirect(url_for("admin.panel_de_administrador"))

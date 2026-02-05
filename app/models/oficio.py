@@ -124,6 +124,7 @@ def obtenter_los_detalles_de_un_oficio(id_oficio):
             o.texto_respuesta,
             o.fecha_recepcion ,
             o.fecha_lectura,
+            o.instrucciones_subdirector,
             -- SELECT DE LOS JOINS
             ud.nombre_completo AS destinatario,
             ce.nombre AS estatus
@@ -165,7 +166,7 @@ def obtener_historial_de_un_oficio(id_oficio):
             ce2.id_estatus = h.id_estatus_anterior
         WHERE
             h.id_oficio = %s
-        ORDER BY h.fecha_movimiento ASC;
+        ORDER BY h.fecha_movimiento DESC;
     """
 
     with conexion.cursor() as cursor:
@@ -371,7 +372,7 @@ def obtener_bandeja_entrada_subdirector(id_usuario):
         return cursor.fetchall()
 
 
-def asignar_oficio_a_jud_db(id_oficio, id_jud, id_subdirector):
+def asignar_oficio_a_jud_db(id_oficio, id_jud, id_subdirector, instrucciones):
     """
     Asigna el oficio a un JUD, cambia el estatus a 'En Proceso' (2)
     y registra el historial.
@@ -385,10 +386,11 @@ def asignar_oficio_a_jud_db(id_oficio, id_jud, id_subdirector):
                 UPDATE oficios 
                 SET id_usuario_asignado = %s, 
                     id_estatus_actual = 2, 
-                    fecha_lectura = NULL  
+                    fecha_lectura = NULL,
+                    instrucciones_subdirector = %s
                 WHERE id_oficio = %s
             """
-            cursor.execute(sql_update, (id_jud, id_oficio))
+            cursor.execute(sql_update, (id_jud, instrucciones, id_oficio))
 
             # 2. Registrar en el historial
             registrar_historial_db(
@@ -428,3 +430,46 @@ def obtener_oficios_asignados_a_un_jud(id_jud):
     with conexion.cursor() as cursor:
         cursor.execute(sql, (id_jud,))
         return cursor.fetchall()
+
+
+def actualizar_respuesta_oficio_db(cursor, id_oficio, texto_respuesta):
+    """Actualiza el oficio con la respuesta del JUD y lo finaliza (Estatus 4)"""
+    sql = """
+        UPDATE oficios
+        SET texto_respuesta = %s,
+            fecha_respuesta = NOW(),
+            id_estatus_actual = 4
+        WHERE id_oficio = %s
+    """
+    cursor.execute(sql, (texto_respuesta, id_oficio))
+
+
+# --- FUNCIONES PARA EL ADMINISTRADOR ---
+def obtener_todos_los_oficios_admin():
+    """Obtiene un resumen de todos los oficios para el panel de admin"""
+    conexion = obtener_conexion()
+    sql = """
+        SELECT o.id_oficio, o.folio_interno, o.asunto, o.fecha_creacion, 
+               ce.nombre as estatus, u.nombre_completo as creador
+        FROM oficios o
+        JOIN cat_estatus ce ON o.id_estatus_actual = ce.id_estatus
+        JOIN usuarios u ON o.id_usuario_creador = u.id_usuario
+        ORDER BY o.fecha_creacion DESC
+        LIMIT 100; -- Limitamos a 100 para no saturar la vista
+    """
+    with conexion.cursor() as cursor:
+        cursor.execute(sql)
+        return cursor.fetchall()
+
+
+def eliminar_oficio_db(cursor, id_oficio):
+    """
+    Elimina físicamente el registro del oficio y sus dependencias.
+    Se debe ejecutar dentro de una transacción.
+    """
+    # 1. Eliminar historial
+    cursor.execute("DELETE FROM historial_oficios WHERE id_oficio = %s", (id_oficio,))
+    # 2. Eliminar registros de documentos (los archivos físicos los borra el service)
+    cursor.execute("DELETE FROM documentos_oficio WHERE id_oficio = %s", (id_oficio,))
+    # 3. Eliminar el oficio
+    cursor.execute("DELETE FROM oficios WHERE id_oficio = %s", (id_oficio,))

@@ -1,5 +1,6 @@
 import os
 import uuid
+import shutil
 from werkzeug.utils import secure_filename
 from flask import current_app
 
@@ -12,6 +13,8 @@ from app.models.oficio import (
     crear_oficio_db,
     guardar_documento_db,
     registrar_historial_db,
+    actualizar_respuesta_oficio_db,
+    eliminar_oficio_db,
 )
 from app.models.usuario import obtener_subdirector_por_area
 
@@ -127,8 +130,10 @@ class ServicioOficio:
                 correo_adicional = formulario["correo_adicional"]
 
                 # Lo enviamos con la funcion del service
-                enviar_notificacion_de_nuevo_oficio(datos_email, correo_sub, correo_adicional)
-                
+                enviar_notificacion_de_nuevo_oficio(
+                    datos_email, correo_sub, correo_adicional
+                )
+
                 return True, f"Oficio {folio_manual} creado y notificado correctamente."
 
             except Exception as e_mail:
@@ -154,6 +159,71 @@ class ServicioOficio:
             # Usamos el logger de Flask en lugar de print para entornos de producción
             current_app.logger.error(f"Error crítico en procesar_nuevo_oficio: {e}")
             return False, f"Error interno: {str(e)}"
+
+    def procesar_respuesta_jud(self, id_oficio, id_usuario, texto_respuesta, archivo):
+        """
+        Procesa la respuesta de un JUD: guarda texto, archivo y actualiza estatus.
+        """
+        conexion = obtener_conexion()
+        
+        try:
+            with conexion.cursor() as cursor:
+                # 1. Actualizar el oficio (Texto y Estatus a Finalizado)
+                actualizar_respuesta_oficio_db(cursor, id_oficio, texto_respuesta)
+
+                # 2. Guardar Archivo de Respuesta (Si existe)
+                if archivo and archivo.filename != "":
+                    if not self._archivo_es_permitido(archivo.filename):
+                        raise Exception(
+                            f"El archivo '{archivo.filename}' no es válido."
+                        )
+
+                    # Reutilizamos tu lógica privada existente
+                    ruta, nombre = self._guardar_archivo_en_disco(archivo, id_oficio)
+
+                    # Reutilizamos la función del modelo que preguntaste
+                    guardar_documento_db(
+                        cursor, id_oficio, id_usuario, nombre, ruta, "RESPUESTA_OFICIAL"
+                    )
+
+                # 3. Historial
+                registrar_historial_db(
+                    cursor,
+                    id_oficio,
+                    id_usuario,
+                    4,
+                    "Oficio atendido y finalizado por el JUD.",
+                )
+
+            conexion.commit()
+            return True, "Respuesta enviada correctamente."
+
+        except Exception as e:
+            conexion.rollback()
+            current_app.logger.error(f"Error al responder oficio {id_oficio}: {e}")
+            return False, f"Error al guardar respuesta: {str(e)}"
+
+    def eliminar_oficio_total(self, id_oficio):
+        """
+        ADMIN: Elimina un oficio de la BD y borra su carpeta de archivos.
+        """
+        conexion = obtener_conexion()
+        conexion.begin()
+        try:
+            with conexion.cursor() as cursor:
+                # 1. Borrar de la BD
+                eliminar_oficio_db(cursor, id_oficio)
+            
+            # 2. Borrar carpeta física (static/uploads/{id_oficio})
+            carpeta_destino = os.path.join(current_app.root_path, "static", "uploads", str(id_oficio))
+            if os.path.exists(carpeta_destino):
+                shutil.rmtree(carpeta_destino) # Borra carpeta y contenido
+
+            conexion.commit()
+            return True, "Oficio y archivos eliminados correctamente."
+        except Exception as e:
+            conexion.rollback()
+            return False, f"Error al eliminar oficio: {str(e)}"
 
     def _guardar_archivo_en_disco(self, archivo, id_oficio):
         """

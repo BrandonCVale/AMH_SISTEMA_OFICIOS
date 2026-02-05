@@ -24,71 +24,94 @@
         </div>
         {# Header fin #}
         {# Datos de la solicitud inicio #}
-        <div class="tarjeta-blanca">
-            <h3 class="titulo-tarjeta">Datos de la solicitud</h3>
-            <div class="lista-detalles">
-                <div class="item-detalle">
-                    <strong>Fecha asignacion: {{ oficio.fecha_asignacion }}</strong>
+        <div class="tarjeta-contenido">
+            <h3 class="titulo-tarjeta">Detalles de la Solicitud</h3>
+            
+            <div class="grid-detalles">
+                <div class="detalle-grupo">
+                    <label>Fecha de creación</label>
+                    <p>{{ oficio.fecha_creacion }}</p>
                 </div>
-                <div class="item-detalle">
-                    <strong>Remitente: {{ oficio.remitente }}</strong>
+                <div class="detalle-grupo">
+                    <label>Remitente</label>
+                    <p>{{ oficio.remitente }}</p>
                 </div>
-                <div class="item-detalle">
-                    <strong>Asunto: {{ oficio.asunto }}</strong>
+                <div class="detalle-grupo">
+                    <label>Asunto</label>
+                    <p>{{ oficio.asunto }}</p>
+                </div>
+            </div>
+
+            <div class="detalle-grupo" style="margin-top: 20px;">
+                <label>Descripción del Oficio</label>
+                <div class="caja-descripcion">
+                    {% if oficio.descripcion_solicitud %}
+                        {{ oficio.descripcion_solicitud }}
+                    {% else %}
+                        <span class="texto-ayuda">Sin descripción disponible.</span>
+                    {% endif %}
                 </div>
             </div>
         </div>
         {# Datos de la solicitud fin#}
-        {# Descripcion inicio #}
-        <div class="tarjeta-blanca">
-            <div class="columna-documento">
-                <div class="tarjeta-blanca tarjeta-instruccion">
-                    <h3 class="titulo-tarjeta titulo-azul">Descripcion del oficio</h3>
-                    <div class="caja-instruccion">
-                        {% if oficio.descripcion_solicitud %}
-                            {{ oficio.descripcion_solicitud }}
-                        {% else %}
-                            Habla con la persona que te asigno este oficio para aclarlo
-                        {% endif %}
-                    </div>
-                </div>
+        {# Instrucciones de mi subdirector inicio #}
+        <div class="tarjeta-contenido">
+            <h3 class="titulo-tarjeta">Instrucciones de mi subdirector</h3>
+            <div class="caja-descripcion">
+                {% if oficio.instrucciones_subdirector %}
+                    {{ oficio.instrucciones_subdirector }}
+                {% else %}
+                    <span class="texto-ayuda">Sin instrucciones disponibles.</span>
+                {% endif %}
             </div>
         </div>
-        {# Descripcion fin #}
+        
+        {# Instrucciones de mi subdirector fin #}
+
+
+        
         {# Documentos adjuntos inicio #}
-        <div class="tarjeta-blanca">
+        <div class="tarjeta-contenido">
             <h3 class="titulo-tarjeta">Documentos Adjuntos</h3>
             {% if documentos %}
-                <ul class="lista-archivos">
+                <table class="tabla-moderna">
                     {% for documento in documentos %}
-                        <li class="lista-archivos">
-                            <div class="info-archivo">
-                                <span>{{ documento.nombre_archivo_original }}</span>
-                            </div>
-                            <a href="{{ url_for('oficios.ver_detalles_oficio', filename = documento.nombre_archivo_original) }}"
-                               class="btn-descargar">Ver</a>
-                        </li>
+                        <tr>
+                            <td>{{ documento.nombre_archivo_original }}</td>
+                            <td class="texto-derecha">
+                            <a href="{{ url_for('static', filename=documento.ruta_almacenamiento) }}" target="_blank"
+                               class="btn-accion">Ver Documento</a>
+                            </td>
+                        </tr>
                     {% endfor %}
-                </ul>
+                </table>
             {% else %}
                 <p class="fila-vacia">Este oficio no tiene archivos adjuntos.</p>
             {% endif %}
         </div>
         {# Documentos adjuntos fin#}
+
         {# Mi respuesta inicio #}
-        <div class="tarjeta-blanca">
+        <div class="tarjeta-contenido tarjeta-destacada">
             <h3 class="titulo-tarjeta">Mi respuesta</h3>
-            <textarea name="texto_respuesta" rows="5" cols="120"></textarea>
-            <small class="texto-ayuda">Adjunta tu documento en PDF</small>
-            <input type="file"
-                   name="archivo"
-                   id="archivo"
-                   class="entrada-texto"
-                   accept=".pdf">
-            {# Mi respuesta fin#}
-            {# Boton enviar inicio #}
-            <button type="submit" class="btn-secundario">Enviar Respuesta</button>
-            {# Boton enviar fin #}
+            <form method="POST" enctype="multipart/form-data">
+                <div style="margin-bottom: 20px;">
+                    <label class="detalle-grupo"><label>Comentarios / Resolución</label></label>
+                    <textarea name="texto_respuesta" rows="6" class="form-control" placeholder="Escribe aquí la resolución del oficio..." required></textarea>
+                </div>
+                
+                <div class="input-archivo-wrapper">
+                    <label class="detalle-grupo"><label>Adjuntar Oficio de Respuesta (PDF)</label></label>
+                    <input type="file" name="archivo" id="archivo" class="form-control" accept=".pdf" required>
+                </div>
+
+                {# Mi respuesta fin#}
+                {# Boton enviar inicio #}
+                <div class="acciones-formulario">
+                    <button type="submit" class="btn-primario">Enviar y Finalizar</button>
+                </div>
+                {# Boton enviar fin #}
+            </form>
         </div>
     </div>
 {% endblock contenido_principal %}

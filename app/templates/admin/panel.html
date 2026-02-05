@@ -121,6 +121,42 @@
                         </table>
                     </div>
                 </div>
+
+                {# SECCIÓN DE OFICIOS (NUEVO) #}
+                <div class="tarjeta-blanca">
+                    <h3 class="titulo-tarjeta">Gestión de Oficios (Últimos 100)</h3>
+                    <div class="table-responsive">
+                        <table class="tabla-usuarios">
+                            <thead>
+                                <tr>
+                                    <th>Folio</th>
+                                    <th>Asunto / Creador</th>
+                                    <th>Estatus</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for oficio in oficios %}
+                                    <tr>
+                                        <td><span class="dato-folio">{{ oficio.folio_interno }}</span></td>
+                                        <td>
+                                            <strong>{{ oficio.asunto }}</strong><br>
+                                            <small class="texto-gris-pequeno">{{ oficio.creador }}</small>
+                                        </td>
+                                        <td>{{ oficio.estatus }}</td>
+                                        <td>
+                                            <form action="{{ url_for('admin.eliminar_oficio', id_oficio=oficio.id_oficio) }}" method="POST" onsubmit="return confirm('¡CUIDADO! Esto borrará el oficio, sus archivos y su historial permanentemente. ¿Continuar?');">
+                                                <button type="submit" class="btn-eliminar">Eliminar</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr><td colspan="4" class="fila-vacia">No hay oficios registrados.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

@@ -1,0 +1,179 @@
+/* app/static/css/admin_usuarios.css */
+
+/* =========================================
+   1. LAYOUT PRINCIPAL (GRID)
+   ========================================= */
+.grid-admin {
+    display: grid;
+    grid-template-columns: 350px 1fr; /* Columna fija para form, resto para tabla */
+    gap: 30px;
+    align-items: start; /* Alineación superior */
+}
+
+/* Responsivo: En tablets/móviles se hace una sola columna */
+@media (max-width: 1024px) {
+    .grid-admin {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* =========================================
+   2. TARJETAS Y CONTENEDORES
+   ========================================= */
+.tarjeta-blanca {
+    background-color: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+}
+
+.titulo-tarjeta {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+    color: #111827;
+    border-bottom: 1px solid #f3f4f6;
+    padding-bottom: 10px;
+    font-weight: 700;
+}
+
+/* =========================================
+   3. FORMULARIO DE REGISTRO
+   ========================================= */
+.grupo-formulario {
+    margin-bottom: 15px;
+}
+
+.etiqueta {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #374151;
+}
+
+.input-select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    color: #1f2937;
+    background-color: #fff;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input-select:focus {
+    outline: none;
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.margen-superior {
+    margin-top: 20px;
+}
+
+.btn-full {
+    width: 100%;
+    display: block;
+    text-align: center;
+}
+
+/* =========================================
+   4. TABLA DE USUARIOS
+   ========================================= */
+.table-responsive {
+    overflow-x: auto; /* Scroll horizontal si es necesario */
+}
+
+.tabla-usuarios {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 700px; /* Ancho mínimo para evitar deformaciones */
+}
+
+.tabla-usuarios th {
+    text-align: left;
+    padding: 12px 15px;
+    background-color: #f9fafb;
+    color: #6b7280;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.tabla-usuarios td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #f3f4f6;
+    vertical-align: middle;
+    color: #374151;
+    font-size: 0.9rem;
+}
+
+.tabla-usuarios tr:hover {
+    background-color: #f9fafb;
+}
+
+/* =========================================
+   5. BADGES (ETIQUETAS DE ROL)
+   ========================================= */
+.badge-rol {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    letter-spacing: 0.5px;
+}
+
+/* Colores específicos por rol */
+.rol-gestor {
+    background-color: #e0f2fe; /* Azul muy claro */
+    color: #0284c7;            /* Azul fuerte */
+}
+
+.rol-subdirector {
+    background-color: #ffedd5; /* Naranja muy claro */
+    color: #c2410c;            /* Naranja fuerte */
+}
+
+.rol-jud {
+    background-color: #dcfce7; /* Verde muy claro */
+    color: #15803d;            /* Verde fuerte */
+}
+
+.rol-admin {
+    background-color: #f3f4f6; /* Gris claro */
+    color: #4b5563;            /* Gris fuerte */
+    border: 1px solid #e5e7eb;
+}
+
+/* =========================================
+   6. BOTONES Y UTILIDADES
+   ========================================= */
+.btn-eliminar {
+    background-color: white;
+    color: #ef4444;
+    border: 1px solid #fca5a5;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-eliminar:hover {
+    background-color: #fee2e2;
+    border-color: #ef4444;
+}
+
+.texto-gris-pequeno {
+    color: #9ca3af;
+    font-size: 0.8rem;
+}

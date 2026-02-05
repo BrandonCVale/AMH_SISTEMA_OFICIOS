@@ -178,8 +178,9 @@ def turnar_oficio_a_jud(id_oficio):
 
     # Obtenemos el ID del JUD desde el <select> del formulario
     id_jud_seleccionado = request.form.get("id_jud")
+    instrucciones = request.form.get("instrucciones")
 
-    if asignar_oficio_a_jud_db(id_oficio, id_jud_seleccionado, current_user.id):
+    if asignar_oficio_a_jud_db(id_oficio, id_jud_seleccionado, current_user.id, instrucciones):
         flash("Oficio asignado al JUD correctamente.", "success")
     else:
         flash("Ocurrió un error al intentar asignar el oficio.", "error")
@@ -190,11 +191,37 @@ def turnar_oficio_a_jud(id_oficio):
 @bp_oficios.route("atender_oficio/<int:id_oficio>", methods=["GET", "POST"])
 @login_required
 def atender_oficio(id_oficio):
-    # Seguridad para que solo entren JUDs
+    # 1. Seguridad para que solo entren JUDs
     if not current_user.es_jud:
         return redirect(url_for("oficios.panel_control"))
 
-    return render_template("oficios/atender.html", id_oficio=id_oficio, oficio=[])
+    # 1.1 Obtener los detalles y archivo del oficio
+    detalles = obtenter_los_detalles_de_un_oficio(id_oficio)
+    archivos = obtener_documentos_de_un_oficio(id_oficio)
+
+    # 2. LOGICA POST
+    # 2.1 Obtener los datos del form
+    if request.method == "POST":
+        texto_respuesta = request.form.get("texto_respuesta")
+        archivo = request.files.get("archivo")
+
+        # 2.2 Procesar la respuesta del jud (texto y archivo)
+        servicio = ServicioOficio()
+        exito, mensaje = servicio.procesar_respuesta_jud(
+            id_oficio, current_user.id, texto_respuesta, archivo
+        )
+
+        if exito:
+            flash(mensaje, "success")
+            return redirect(url_for("oficios.panel_control"))
+        else:
+            flash(mensaje, "error")
+
+    return render_template(
+        "oficios/atender.html",
+        oficio=detalles,
+        documentos=archivos,
+    )
 
 
 @bp_oficios.route("/api/subdirector/<int:id_area>")
