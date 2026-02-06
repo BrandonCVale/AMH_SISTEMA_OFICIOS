@@ -180,7 +180,9 @@ def turnar_oficio_a_jud(id_oficio):
     id_jud_seleccionado = request.form.get("id_jud")
     instrucciones = request.form.get("instrucciones")
 
-    if asignar_oficio_a_jud_db(id_oficio, id_jud_seleccionado, current_user.id, instrucciones):
+    if asignar_oficio_a_jud_db(
+        id_oficio, id_jud_seleccionado, current_user.id, instrucciones
+    ):
         flash("Oficio asignado al JUD correctamente.", "success")
     else:
         flash("Ocurrió un error al intentar asignar el oficio.", "error")
@@ -222,6 +224,31 @@ def atender_oficio(id_oficio):
         oficio=detalles,
         documentos=archivos,
     )
+
+
+@bp_oficios.route("/nueva_peticion", methods=["GET", "POST"])
+@login_required
+def nueva_peticion():
+    if request.method == "POST":
+        # 1. Recolectar datos
+        formulario = {
+            "asunto": request.form["asunto"],
+            "folio": request.form["folio"],
+            "descripcion_solicitud": request.form["descripcion_solicitud"]
+        }
+        archivo = request.files.get("archivo")
+
+        # 2. Llamar al servicio específico de peticiones
+        servicio = ServicioOficio()
+        exito, mensaje = servicio.procesar_peticion_jud(formulario, archivo, current_user)
+
+        if exito:
+            flash(mensaje, "success")
+            return redirect(url_for("oficios.panel_control"))
+        else:
+            flash(mensaje, "error")
+
+    return render_template("oficios/peticion_jud.html", usuario=current_user)
 
 
 @bp_oficios.route("/api/subdirector/<int:id_area>")

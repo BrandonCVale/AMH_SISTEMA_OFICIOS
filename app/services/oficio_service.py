@@ -15,6 +15,8 @@ from app.models.oficio import (
     registrar_historial_db,
     actualizar_respuesta_oficio_db,
     eliminar_oficio_db,
+    crear_peticion_db,
+    guardar_archivo_peticion_db,
 )
 from app.models.usuario import obtener_subdirector_por_area
 
@@ -225,6 +227,55 @@ class ServicioOficio:
             conexion.rollback()
             return False, f"Error al eliminar oficio: {str(e)}"
 
+    def procesar_peticion_jud(self, formulario, archivo, usuario_jud):
+        """
+        Guarda una petición en la tabla 'peticiones' y su archivo en 'archivos_peticion'.
+        """
+        conexion = obtener_conexion()
+        try:
+            # 1. Obtener destinatario (Subdirector del área)
+            subdirector = obtener_subdirector_por_area(usuario_jud.id_area)
+            if not subdirector:
+                return False, "No se encontró un Subdirector activo en tu área."
+
+            conexion.begin()
+            with conexion.cursor() as cursor:
+                # 2. Insertar en tabla PETICIONES
+                datos_peticion = {
+                    "asunto": formulario["asunto"],
+                    "folio": formulario["folio"].strip(),
+                    "descripcion": formulario["descripcion_solicitud"],
+                    "id_creador": usuario_jud.id,
+                    "id_destinatario": subdirector["id_usuario"]
+                }
+                id_peticion = crear_peticion_db(cursor, datos_peticion)
+
+                # 3. Guardar Archivo (Obligatorio)
+                if archivo and archivo.filename != "":
+                    if not self._archivo_es_permitido(archivo.filename):
+                        raise Exception("El archivo debe ser PDF, DOC o Excel.")
+                    
+                    # Guardamos físico (en carpeta separada 'peticiones')
+                    ruta, nombre, ext = self._guardar_archivo_peticion_en_disco(archivo, id_peticion)
+                    
+                    # Guardamos en tabla ARCHIVOS_PETICION
+                    guardar_archivo_peticion_db(
+                        cursor, id_peticion, usuario_jud.id, nombre, ruta, ext
+                    )
+                else:
+                    raise Exception("Es obligatorio adjuntar el archivo de la petición.")
+
+            conexion.commit()
+            return True, f"Petición {datos_peticion['folio']} enviada correctamente."
+
+        except IntegrityError:
+            conexion.rollback()
+            return False, f"El folio '{formulario['folio']}' ya existe."
+        except Exception as e:
+            conexion.rollback()
+            current_app.logger.error(f"Error en procesar_peticion_jud: {e}")
+            return False, f"Error al procesar la petición: {str(e)}"
+
     def _guardar_archivo_en_disco(self, archivo, id_oficio):
         """
         Método auxiliar privado. Solo se encarga de mover el archivo al disco duro.
@@ -245,6 +296,26 @@ class ServicioOficio:
         # Retornamos la ruta relativa para la BD (ej: uploads/45/uuid_archivo.pdf)
         ruta_bd = f"uploads/{id_oficio}/{nombre_unico}"
         return ruta_bd, nombre_seguro
+
+    def _guardar_archivo_peticion_en_disco(self, archivo, id_peticion):
+        """
+        Guarda archivos de peticiones en 'static/uploads/peticiones/ID/'
+        para evitar colisiones con los oficios normales.
+        """
+        nombre_seguro = secure_filename(archivo.filename)
+        extension = nombre_seguro.split(".")[-1].lower() if "." in nombre_seguro else ""
+        nombre_unico = f"{uuid.uuid4().hex[:8]}_{nombre_seguro}"
+
+        # Carpeta diferenciada
+        carpeta_destino = os.path.join(
+            current_app.root_path, "static", "uploads", "peticiones", str(id_peticion)
+        )
+        os.makedirs(carpeta_destino, exist_ok=True)
+
+        archivo.save(os.path.join(carpeta_destino, nombre_unico))
+        
+        ruta_bd = f"uploads/peticiones/{id_peticion}/{nombre_unico}"
+        return ruta_bd, nombre_seguro, extension
 
     def _archivo_es_permitido(self, nombre_archivo):
         """Verifica si un archivo tiene una extensión permitida."""

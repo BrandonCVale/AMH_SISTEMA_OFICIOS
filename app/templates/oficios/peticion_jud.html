@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block titulo %}
+    Peticiones
+{% endblock titulo %}
+{% block css_adicional %}
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/panel.css') }}">
+{% endblock css_adicional %}
+{% block contenido_principal %}
+    <div class="contenedor-principal">
+        {# Header inicio #}
+        <div class="header-seccion">
+            <div>
+                <h1 class="titulo-panel">Nueva Petición</h1>
+                <p class="subtitulo-panel">Rellena los siguientes campos para realizar una nueva petición</p>
+            </div>
+            <a href="{{ url_for('oficios.panel_control') }}" class="btn-gris">Volver</a>
+        </div>
+        {# Header fin #}
+        {# Formulario inicio #}
+        <div class="tarjeta-contenido">
+            <div class="titulo-tarjeta">
+                <h3>Las peticiones pasan en automático a tu subdirector</h3>
+            </div>
+            <form method="POST" enctype="multipart/form-data">
+                <div>
+                    <label class="detalle-grupo">Asunto de la petición:</label>
+                    <input type="text" name="asunto" class="form-control" required>
+                </div>
+                <div>
+                    <label class="detalle-grupo">Folio:</label>
+                    <input type="text" name="folio" class="form-control" required>
+                </div>
+                <div>
+                    <label class="detalle-grupo">Descripción de la Petición:</label>
+                    <textarea name="descripcion_solicitud" rows="6" class="form-control" required></textarea>
+                </div>
+                <div class="input-archivo-wrapper">
+                    <label class="detalle-grupo">Adjuntar Oficio de Petición (PDF):</label>
+                    <input type="file"
+                           name="archivo"
+                           id="archivo"
+                           class="form-control"
+                           accept=".pdf"
+                           required>
+                </div>
+                {# boton enviar inicio#}
+                <div class="acciones-formulario">
+                    <button type="submit" class="btn-primario">Enviar</button>
+                </div>
+                {# boton enviar fin#}
+            </form>
+        </div>
+        {# Formulario fin #}
+    </div>
+{% endblock contenido_principal %}

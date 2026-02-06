@@ -473,3 +473,33 @@ def eliminar_oficio_db(cursor, id_oficio):
     cursor.execute("DELETE FROM documentos_oficio WHERE id_oficio = %s", (id_oficio,))
     # 3. Eliminar el oficio
     cursor.execute("DELETE FROM oficios WHERE id_oficio = %s", (id_oficio,))
+
+
+def crear_peticion_db(cursor, datos):
+    """Inserta una nueva petición en la tabla 'peticiones'"""
+    sql = """
+        INSERT INTO peticiones
+        (asunto, folio_peticion, descripcion, id_usuario_creador, id_destinatario, id_estatus)
+        VALUES (%s, %s, %s, %s, %s, %s)
+    """
+    cursor.execute(sql, (
+        datos["asunto"],
+        datos["folio"],
+        datos["descripcion"],
+        datos["id_creador"],
+        datos["id_destinatario"],
+        1  # Estatus inicial (ej: 1 = Pendiente/Enviado)
+    ))
+    return cursor.lastrowid
+
+
+def guardar_archivo_peticion_db(cursor, id_peticion, id_usuario, nombre, ruta, extension):
+    """Inserta el registro del archivo en 'archivos_peticion'"""
+    sql = """
+        INSERT INTO archivos_peticion
+        (id_peticion, id_usuario_creador, nombre_archivo, ruta_almacenamiento, extension)
+        VALUES (%s, %s, %s, %s, %s)
+    """
+    cursor.execute(sql, (id_peticion, id_usuario, nombre, ruta, extension))
+
+    

@@ -26,7 +26,6 @@
         {# Datos de la solicitud inicio #}
         <div class="tarjeta-contenido">
             <h3 class="titulo-tarjeta">Detalles de la Solicitud</h3>
-            
             <div class="grid-detalles">
                 <div class="detalle-grupo">
                     <label>Fecha de creación</label>
@@ -41,7 +40,6 @@
                     <p>{{ oficio.asunto }}</p>
                 </div>
             </div>
-
             <div class="detalle-grupo" style="margin-top: 20px;">
                 <label>Descripción del Oficio</label>
                 <div class="caja-descripcion">
@@ -65,11 +63,7 @@
                 {% endif %}
             </div>
         </div>
-        
         {# Instrucciones de mi subdirector fin #}
-
-
-        
         {# Documentos adjuntos inicio #}
         <div class="tarjeta-contenido">
             <h3 class="titulo-tarjeta">Documentos Adjuntos</h3>
@@ -79,8 +73,9 @@
                         <tr>
                             <td>{{ documento.nombre_archivo_original }}</td>
                             <td class="texto-derecha">
-                            <a href="{{ url_for('static', filename=documento.ruta_almacenamiento) }}" target="_blank"
-                               class="btn-accion">Ver Documento</a>
+                                <a href="{{ url_for('static', filename=documento.ruta_almacenamiento) }}"
+                                   target="_blank"
+                                   class="btn-accion">Ver Documento</a>
                             </td>
                         </tr>
                     {% endfor %}
@@ -90,21 +85,31 @@
             {% endif %}
         </div>
         {# Documentos adjuntos fin#}
-
         {# Mi respuesta inicio #}
         <div class="tarjeta-contenido tarjeta-destacada">
             <h3 class="titulo-tarjeta">Mi respuesta</h3>
             <form method="POST" enctype="multipart/form-data">
                 <div style="margin-bottom: 20px;">
-                    <label class="detalle-grupo"><label>Comentarios / Resolución</label></label>
-                    <textarea name="texto_respuesta" rows="6" class="form-control" placeholder="Escribe aquí la resolución del oficio..." required></textarea>
+                    <label class="detalle-grupo">
+                        <label>Comentarios / Resolución</label>
+                    </label>
+                    <textarea name="texto_respuesta"
+                              rows="6"
+                              class="form-control"
+                              placeholder="Escribe aquí la resolución del oficio..."
+                              required></textarea>
                 </div>
-                
                 <div class="input-archivo-wrapper">
-                    <label class="detalle-grupo"><label>Adjuntar Oficio de Respuesta (PDF)</label></label>
-                    <input type="file" name="archivo" id="archivo" class="form-control" accept=".pdf" required>
+                    <label class="detalle-grupo">
+                        <label>Adjuntar Oficio de Respuesta (PDF)</label>
+                    </label>
+                    <input type="file"
+                           name="archivo"
+                           id="archivo"
+                           class="form-control"
+                           accept=".pdf"
+                           required>
                 </div>
-
                 {# Mi respuesta fin#}
                 {# Boton enviar inicio #}
                 <div class="acciones-formulario">
