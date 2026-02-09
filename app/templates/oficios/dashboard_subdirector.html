@@ -1,68 +1,121 @@
 {% extends "base.html" %}
 {% block titulo %}
-    Bandeja de Entrada - Subdirector
+    Dashboard - Subdirección
 {% endblock titulo %}
 {% block css_adicional %}
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/panel.css') }}">
 {% endblock css_adicional %}
-{# BODY #}
 {% block contenido_principal %}
     <div class="contenedor-principal">
+        {# ENCABEZADO GENERAL #}
+        <div class="header-seccion">
+            <div>
+                <h1 class="titulo-panel">Panel de Control</h1>
+                <p class="subtitulo-panel">Gestiona la correspondencia y las solicitudes de tu equipo.</p>
+            </div>
+        </div>
         {# KPIs #}
+        {# Nota: Asegúrate de pasar 'kpis' desde Python #}
         {% with
-            titulo1="Recibidos", valor1 = kpis['Recibidos'],
+            titulo1="Oficios Recibidos", valor1 = kpis['Recibidos'],
             titulo2="Por Asignar", valor2 = kpis['Por Asignar'],
-            titulo3="En Proceso", valor3 = kpis['En Proceso']
+            titulo3="Peticiones JUDs", valor3 = kpis['Peticiones']
             %}
             {% include "fragments/kpis.html" %}
         {% endwith %}
-        {# ENCABEZADO (Usando tus clases .header-seccion y .titulo-panel) #}
-        <div class="header-seccion">
-            <div>
-                <h1 class="titulo-panel">Bandeja de Entrada</h1>
-                <p class="subtitulo-panel">Oficios pendientes de asignación para tu área.</p>
+        {# --- SISTEMA DE PESTAÑAS --- #}
+        <div class="contenedor-tabs">
+            <button class="tab-btn activo" onclick="abrirPestana(event, 'tab-asignar')">Oficios por Asignar</button>
+            <button class="tab-btn" onclick="abrirPestana(event, 'tab-peticiones')">Solicitudes de JUDs</button>
+        </div>
+        {# --- CONTENIDO 1: OFICIOS POR ASIGNAR --- #}
+        <div id="tab-asignar" class="contenido-tab activo">
+            <div class="tarjeta-tabla">
+                <table class="tabla-moderna">
+                    <thead>
+                        <tr>
+                            <th>Folio</th>
+                            <th>Remitente</th>
+                            <th>Asunto</th>
+                            <th>Fecha Recepción</th>
+                            <th class="texto-centro">Estatus</th>
+                            <th class="texto-derecha">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for oficio in oficios %}
+                            <tr>
+                                <td>
+                                    <span class="dato-folio">{{ oficio.folio_interno }}</span>
+                                </td>
+                                <td>{{ oficio.remitente }}</td>
+                                <td>{{ oficio.asunto }}</td>
+                                <td>{{ oficio.fecha_creacion }}</td>
+                                <td class="texto-centro">
+                                    <span class="badge badge-amarillo">{{ oficio.estatus }}</span>
+                                </td>
+                                <td class="texto-derecha">
+                                    <a href="{{ url_for('oficios.reasignar_oficio', id_oficio=oficio.id_oficio) }}"
+                                       class="btn-primario">Revisar y Turnar</a>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="fila-vacia">No hay oficios pendientes por asignar.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
-        {# TABLA (Usando tus clases .tarjeta-tabla y .tabla-moderna) #}
-        <div class="tarjeta-tabla">
-            <table class="tabla-moderna">
-                <thead>
-                    <tr>
-                        <th>Folio</th>
-                        <th>Remitente</th>
-                        <th>Asunto</th>
-                        <th>Fecha</th>
-                        <th class="texto-centro">Estatus</th>
-                        <th class="texto-derecha">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for oficio in oficios %}
+        {# --- CONTENIDO 2: PETICIONES DE LOS JUDS --- #}
+        <div id="tab-peticiones" class="contenido-tab">
+            <div class="tarjeta-tabla">
+                <table class="tabla-moderna">
+                    <thead>
                         <tr>
-                            <td>
-                                <span class="dato-folio">{{ oficio.folio_interno }}</span>
-                            </td>
-                            <td>
-                                <div>{{ oficio.remitente }}</div>
-                            </td>
-                            <td>{{ oficio.asunto }}</td>
-                            <td>{{ oficio.fecha_creacion }}</td>
-                            <td class="texto-centro">
-                                <span class="badge badge-amarillo">{{ oficio.estatus }}</span>
-                            </td>
-                            <td class="texto-derecha">
-                                <a href="{{ url_for('oficios.reasignar_oficio', id_oficio=oficio.id_oficio) }}"
-                                   class="btn-primario">Revisar y Turnar</a>
-                            </td>
+                            <th>Fecha</th>
+                            <th>Solicitante (JUD)</th>
+                            <th>Asunto</th>
+                            <th class="texto-centro">Estatus</th>
+                            <th class="texto-derecha">Acciones</th>
                         </tr>
-                    {% else %}
-                        <tr>
-                            <td colspan="6" class="fila-vacia">No hay oficios pendientes por asignar.</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {# Iteramos sobre la variable 'peticiones' que debes enviar desde Python #}
+                        {% for peticion in peticiones %}
+                            <tr>
+                                <td>{{ peticion.fecha_creacion }}</td>
+                                <td>
+                                    <strong>{{ peticion.remitente }}</strong>
+                                </td>
+                                <td>{{ peticion.asunto }}</td>
+                                <td class="texto-centro">
+                                    {% if peticion.estatus == 'EN_REVISION' %}
+                                        <span class="badge badge-amarillo">Por Revisar</span>
+                                    {% elif peticion.estatus == 'APROBADO' %}
+                                        <span class="badge badge-verde">Aprobado</span>
+                                    {% else %}
+                                        <span class="badge badge-rojo">Rechazado</span>
+                                    {% endif %}
+                                </td>
+                                <td class="texto-centro">
+                                    <a href="{{ url_for('oficios.responder_peticion_de_jud', id_peticion=peticion.id_peticion) }}"
+                                       class="btn-primario">Responder</a>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="5" class="fila-vacia">No hay solicitudes pendientes de tu equipo.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 {% endblock contenido_principal %}
+{% block script_adicional %}
+    <script src="{{ url_for('static', filename='js/tabs.js') }}"></script>
+{% endblock script_adicional %}

@@ -15,6 +15,7 @@ from app.models.oficio import (
     obtener_oficios_asignados_a_un_jud,
     oficios_atendidos_por_un_jud,
     obtener_peticiones_del_jud,
+    obtener_solicitudes_de_mis_juds,
 )
 from app.models.usuario import obtener_juds_por_area
 
@@ -47,12 +48,15 @@ def panel_control():
         # BUSCAR LOS OFICIOS DE SU AREA
         mis_oficios = obtener_bandeja_entrada_subdirector(current_user.id)
         mis_kpis = obtener_kpis_subdirector(current_user.id)
+        # Obtener las peticiones de mis juds
+        peticiones_de_mis_juds = obtener_solicitudes_de_mis_juds(current_user.id)
 
         return render_template(
             "oficios/dashboard_subdirector.html",
             usuario=current_user,
             oficios=mis_oficios,
             kpis=mis_kpis,
+            peticiones=peticiones_de_mis_juds,
         )
 
     # 3. Verificación para JUD
@@ -261,6 +265,16 @@ def nueva_peticion():
             flash(mensaje, "error")
 
     return render_template("oficios/peticion_jud.html", usuario=current_user)
+
+
+@bp_oficios.route(
+    "/responder_peticion_de_jud/<int:id_peticion>", methods=["GET", "POST"]
+)
+@login_required
+def responder_peticion_de_jud(id_peticion):
+    if request.method == "POST":
+        pass
+    return render_template("oficios/responder_peticion_jud.html", peticion=[])
 
 
 @bp_oficios.route("/api/subdirector/<int:id_area>")

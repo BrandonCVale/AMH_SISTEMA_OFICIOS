@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block titulo %}
+    Revisar Petición
+{% endblock titulo %}
+{% block css_adicional %}
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/panel.css') }}">
+{% endblock css_adicional %}
+{% block contenido_principal %}
+    <div class="contenedor-principal">
+        {# ENCABEZADO Y BOTÓN DE RETORNO #}
+        <div class="header-seccion">
+            <div>
+                <h1 class="titulo-panel">Evaluación de Solicitud</h1>
+                <p class="subtitulo-panel">Revisa los detalles y emite una respuesta.</p>
+            </div>
+            <div>
+                <a href="{{ url_for('oficios.panel_control') }}" class="btn-gris">Volver al Tablero</a>
+            </div>
+        </div>
+        <div class="grid-detalle">
+            {# COLUMNA IZQUIERDA: INFORMACIÓN DE LA PETICIÓN #}
+            <div class="columna-info">
+                <div class="tarjeta-blanca">
+                    <h3 class="titulo-tarjeta">Detalles de la Petición</h3>
+                    <div class="grupo-dato">
+                        <label class="etiqueta-dato">Folio:</label>
+                        <span class="valor-dato">{{ peticion.folio_peticion }}</span>
+                    </div>
+                    <div class="grupo-dato">
+                        <label class="etiqueta-dato">Solicitante:</label>
+                        <span class="valor-dato">{{ peticion.remitente }}</span>
+                    </div>
+                    <div class="grupo-dato">
+                        <label class="etiqueta-dato">Fecha de Solicitud:</label>
+                        <span class="valor-dato">{{ peticion.fecha_creacion }}</span>
+                    </div>
+                    <div class="grupo-dato">
+                        <label class="etiqueta-dato">Asunto:</label>
+                        <span class="valor-dato">{{ peticion.asunto }}</span>
+                    </div>
+                    <div class="separador"></div>
+                    <div class="grupo-dato">
+                        <label class="etiqueta-dato">Descripción / Justificación:</label>
+                        <p class="texto-descripcion">{{ peticion.descripcion }}</p>
+                    </div>
+                </div>
+                {# BLOQUE DE ARCHIVOS ADJUNTOS (Si existen) #}
+                {% if archivos %}
+                    <div class="tarjeta-blanca">
+                        <h3 class="titulo-tarjeta">Documentos de Evidencia</h3>
+                        <ul class="lista-documentos">
+                            {% for archivo in archivos %}
+                                <li>
+                                    <a href="{{ url_for('oficios.descargar_archivo', filename=archivo.nombre_archivo) }}"
+                                       target="_blank"
+                                       class="enlace-archivo">{{ archivo.nombre_archivo }}</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+            </div>
+            {# COLUMNA DERECHA: FORMULARIO DE RESPUESTA #}
+            <div class="columna-accion">
+                <div class="tarjeta-blanca borde-activo">
+                    <h3 class="titulo-tarjeta">Dictamen del Subdirector</h3>
+                    <form action="#"
+                          method="POST">
+                        <input type="hidden" name="id_peticion" value="{{ peticion.id_peticion }}">
+                        <div class="grupo-formulario">
+                            <label class="etiqueta">Instrucciones o Comentarios:</label>
+                            <textarea name="respuesta_texto"
+                                      class="input-area"
+                                      rows="6"
+                                      required
+                                      placeholder="Escribe aquí la respuesta oficial para el solicitante..."></textarea>
+                        </div>
+                        <div class="botones-decision">
+                            <button type="submit"
+                                    name="decision"
+                                    value="APROBADO"
+                                    class="btn-verde-grande">Aprobar Solicitud</button>
+                            <button type="submit"
+                                    name="decision"
+                                    value="RECHAZADO"
+                                    class="btn-rojo-grande">Rechazar Solicitud</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock contenido_principal %}

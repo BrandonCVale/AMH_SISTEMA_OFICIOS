@@ -543,6 +543,40 @@ def obtener_peticiones_del_jud(id_jud):
         return cursor.fetchall()
 
 
+def obtener_solicitudes_de_mis_juds(id_subdirector):
+    """Obtiene las peticiones hechas por un jud, que son asignadas a su subdirector.
+    Lo usa el subdirector para la pestana solicitudes juds"""
+    conexion = obtener_conexion()
+    sql = """
+            SELECT
+                p.id_peticion,
+                p.asunto ,
+                p.folio_peticion ,
+                p.descripcion ,
+                u.nombre_completo AS remitente,
+                p.fecha_creacion,
+                ce.nombre AS estatus
+            FROM
+                peticiones p
+            JOIN usuarios u ON
+                p.id_usuario_creador = u.id_usuario
+            JOIN cat_estatus ce ON 
+                p.id_estatus = ce.id_estatus
+            WHERE
+                p.id_destinatario = %s
+            ORDER BY
+                p.fecha_creacion DESC;
+    """
+    with conexion.cursor() as cursor:
+        cursor.execute(sql, (id_subdirector,))
+        return cursor.fetchall()
+
+
+def registrar_respuesta_peticion_db(cursor, id_peticion, texto_respuesta):
+    """Guarda la respuesta del subdirector en la tabla 'peticiones' columna 'respuesta_subdirector'"""
+    pass
+
+
 def guardar_archivo_peticion_db(
     cursor, id_peticion, id_usuario, nombre, ruta, extension
 ):
