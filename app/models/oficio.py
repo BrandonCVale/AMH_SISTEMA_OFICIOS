@@ -410,10 +410,10 @@ def asignar_oficio_a_jud_db(id_oficio, id_jud, id_subdirector, instrucciones):
 
 
 def obtener_oficios_asignados_a_un_jud(id_jud):
-    """Recupera todos los oficios asignados a un JUD"""
+    """Recupera todos los oficios PENDIENTES asignados a un JUD"""
     conexion = obtener_conexion()
 
-    sql = """
+    sql_pendientes = """
         SELECT
             o.id_oficio ,
             o.folio_interno ,
@@ -423,12 +423,35 @@ def obtener_oficios_asignados_a_un_jud(id_jud):
             oficios o
         WHERE
             o.id_usuario_asignado = %s
+            AND o.fecha_respuesta IS NULL
         ORDER BY
             o.fecha_recepcion DESC;
     """
 
     with conexion.cursor() as cursor:
-        cursor.execute(sql, (id_jud,))
+        cursor.execute(sql_pendientes, (id_jud,))
+        return cursor.fetchall()
+
+
+def oficios_atendidos_por_un_jud(id_jud):
+    """Recupera todos los oficios ATENDIDOS por un JUD"""
+    conexion = obtener_conexion()
+    sql_atendidos = """
+                SELECT
+                    o.id_oficio ,
+                    o.folio_interno ,
+                    o.asunto ,
+                    o.descripcion_solicitud
+                FROM
+                    oficios o
+                WHERE
+                    o.id_usuario_asignado = %s
+                    AND o.fecha_respuesta IS NOT NULL
+                ORDER BY
+                    o.fecha_recepcion DESC;
+    """
+    with conexion.cursor() as cursor:
+        cursor.execute(sql_atendidos, (id_jud,))
         return cursor.fetchall()
 
 
@@ -480,20 +503,49 @@ def crear_peticion_db(cursor, datos):
     sql = """
         INSERT INTO peticiones
         (asunto, folio_peticion, descripcion, id_usuario_creador, id_destinatario, id_estatus)
-        VALUES (%s, %s, %s, %s, %s, %s)
+        VALUES (%s, %s, %s, %s, %s, 1)
     """
-    cursor.execute(sql, (
-        datos["asunto"],
-        datos["folio"],
-        datos["descripcion"],
-        datos["id_creador"],
-        datos["id_destinatario"],
-        1  # Estatus inicial (ej: 1 = Pendiente/Enviado)
-    ))
+    cursor.execute(
+        sql,
+        (
+            datos["asunto"],
+            datos["folio"],
+            datos["descripcion"],
+            datos["id_creador"],
+            datos["id_destinatario"],
+        ),
+    )
     return cursor.lastrowid
 
 
-def guardar_archivo_peticion_db(cursor, id_peticion, id_usuario, nombre, ruta, extension):
+def obtener_peticiones_del_jud(id_jud):
+    """Retorna las peticiones hechas por un jud"""
+    conexion = obtener_conexion()
+    sql = """
+            SELECT
+                p.id_peticion,
+                p.folio_peticion,
+                p.asunto,
+                p.descripcion,
+                ce.nombre AS estatus,
+                p.respuesta_subdirector
+            FROM
+                peticiones p
+            JOIN cat_estatus ce ON
+                p.id_estatus = ce.id_estatus
+            WHERE
+                p.id_usuario_creador = %s
+            ORDER BY
+                p.fecha_creacion DESC;
+    """
+    with conexion.cursor() as cursor:
+        cursor.execute(sql, (id_jud,))
+        return cursor.fetchall()
+
+
+def guardar_archivo_peticion_db(
+    cursor, id_peticion, id_usuario, nombre, ruta, extension
+):
     """Inserta el registro del archivo en 'archivos_peticion'"""
     sql = """
         INSERT INTO archivos_peticion
@@ -501,5 +553,3 @@ def guardar_archivo_peticion_db(cursor, id_peticion, id_usuario, nombre, ruta, e
         VALUES (%s, %s, %s, %s, %s)
     """
     cursor.execute(sql, (id_peticion, id_usuario, nombre, ruta, extension))
-
-    

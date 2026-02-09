@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block titulo %}
-    Pandel JUD
+    Panel JUD
 {% endblock titulo %}
 {% block css_adicional %}
     <link rel="stylesheet"
@@ -13,31 +13,30 @@
                 <h1 class="titulo-panel">Mi Dashboard</h1>
             </div>
         </div>
-        {# KPIs -- INICIO #}
+        {# KPIs #}
         {% with
-            titulo1="Pendientes",
-            titulo2="Atendidos"
+            titulo1="Asignaciones Pendientes",
+            titulo2="Oficios Atendidos"
             %}
             {% include "fragments/kpis.html" %}
         {% endwith %}
-        {# KPIs -- FIN#}
-        {# TAB -- INICIO#}
+        {# --- TABS DE NAVEGACIÓN (3 Pestañas) --- #}
         <div class="contenedor-tabs">
             <button class="tab-btn activo"
-                    onclick="abrirPestana (event, 'tab-asignaciones')">Mis Asignaciones</button>
-            <button class="tab-btn" onclick="abrirPestana (event, 'tab-peticiones')">Mis Peticiones</button>
+                    onclick="abrirPestana(event, 'tab-asignaciones')">Mis Asignaciones</button>
+            <button class="tab-btn" onclick="abrirPestana(event, 'tab-peticiones')">Mis Peticiones</button>
+            <button class="tab-btn" onclick="abrirPestana(event, 'tab-atendidos')">Asignaciones Atendidas</button>
         </div>
-        {# TAB -- FIN#}
+        {# --- CONTENIDO 1: ASIGNACIONES PENDIENTES --- #}
         <div id="tab-asignaciones" class="contenido-tab activo">
-            {# TABLA -- INICIO#}
             <div class="tarjeta-tabla">
                 <table class="tabla-moderna">
                     <thead>
                         <tr>
                             <th>Folio</th>
                             <th>Asunto</th>
-                            <th>Descripcion</th>
-                            <th>Acciones</th>
+                            <th>Descripción</th>
+                            <th class="alinear-derecha">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -48,24 +47,24 @@
                                 </td>
                                 <td>{{ oficio.asunto }}</td>
                                 <td>{{ oficio.descripcion_solicitud }}</td>
-                                <td>
+                                <td class="alinear-derecha">
                                     <a href="{{ url_for('oficios.atender_oficio', id_oficio=oficio.id_oficio) }}"
                                        class="btn-accion">Atender</a>
                                 </td>
                             </tr>
                         {% else %}
                             <tr>
-                                <td class="fila-vacia">Sin asignaciones</td>
+                                <td colspan="4" class="fila-vacia">Sin asignaciones pendientes</td>
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
-            {# TABLA -- FIN#}
         </div>
+        {# --- CONTENIDO 2: MIS PETICIONES --- #}
         <div id="tab-peticiones" class="contenido-tab">
             <div class="header-seccion">
-                <h3 class="titulo-seccion">Realizar una petición</h3>
+                <h3 class="titulo-seccion">Gestionar Peticiones</h3>
                 <a href="{{ url_for('oficios.nueva_peticion') }}" class="btn-primario">Nueva Solicitud</a>
             </div>
             <div class="tarjeta-tabla">
@@ -74,25 +73,71 @@
                         <tr>
                             <th>Folio</th>
                             <th>Asunto</th>
-                            <th>Descripcion</th>
-                            <th>Estatus de mi solicitud</th>
-                            <th>Respuesta</th>
+                            <th>Descripción</th>
+                            <th>Estatus</th>
+                            <th>Respuesta Subdirector</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for oficio in oficios %}
+                        {% for peticion in peticiones %}
                             <tr>
                                 <td>
-                                    <span class="dato-folio">{{ oficio.folio_interno }}</span>
+                                    <strong>{{ peticion.folio_peticion }}</strong>
                                 </td>
-                                <td>{{ oficio.asunto }}</td>
-                                <td>{{ oficio.descripcion_solicitud }}</td>
-                                <td>{{ oficio.estatus_solicitud }}</td>
-                                <td>{{ oficio.texto_respuesta }}</td>
+                                <td>{{ peticion.asunto }}</td>
+                                <td>{{ peticion.descripcion }}</td>
+                                <td>
+                                    {% if peticion.estatus == 'EN_REVISION' %}
+                                        <span class="badge-amarillo">En revisión</span>
+                                    {% elif peticion.estatus == 'APROBADO' %}
+                                        <span class="badge-verde">Aprobado</span>
+                                    {% else %}
+                                        <span class="badge-rojo">Rechazado</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if peticion.respuesta_subdirector %}
+                                        {{ peticion.respuesta_subdirector }}
+                                    {% else %}
+                                        <span class="texto-gris">Sin respuesta aún</span>
+                                    {% endif %}
+                                </td>
                             </tr>
                         {% else %}
                             <tr>
-                                <td class="fila-vacia">Sin peticiones</td>
+                                <td colspan="4" class="fila-vacia">No has realizado ninguna petición</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {# --- CONTENIDO 3: HISTORIAL ASIGNACIONES ATENDIDAS --- #}
+        <div id="tab-atendidos" class="contenido-tab">
+            <div class="tarjeta-tabla">
+                <table class="tabla-moderna">
+                    <thead>
+                        <tr>
+                            <th>Folio</th>
+                            <th>Asunto</th>
+                            <th class="alinear-derecha">Estatus</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for atendido in atendidos %}
+                            <tr>
+                                <td>
+                                    <span class="dato-folio">{{ atendido.folio_interno }}</span>
+                                </td>
+                                <td>{{ atendido.asunto }}</td>
+                                {# <td>{{ atendido.texto_respuesta }}</td> #}
+                                <td class="alinear-derecha">
+                                    <button class="btn-gris" disabled>Atendido</button>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="4" class="fila-vacia">No has atendido oficios aún</td>
                             </tr>
                         {% endfor %}
                     </tbody>

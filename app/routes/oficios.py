@@ -13,6 +13,8 @@ from app.models.oficio import (
     asignar_oficio_a_jud_db,
     obtener_historial_de_un_oficio,
     obtener_oficios_asignados_a_un_jud,
+    oficios_atendidos_por_un_jud,
+    obtener_peticiones_del_jud,
 )
 from app.models.usuario import obtener_juds_por_area
 
@@ -55,11 +57,19 @@ def panel_control():
 
     # 3. Verificación para JUD
     elif current_user.es_jud:
-        # 1. Traer los oficios del jud
+        # Traer los oficios PENDIENTES del jud
         mis_oficios = obtener_oficios_asignados_a_un_jud(current_user.id)
+        # Traer los oficios ATENDIDOS del jud
+        oficios_atendidos = oficios_atendidos_por_un_jud(current_user.id)
+        # Traer las peticiones hechas por el jud
+        mis_peticiones = obtener_peticiones_del_jud(current_user.id)
 
         return render_template(
-            "oficios/dashboard_jud.html", usuario=current_user, oficios=mis_oficios
+            "oficios/dashboard_jud.html",
+            usuario=current_user,
+            oficios=mis_oficios,
+            atendidos=oficios_atendidos,
+            peticiones=mis_peticiones,
         )
 
     # 4. Verificacion para administrador
@@ -234,13 +244,15 @@ def nueva_peticion():
         formulario = {
             "asunto": request.form["asunto"],
             "folio": request.form["folio"],
-            "descripcion_solicitud": request.form["descripcion_solicitud"]
+            "descripcion_solicitud": request.form["descripcion_solicitud"],
         }
         archivo = request.files.get("archivo")
 
         # 2. Llamar al servicio específico de peticiones
         servicio = ServicioOficio()
-        exito, mensaje = servicio.procesar_peticion_jud(formulario, archivo, current_user)
+        exito, mensaje = servicio.procesar_peticion_jud(
+            formulario, archivo, current_user
+        )
 
         if exito:
             flash(mensaje, "success")
