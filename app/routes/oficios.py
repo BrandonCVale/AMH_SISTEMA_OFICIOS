@@ -16,6 +16,9 @@ from app.models.oficio import (
     oficios_atendidos_por_un_jud,
     obtener_peticiones_del_jud,
     obtener_solicitudes_de_mis_juds,
+    obtener_detalles_peticion,
+    obtener_archivos_peticion,
+    registrar_respuesta_peticion_db,
 )
 from app.models.usuario import obtener_juds_por_area
 
@@ -272,9 +275,41 @@ def nueva_peticion():
 )
 @login_required
 def responder_peticion_de_jud(id_peticion):
+    # Obtenemos la informacion de la peticion
+    info_peticion = obtener_detalles_peticion(id_peticion)
+    archivos_peticion = obtener_archivos_peticion(id_peticion)
+
     if request.method == "POST":
-        pass
-    return render_template("oficios/responder_peticion_jud.html", peticion=[])
+        # Recibir los datos del formualario (id_et)
+        id_peticion = request.form.get("id_peticion")
+        texto_respuesta = request.form.get("respuesta_texto")
+        decision_boton = request.form.get("decision")
+
+        # Validacion del boton y asignas el nuevo estatus
+        if decision_boton == "APROBADO":
+            id_nuevo_estatus = 6
+            mensaje = "Solicitud aprobada exitosamente"
+            tipo = "success"
+        else:
+            id_nuevo_estatus = 5
+            mensaje = "Solicitud rechazada exitosamente"
+            tipo = "danger"
+
+        # Guardar los cambios en la bd
+        registrar_respuesta_peticion_db(
+            id_peticion=id_peticion,
+            texto_respuesta=texto_respuesta,
+            id_estatus_final=id_nuevo_estatus,
+        )
+        flash(mensaje, tipo)
+        return redirect(url_for("oficios.panel_control"))
+
+    # Si es GET
+    return render_template(
+        "oficios/responder_peticion_jud.html",
+        peticion=info_peticion,
+        archivos=archivos_peticion,
+    )
 
 
 @bp_oficios.route("/api/subdirector/<int:id_area>")

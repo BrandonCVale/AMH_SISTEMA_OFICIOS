@@ -5,6 +5,8 @@
 {% block css_adicional %}
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/panel.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/detalle_oficio.css') }}">
 {% endblock css_adicional %}
 {% block contenido_principal %}
     <div class="contenedor-principal">
@@ -20,41 +22,46 @@
         </div>
         <div class="grid-detalle">
             {# COLUMNA IZQUIERDA: INFORMACIÓN DE LA PETICIÓN #}
-            <div class="columna-info">
+            <div>
                 <div class="tarjeta-blanca">
                     <h3 class="titulo-tarjeta">Detalles de la Petición</h3>
-                    <div class="grupo-dato">
-                        <label class="etiqueta-dato">Folio:</label>
-                        <span class="valor-dato">{{ peticion.folio_peticion }}</span>
-                    </div>
-                    <div class="grupo-dato">
-                        <label class="etiqueta-dato">Solicitante:</label>
-                        <span class="valor-dato">{{ peticion.remitente }}</span>
-                    </div>
-                    <div class="grupo-dato">
-                        <label class="etiqueta-dato">Fecha de Solicitud:</label>
-                        <span class="valor-dato">{{ peticion.fecha_creacion }}</span>
-                    </div>
-                    <div class="grupo-dato">
-                        <label class="etiqueta-dato">Asunto:</label>
-                        <span class="valor-dato">{{ peticion.asunto }}</span>
-                    </div>
-                    <div class="separador"></div>
-                    <div class="grupo-dato">
-                        <label class="etiqueta-dato">Descripción / Justificación:</label>
-                        <p class="texto-descripcion">{{ peticion.descripcion }}</p>
+                    <div class="lista-detalles">
+                        <div class="item-detalle">
+                            <strong>Folio:</strong> {{ peticion.folio_peticion }}
+                        </div>
+                        <div class="item-detalle">
+                            <strong>Solicitante:</strong> {{ peticion.solicitante }}
+                        </div>
+                        <div class="item-detalle">
+                            <strong>Fecha de Solicitud:</strong> {{ peticion.fecha_creacion }}
+                        </div>
+                        <div class="item-detalle">
+                            <strong>Asunto:</strong> {{ peticion.asunto }}
+                        </div>
+                        
+                        <div class="separador-horizontal"></div>
+                        
+                        <div class="item-detalle">
+                            <strong>Descripción / Justificación:</strong>
+                            <div class="descripcion-larga">
+                                {{ peticion.descripcion }}
+                            </div>
+                        </div>
                     </div>
                 </div>
                 {# BLOQUE DE ARCHIVOS ADJUNTOS (Si existen) #}
                 {% if archivos %}
                     <div class="tarjeta-blanca">
                         <h3 class="titulo-tarjeta">Documentos de Evidencia</h3>
-                        <ul class="lista-documentos">
+                        <ul class="lista-archivos">
                             {% for archivo in archivos %}
-                                <li>
-                                    <a href="{{ url_for('oficios.descargar_archivo', filename=archivo.nombre_archivo) }}"
-                                       target="_blank"
-                                       class="enlace-archivo">{{ archivo.nombre_archivo }}</a>
+                                <li class="item-archivo">
+                                    <div class="info-archivo">
+                                        <span class="nombre-archivo">{{ archivo.nombre_archivo }}</span>
+                                    </div>
+                                    <a href="{{ url_for('static', filename=archivo.ruta_almacenamiento) }}"
+                                       class="btn-descargar"
+                                       target="_blank">Descargar</a>
                                 </li>
                             {% endfor %}
                         </ul>
@@ -62,9 +69,9 @@
                 {% endif %}
             </div>
             {# COLUMNA DERECHA: FORMULARIO DE RESPUESTA #}
-            <div class="columna-accion">
-                <div class="tarjeta-blanca borde-activo">
-                    <h3 class="titulo-tarjeta">Dictamen del Subdirector</h3>
+            <div>
+                <div class="tarjeta-blanca tarjeta-destacada">
+                    <h3 class="titulo-tarjeta">Respuesta del Subdirector</h3>
                     <form action="#"
                           method="POST">
                         <input type="hidden" name="id_peticion" value="{{ peticion.id_peticion }}">
@@ -74,17 +81,19 @@
                                       class="input-area"
                                       rows="6"
                                       required
-                                      placeholder="Escribe aquí la respuesta oficial para el solicitante..."></textarea>
+                                      placeholder="Escribe aquí tu respuesta para el solicitante..."></textarea>
                         </div>
-                        <div class="botones-decision">
+                        <div style="margin-top: 20px;">
                             <button type="submit"
                                     name="decision"
                                     value="APROBADO"
-                                    class="btn-verde-grande">Aprobar Solicitud</button>
+                                    class="btn-primario btn-full"
+                                    style="background-color: #10b981; border-color: #10b981; margin-bottom: 10px;">Aprobar Solicitud</button>
                             <button type="submit"
                                     name="decision"
                                     value="RECHAZADO"
-                                    class="btn-rojo-grande">Rechazar Solicitud</button>
+                                    class="btn-primario btn-full"
+                                    style="background-color: #ef4444; border-color: #ef4444;">Rechazar Solicitud</button>
                         </div>
                     </form>
                 </div>

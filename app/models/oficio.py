@@ -572,9 +572,72 @@ def obtener_solicitudes_de_mis_juds(id_subdirector):
         return cursor.fetchall()
 
 
-def registrar_respuesta_peticion_db(cursor, id_peticion, texto_respuesta):
-    """Guarda la respuesta del subdirector en la tabla 'peticiones' columna 'respuesta_subdirector'"""
-    pass
+def obtener_detalles_peticion(id_peticion):
+    """Obtiene los detalles de una peticion"""
+    conexion = obtener_conexion()
+    sql = """
+            SELECT
+                p.id_peticion ,
+                p.folio_peticion ,
+                u.nombre_completo AS solicitante,
+                p.fecha_creacion ,
+                p.asunto,
+                p.descripcion
+            FROM
+                peticiones p
+            JOIN usuarios u ON
+                p.id_usuario_creador = u.id_usuario
+            WHERE
+                p.id_peticion = %s
+            ORDER BY
+                p.fecha_creacion DESC;
+    """
+    with conexion.cursor() as cursor:
+        cursor.execute(sql, (id_peticion,))
+        return cursor.fetchone()
+
+
+def obtener_archivos_peticion(id_peticion):
+    """Obtiene los archivos de una peticion"""
+    conexion = obtener_conexion()
+    sql = """
+            SELECT
+                ap.id_documento ,
+                ap.id_peticion ,
+                ap.nombre_archivo ,
+                ap.ruta_almacenamiento ,
+                ap.extension
+            FROM
+                archivos_peticion ap
+            WHERE
+                ap.id_peticion = %s;
+    """
+    with conexion.cursor() as cursor:
+        cursor.execute(sql, (id_peticion,))
+        return cursor.fetchall()
+
+
+def registrar_respuesta_peticion_db(id_peticion, texto_respuesta, id_estatus_final):
+    """Guarda la respuesta del subdirector en la tabla 'peticiones' columna 'respuesta_subdirector'
+    y define el estatus aprobatorio o rechazado"""
+    conexion = obtener_conexion()
+    sql = """
+            UPDATE
+                peticiones p
+            SET
+                p.respuesta_subdirector = %s,
+                p.id_estatus = %s
+            WHERE
+                p.id_peticion = %s;
+    """
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute(sql, (texto_respuesta, id_estatus_final, id_peticion))
+            conexion.commit()
+    except Exception as e:
+        print(f"Error al actualizar petición: {e}")
+        conexion.rollback()
+        raise e
 
 
 def guardar_archivo_peticion_db(
