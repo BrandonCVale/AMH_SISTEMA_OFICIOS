@@ -15,8 +15,9 @@
         </div>
         {# KPIs #}
         {% with
-            titulo1="Asignaciones Pendientes",
-            titulo2="Oficios Atendidos"
+            titulo1="Asignaciones Pendientes", valor1 = kpis['Pendientes'],
+            titulo2="Asignaciones Atendidas", valor2=kpis['Atendidos'],
+            titulo3="Peticiones", valor3=kpis['Peticiones']
             %}
             {% include "fragments/kpis.html" %}
         {% endwith %}

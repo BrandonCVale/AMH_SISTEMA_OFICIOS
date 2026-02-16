@@ -4,40 +4,45 @@ from app import mail
 
 
 def enviar_notificacion_de_nuevo_oficio(datos, correo_subdirector, correo_adicional):
-    try:
-            # 1. Definimos el Asunto
-            asunto = f"Nuevo Oficio Asignado: {datos['folio']}"
-            
-            # 2. Definimos los Destinatarios (Lista)
-            destinatarios = [correo_subdirector, correo_adicional]
-            
-            # 3. Creamos el objeto Mensaje
-            msg = Message(
-                subject=asunto,
-                sender=current_app.config['MAIL_USERNAME'],
-                recipients=destinatarios
-            )
-            
-            # 4. Cuerpo del correo (Texto plano)
-            msg.body = f"""         
-            Saludos,
+    """
+    Envía la notificación.
+    """
 
-            Se le ha dado seguimiento a tu oficio.
+    # 1. Validar y limpiar destinatarios
+    destinatarios = [correo_subdirector]  # El subdirector siempre va
 
-            DETALLES DEL OFICIO:
-            --------------------------------------
-            Folio:    {datos['folio']}\n
-            Asunto:   {datos['asunto']}\n
-            Área:     {datos['area']}\n
-            --------------------------------------
-            """
-            
-            # 5. ¡Enviamos!
-            mail.send(msg)
-            return True, "Notificación enviada con éxito."
+    # Solo agregamos el adicional si existe y no está vacío
+    if correo_adicional and correo_adicional.strip():
+        destinatarios.append(correo_adicional)
 
-    except Exception as e:
-        print(f"Error al enviar correo: {e}")
-        # Retornamos True (no bloqueante) pero avisamos del error
-        return False, f"Error enviando correo: {str(e)}"
+    # 2. Definimos el Asunto
+    asunto = f"Nuevo Oficio Asignado: {datos['folio']}"
+
+    # 3. Creamos el objeto Mensaje
+    msg = Message(
+        subject=asunto,
+        sender=current_app.config["MAIL_USERNAME"],
+        recipients=destinatarios,
+    )
+
+    # 4. Cuerpo del correo
+    msg.body = f"""         
+    Saludos,
+
+    Se le ha asignado un nuevo oficio para su atención.
+
+    DETALLES DEL OFICIO:
+    --------------------------------------
+    Folio:    {datos['folio']}
+    Asunto:   {datos['asunto']}
+    Área:     {datos['area']}
+    --------------------------------------
+    
+    Ingrese al sistema para atenderlo.
+    """
+
+    # 5. Enviamos (Si falla aquí, lanzará una excepción que capturará la otra función)
+    mail.send(msg)
+    return True
+
 

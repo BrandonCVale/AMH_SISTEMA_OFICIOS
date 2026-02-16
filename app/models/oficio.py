@@ -296,18 +296,18 @@ def obtener_kpis_subdirector(id_usuario):
         cursor.execute(sql_por_asignar, (id_usuario,))
         conteo_kpis["Por Asignar"] = cursor.fetchone()["por_asignar"]
 
-        # 3. En Proceso
+        # 3. Peticiones juds
         sql_en_proceso = """
         SELECT
-            COUNT(*) AS en_proceso
+            COUNT(p.id_peticion) AS peticiones_juds
         FROM
-            oficios
+            peticiones p
         WHERE
-            id_usuario_asignado = %s
-            AND id_estatus_actual = 2;
+            p.id_destinatario = %s
+            AND p.id_estatus = 1;
         """
         cursor.execute(sql_en_proceso, (id_usuario,))
-        conteo_kpis["En Proceso"] = cursor.fetchone()["en_proceso"]
+        conteo_kpis["Peticiones"] = cursor.fetchone()["peticiones_juds"]
 
     return conteo_kpis
 
@@ -315,27 +315,36 @@ def obtener_kpis_subdirector(id_usuario):
 def obtener_kpis_jud(id_usuario):
     """Cuenta los oficios del JUD para sus KPIs."""
     conexion = obtener_conexion()
-    conteo_kpis = {"Pendientes": 0, "Atendidos": 0}
+    conteo_kpis = {"Pendientes": 0, "Atendidos": 0, "Peticiones": 0}
 
     with conexion.cursor() as cursor:
-        # 1. Pendientes
-        sql_pendientes = """
+        sql_asignaciones = """
         SELECT
-            COUNT(*) AS pendientes
+            -- PENDIENTES
+            SUM(CASE WHEN id_estatus_actual = 2 THEN 1 ELSE 0 END) AS pendientes,
+            -- ATENDIDAS
+            SUM(CASE WHEN id_estatus_actual IN (3, 4) THEN 1 ELSE 0 END) AS atendidos
         FROM
-            oficios o
+            oficios
         WHERE
-            o.id_usuario_asignado = %s;
-        """
-        cursor.execute(sql_pendientes, (id_usuario,))
-        conteo_kpis["Pendientes"] = cursor.fetchone()["pendientes"]
+            id_usuario_asignado = %s;
+       """
 
-        # 2. Atendidos
-        sql_atendidos = """
-        
-        """
+        cursor.execute(sql_asignaciones, (id_usuario,))
+        resultado_oficios = cursor.fetchone()
+        conteo_kpis["Pendientes"] = int(resultado_oficios["pendientes"] or 0)
+        conteo_kpis["Atendidos"] = int(resultado_oficios["atendidos"] or 0)
 
-        return conteo_kpis
+        sql_mis_peticiones = """
+            SELECT COUNT(*) as peticiones
+            FROM peticiones
+            WHERE id_usuario_creador = %s;
+        """
+        cursor.execute(sql_mis_peticiones, (id_usuario,))
+        resultado_peticiones = cursor.fetchone()
+        conteo_kpis["Peticiones"] = int(resultado_peticiones["peticiones"] or 0)
+
+    return conteo_kpis
 
 
 def obtener_bandeja_entrada_subdirector(id_usuario):

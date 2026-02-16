@@ -19,6 +19,7 @@ from app.models.oficio import (
     obtener_detalles_peticion,
     obtener_archivos_peticion,
     registrar_respuesta_peticion_db,
+    obtener_kpis_jud,
 )
 from app.models.usuario import obtener_juds_por_area
 
@@ -64,6 +65,8 @@ def panel_control():
 
     # 3. Verificación para JUD
     elif current_user.es_jud:
+        # Obtener kpis
+        mis_kpis = obtener_kpis_jud(current_user.id)
         # Traer los oficios PENDIENTES del jud
         mis_oficios = obtener_oficios_asignados_a_un_jud(current_user.id)
         # Traer los oficios ATENDIDOS del jud
@@ -77,6 +80,7 @@ def panel_control():
             oficios=mis_oficios,
             atendidos=oficios_atendidos,
             peticiones=mis_peticiones,
+            kpis=mis_kpis,
         )
 
     # 4. Verificacion para administrador

@@ -19,7 +19,7 @@ from app.models.oficio import (
     guardar_archivo_peticion_db,
 )
 from app.models.usuario import obtener_subdirector_por_area
-
+from app.models.catalogo import obtener_nombre_del_area
 from app.services.email_service import enviar_notificacion_de_nuevo_oficio
 
 
@@ -121,15 +121,18 @@ class ServicioOficio:
             conexion.commit()
 
             try:
+                # Obtener el nombre del area
+                nombre_area = obtener_nombre_del_area(formulario["id_area"])
+
                 # Preparamos los datos para el email
                 datos_email = {
                     "folio": folio_manual,
                     "asunto": formulario["asunto"],
-                    "area": f"Area ID {formulario['id_area']}",
+                    "area": nombre_area,
                 }
                 # Preparammos los correos
                 correo_sub = subdirector["correo_electronico"]
-                correo_adicional = formulario["correo_adicional"]
+                correo_adicional = formulario.get("correo_adicional")
 
                 # Lo enviamos con la funcion del service
                 enviar_notificacion_de_nuevo_oficio(
@@ -167,7 +170,7 @@ class ServicioOficio:
         Procesa la respuesta de un JUD: guarda texto, archivo y actualiza estatus.
         """
         conexion = obtener_conexion()
-        
+
         try:
             with conexion.cursor() as cursor:
                 # 1. Actualizar el oficio (Texto y Estatus a Finalizado)
@@ -215,11 +218,13 @@ class ServicioOficio:
             with conexion.cursor() as cursor:
                 # 1. Borrar de la BD
                 eliminar_oficio_db(cursor, id_oficio)
-            
+
             # 2. Borrar carpeta física (static/uploads/{id_oficio})
-            carpeta_destino = os.path.join(current_app.root_path, "static", "uploads", str(id_oficio))
+            carpeta_destino = os.path.join(
+                current_app.root_path, "static", "uploads", str(id_oficio)
+            )
             if os.path.exists(carpeta_destino):
-                shutil.rmtree(carpeta_destino) # Borra carpeta y contenido
+                shutil.rmtree(carpeta_destino)  # Borra carpeta y contenido
 
             conexion.commit()
             return True, "Oficio y archivos eliminados correctamente."
@@ -246,7 +251,7 @@ class ServicioOficio:
                     "folio": formulario["folio"].strip(),
                     "descripcion": formulario["descripcion_solicitud"],
                     "id_creador": usuario_jud.id,
-                    "id_destinatario": subdirector["id_usuario"]
+                    "id_destinatario": subdirector["id_usuario"],
                 }
                 id_peticion = crear_peticion_db(cursor, datos_peticion)
 
@@ -254,16 +259,20 @@ class ServicioOficio:
                 if archivo and archivo.filename != "":
                     if not self._archivo_es_permitido(archivo.filename):
                         raise Exception("El archivo debe ser PDF, DOC o Excel.")
-                    
+
                     # Guardamos físico (en carpeta separada 'peticiones')
-                    ruta, nombre, ext = self._guardar_archivo_peticion_en_disco(archivo, id_peticion)
-                    
+                    ruta, nombre, ext = self._guardar_archivo_peticion_en_disco(
+                        archivo, id_peticion
+                    )
+
                     # Guardamos en tabla ARCHIVOS_PETICION
                     guardar_archivo_peticion_db(
                         cursor, id_peticion, usuario_jud.id, nombre, ruta, ext
                     )
                 else:
-                    raise Exception("Es obligatorio adjuntar el archivo de la petición.")
+                    raise Exception(
+                        "Es obligatorio adjuntar el archivo de la petición."
+                    )
 
             conexion.commit()
             return True, f"Petición {datos_peticion['folio']} enviada correctamente."
@@ -313,7 +322,7 @@ class ServicioOficio:
         os.makedirs(carpeta_destino, exist_ok=True)
 
         archivo.save(os.path.join(carpeta_destino, nombre_unico))
-        
+
         ruta_bd = f"uploads/peticiones/{id_peticion}/{nombre_unico}"
         return ruta_bd, nombre_seguro, extension
 
