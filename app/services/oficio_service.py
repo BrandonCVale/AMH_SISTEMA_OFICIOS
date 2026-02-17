@@ -3,6 +3,7 @@ import uuid
 import shutil
 from werkzeug.utils import secure_filename
 from flask import current_app
+from datetime import datetime
 
 # Importamos la excepción para detectar folios duplicados
 from pymysql.err import IntegrityError
@@ -24,7 +25,7 @@ from app.services.email_service import enviar_notificacion_de_nuevo_oficio
 
 
 # EXTENSIONES PERMITIDAS
-EXTENSIONES_PERMITIDAS = {"pdf", "doc", "docx", "xls", "xlsx"}
+EXTENSIONES_PERMITIDAS = {"pdf", "doc", "docx", "xls", "xlsx", "jpg", "jpeg", "png"}
 
 
 class ServicioOficio:
@@ -57,10 +58,15 @@ class ServicioOficio:
 
             with conexion.cursor() as cursor:
 
-                # A. Insertar el Oficio (Encabezado)
+                # GENERAR FOLIO CONSECUTIVO
+                anio_actual = datetime.now().year
+                folio_consecutivo = self._obtener_siguiente_folio(cursor, anio_actual)
+
+                # Insertar el Oficio (Encabezado)
                 # Preparamos el diccionario limpio para el modelo
                 datos_oficio = {
                     "folio": folio_manual,
+                    "folio_consecutivo": folio_consecutivo,
                     "asunto": formulario["asunto"],
                     "descripcion_solicitud": formulario["descripcion_solicitud"],
                     "id_creador": usuario_gestor.id,
@@ -332,3 +338,33 @@ class ServicioOficio:
             "." in nombre_archivo
             and nombre_archivo.rsplit(".", 1)[1].lower() in EXTENSIONES_PERMITIDAS
         )
+
+    def _obtener_siguiente_folio(self, cursor, anio):
+        """
+        Incrementa el contador en la tbl folios_contador y devuelve el nuevo número de forma SEGURA.
+        Maneja la concurrencia bloqueando la fila durante la actualización.
+        """
+        # A. INTENTAMOS ACTUALIZAR (Esto bloquea la fila momentáneamente)
+        sql_update = """
+            UPDATE folios_contador 
+            SET ultimo_folio = ultimo_folio + 1 
+            WHERE anio = %s
+        """
+        cursor.execute(sql_update, (anio,))
+
+        # B. VERIFICAMOS SI EL AÑO EXISTÍA
+        # Si es el primer oficio del año y no existe la fila, la creamos
+        if cursor.rowcount == 0:
+            # Iniciamos en 1
+            sql_insert = (
+                "INSERT INTO folios_contador (anio, ultimo_folio) VALUES (%s, 1)"
+            )
+            cursor.execute(sql_insert, (anio,))
+            return 1
+
+        # C. RECUPERAMOS EL NÚMERO QUE ACABAMOS DE GENERAR
+        sql_select = "SELECT ultimo_folio FROM folios_contador WHERE anio = %s"
+        cursor.execute(sql_select, (anio,))
+        resultado = cursor.fetchone()
+
+        return resultado["ultimo_folio"]

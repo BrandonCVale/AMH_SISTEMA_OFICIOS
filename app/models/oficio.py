@@ -17,16 +17,24 @@ def crear_oficio_db(cursor, datos):
     Inserta el encabezado del oficio en la tabla 'oficios'.
     """
     sql = """
-        INSERT INTO oficios 
-        (folio_interno, asunto, descripcion_solicitud, id_usuario_creador, 
-         id_usuario_asignado, id_area_asignada, id_estatus_actual)
-        VALUES (%s, %s, %s, %s, %s, %s, %s)
+        INSERT INTO oficios (
+            folio_interno,
+            folio_consecutivo,
+            asunto,
+            descripcion_solicitud,
+            id_usuario_creador, 
+            id_usuario_asignado,
+            id_area_asignada,
+            id_estatus_actual,
+        )
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
     """
 
     cursor.execute(
         sql,
         (
             datos["folio"],
+            datos["folio_consecutivo"],
             datos["asunto"],
             datos["descripcion_solicitud"],
             datos["id_creador"],

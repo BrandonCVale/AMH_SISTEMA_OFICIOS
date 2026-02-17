@@ -13,7 +13,7 @@
         <div class="flex-header">
             <div>
                 <h1 class="titulo-panel">Oficio: {{ oficio.folio_interno }}</h1>
-                <p class="subtitulo-panel">Seguimiento del trámite</p>
+                <p class="subtitulo-panel">Seguimiento del trámite (Consecutivo Interno: #{{ oficio.folio_consecutivo }})</p>
             </div>
             <a href="{{ url_for('oficios.panel_control') }}" class="btn-gris">Volver al Panel</a>
         </div>
@@ -70,8 +70,18 @@
                                                 🔵
                                             {% endif %}
                                         </span>
+                                        {# Nombre del archivo #}
                                         <span>{{ doc.nombre_archivo_original }}</span>
+                                        {# Tipo de archivo #}
+                                        {% if doc.tipo_documento == 'SOLICITUD' %}
+                                            <span class="badge badge-azul">Solicitud Original</span>
+                                        {% elif doc.tipo_documento == 'RESPUESTA_OFICIAL' %}
+                                            <span class="badge badge-verde">Respuesta</span>
+                                        {% elif doc.tipo_documento == 'ANEXO_SOLICITUD' %}
+                                            <span class="badge badge-gris">Anexo</span>
+                                        {% endif %}
                                     </div>
+                                    {# BTN DESCARGAR #}
                                     <a href="{{ url_for('static', filename=doc.ruta_almacenamiento) }}"
                                        class="btn-descargar"
                                        target="_blank">Descargar</a>
