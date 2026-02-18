@@ -50,6 +50,14 @@
                     <h3 class="titulo-tarjeta">Documentos Adjuntos</h3>
                     {% if archivos_del_oficio %}
                         {% for archivo in archivos_del_oficio %}
+                            {# Tipo de archivo #}
+                            {% if archivo.tipo_documento == 'SOLICITUD' %}
+                                <span class="badge badge-azul">Solicitud Original</span>
+                            {% elif archivo.tipo_documento == 'RESPUESTA_OFICIAL' %}
+                                <span class="badge badge-verde">Respuesta</span>
+                            {% elif archivo.tipo_documento == 'ANEXO_SOLICITUD' %}
+                                <span class="badge badge-gris">Anexo</span>
+                            {% endif %}
                             <div class="contenedor-archivo">
                                 <p class="nombre-archivo">
                                     <strong>Documento:</strong> {{ archivo.nombre_archivo_original }}

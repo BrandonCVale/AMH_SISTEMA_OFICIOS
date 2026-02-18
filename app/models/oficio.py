@@ -25,7 +25,7 @@ def crear_oficio_db(cursor, datos):
             id_usuario_creador, 
             id_usuario_asignado,
             id_area_asignada,
-            id_estatus_actual,
+            id_estatus_actual
         )
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
     """
@@ -126,6 +126,7 @@ def obtenter_los_detalles_de_un_oficio(id_oficio):
             o.fecha_creacion,
             ur.nombre_completo AS remitente,
             o.folio_interno,
+            o.folio_consecutivo,
             o.asunto,
             o.descripcion_solicitud,
             o.fecha_respuesta,
