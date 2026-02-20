@@ -9,6 +9,10 @@ from datetime import datetime
 from pymysql.err import IntegrityError
 from app.db import obtener_conexion
 
+# Importamos la herramienta para trabajar con el pdf
+from app.utils.pdf_tools import estampar_acuse_en_disco
+
+
 # Importamos los modelos (Los "Empleados" que escriben en la BD)
 from app.models.oficio import (
     crear_oficio_db,
@@ -89,9 +93,41 @@ class ServicioOficio:
                     ruta, nombre = self._guardar_archivo_en_disco(
                         archivo_principal, id_oficio
                     )
+
+                    # Estampar acuse de recibido si el archivo es pdf
+                    if nombre.lower().endswith(".pdf"):
+                        # 1. Necesitamos la ruta completa y real en el disco duro del servidor
+                        ruta_absoluta = os.path.join(
+                            current_app.root_path, "static", ruta
+                        )
+
+                        # 2. Preparamos los textos que irán en el sello
+                        persona_que_recibio = usuario_gestor.nombre_completo
+                        fecha_recibido = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                        folio_del_sistema = folio_consecutivo
+
+                        # 3. Mandamos llamar a la función que dibuja el sello y sobrescribe el archivo
+                        exito_estampado = estampar_acuse_en_disco(
+                            ruta_absoluta,
+                            persona_que_recibio,
+                            folio_del_sistema,
+                            fecha_recibido,
+                        )
+
+                        if not exito_estampado:
+                            # Opcional: Podrías hacer un current_app.logger.warning aquí
+                            print(
+                                "Advertencia: No se pudo estampar el acuse en el PDF."
+                            )
+
                     # Guardamos la ruta en la tabla 'documentos_oficio' usando el mismo cursor
                     guardar_documento_db(
-                        cursor, id_oficio, usuario_gestor.id, nombre, ruta, "SOLICITUD"
+                        cursor=cursor,
+                        id_oficio=id_oficio,
+                        id_usuario=usuario_gestor.id,
+                        nombre_real=nombre,
+                        ruta=ruta,
+                        tipo="SOLICITUD",
                     )
 
                 # C. Guardar Anexos (Físico + BD)
@@ -105,12 +141,12 @@ class ServicioOficio:
 
                         ruta, nombre = self._guardar_archivo_en_disco(anexo, id_oficio)
                         guardar_documento_db(
-                            cursor,
-                            id_oficio,
-                            usuario_gestor.id,
-                            nombre,
-                            ruta,
-                            "ANEXO_SOLICITUD",
+                            cursor=cursor,
+                            id_oficio=id_oficio,
+                            id_usuario=usuario_gestor.id,
+                            nombre_real=nombre,
+                            ruta=ruta,
+                            tipo="ANEXO_SOLICITUD",
                         )
 
                 # D. Registrar Historial (Bitácora)

@@ -7,7 +7,7 @@ from reportlab.lib.colors import black, blue
 from pypdf import PdfReader, PdfWriter
 
 
-def crear_sello_acuse(folio_texto, fecha_hora_texto):
+def crear_sello_acuse(persona_recibe_doc, folio_consecutivo, fecha_hora):
     """Genera el sello visual en memoria."""
     # Cear un archivo virtual que vive en RAM
     packet = io.BytesIO()
@@ -16,36 +16,41 @@ def crear_sello_acuse(folio_texto, fecha_hora_texto):
 
     # --- POSICIÓN DEL SELLO ---
     # Esquina superior derecha.
-    x = 350
-    y = 740
+    x = 50
+    y = 750
 
     # Dibujamos un marco (Opcional, para que parezca sello)
     c.setStrokeColor(blue)
     c.setLineWidth(1)
-    c.rect(x - 10, y - 10, 230, 45, stroke=1, fill=0)
+    c.rect(x - 10, y - 10, 260, 45, stroke=1, fill=0)
 
     # Textos del sello
     c.setFillColor(blue)
-    c.setFont("Helvetica-Bold", 10)
+    c.setFont("Helvetica-Bold", 15)
     c.drawString(x, y + 20, "ACUSE DE RECIBIDO - SISTEMA")
+    
+    c.setFillColor(blue)
+    c.setFont("Helvetica-Bold", 14)
+    c.drawString(x, y + 10, f"Persona que recibe: {persona_recibe_doc}")
 
-    c.setFillColor(black)
-    c.setFont("Helvetica", 9)
-    c.drawString(x, y + 5, f"Folio: {folio_texto}")
-    c.drawString(x, y - 8, f"Recibido: {fecha_hora_texto}")
+
+    c.setFillColor(blue)
+    c.setFont("Helvetica-Bold", 14)
+    c.drawString(x, y + 5, f"Folio: {folio_consecutivo}")
+    c.drawString(x, y - 8, f"Fecha recibido: {fecha_hora}")
 
     c.save()
     packet.seek(0)
     return packet
 
 
-def estampar_acuse_en_disco(ruta_fisica_pdf, folio_texto, fecha_hora_texto):
+def estampar_acuse_en_disco(ruta_fisica_pdf, persona, folio, fecha_hora):
     """
     Lee el PDF del disco, le pega el sello y lo SOBRESCRIBE.
     """
     try:
         # 1. Generar el sello en memoria
-        sello_io = crear_sello_acuse(folio_texto, fecha_hora_texto)
+        sello_io = crear_sello_acuse(persona, folio, fecha_hora)
         sello_reader = PdfReader(sello_io)
         pagina_sello = sello_reader.pages[0]
 
