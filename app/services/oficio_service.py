@@ -80,6 +80,9 @@ class ServicioOficio:
                 # El modelo escribe en la tabla 'oficios' y nos devuelve el ID generado (ej: 45)
                 id_oficio = crear_oficio_db(cursor, datos_oficio)
 
+                # LISTA PARA LOS MULTIPLES ARCHIVOS ADJUNTOS
+                rutas_para_correo = []
+
                 # B. Guardar Archivo Principal (Físico + BD)
                 if archivo_principal:
                     # Validamos extensión antes de guardar
@@ -120,6 +123,12 @@ class ServicioOficio:
                                 "Advertencia: No se pudo estampar el acuse en el PDF."
                             )
 
+                    # CALCULAR LAS RUTAS DE LOS ARCHIVOS
+                    ruta_absoluta_principal = os.path.join(
+                        current_app.root_path, "static", ruta
+                    )
+                    rutas_para_correo.append(ruta_absoluta_principal)
+
                     # Guardamos la ruta en la tabla 'documentos_oficio' usando el mismo cursor
                     guardar_documento_db(
                         cursor=cursor,
@@ -140,6 +149,13 @@ class ServicioOficio:
                             )
 
                         ruta, nombre = self._guardar_archivo_en_disco(anexo, id_oficio)
+
+                        # CALCULAR LAS RUTAS DE LOS ARCHIVOS
+                        ruta_absoluta_anexo = os.path.join(
+                            current_app.root_path, "static", ruta
+                        )
+                        rutas_para_correo.append(ruta_absoluta_anexo)
+
                         guardar_documento_db(
                             cursor=cursor,
                             id_oficio=id_oficio,
@@ -176,9 +192,12 @@ class ServicioOficio:
                 correo_sub = subdirector["correo_electronico"]
                 correo_adicional = formulario.get("correo_adicional")
 
-                # Lo enviamos con la funcion del service
+                # MULTIPLES ARCHIVOS ADJUNTOS
                 enviar_notificacion_de_nuevo_oficio(
-                    datos_email, correo_sub, correo_adicional
+                    datos_email,
+                    correo_sub,
+                    correo_adicional,
+                    lista_archivos_adjuntos=rutas_para_correo,
                 )
 
                 return True, f"Oficio {folio_manual} creado y notificado correctamente."
