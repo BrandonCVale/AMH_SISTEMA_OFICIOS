@@ -181,7 +181,13 @@ def buscar_usuario_por_email(email: str) -> Optional[Usuario]:
 def buscar_usuario_por_id(id_usuario: int) -> Optional[Usuario]:
     conexion = obtener_conexion()
     sql = """
-        SELECT id_usuario, nombre_completo, correo_electronico, id_rol, contrasena_hash, id_area 
+        SELECT 
+            id_usuario,
+            nombre_completo,
+            correo_electronico,
+            id_rol,
+            contrasena_hash,
+            id_area 
         FROM usuarios 
         WHERE id_usuario = %s AND activo = 1
     """

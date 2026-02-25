@@ -71,3 +71,46 @@ def enviar_notificacion_de_nuevo_oficio(
     # 6. Enviamos (Si falla aquí, lanzará una excepción que capturará la otra función)
     mail.send(msg)
     return True
+
+
+def enviar_notificacion_oficio_turnado(datos, correo_jud, lista_rutas_adjuntos=None):
+    """
+    Envia una notificacion por correo al JUD con los archivos adjuntos.
+    """
+    asunto = f"Se te ha asignado un oficio para su atención: {datos['folio_interno']}"
+
+    msg = Message(
+        subject=asunto,
+        sender=current_app.config["MAIL_USERNAME"],
+        recipients=[correo_jud],
+    )
+    msg.body = f"""
+        Saludos, 
+        Te han turnado una solicitud para su atención y seguimiento.
+        
+        Detalles:
+        Folio: {datos['folio_interno']}
+        Asunto: {datos['asunto']}
+        Descripcion de la solicitud: {datos['descripcion']}
+        
+                
+        Adjunto a este correo encontrará la solicitud oficial (PDF) y sus anexos correspondientes.
+        Ingrese al sistema para dar respuesta a esta solicitud.
+        """
+
+    # ARCHIVOS ADJUNTOS
+    if lista_rutas_adjuntos:
+        for ruta in lista_rutas_adjuntos:
+            if os.path.exists(ruta):
+                nombre_archivo = os.path.basename(ruta)
+                mime_type, _ = mimetypes.guess_type(ruta)
+                if not mime_type:
+                    mime_type = "application/octet-stream"
+                with open(ruta, "rb") as archivo:
+                    msg.attach(
+                        filename=nombre_archivo,
+                        content_type=mime_type,
+                        data=archivo.read(),
+                    )
+    mail.send(msg)
+    return True

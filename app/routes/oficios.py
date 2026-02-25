@@ -1,7 +1,10 @@
+import os
+from flask import current_app
 from flask import Blueprint, jsonify, redirect, render_template, request, url_for, flash
 from flask_login import login_required, current_user
 from app.models.catalogo import obtener_areas_activas
 from app.services.oficio_service import ServicioOficio
+from app.services.email_service import enviar_notificacion_oficio_turnado
 from app.models.oficio import (
     obtener_oficios_del_gestor,
     obtener_bandeja_entrada_subdirector,
@@ -20,8 +23,9 @@ from app.models.oficio import (
     obtener_archivos_peticion,
     registrar_respuesta_peticion_db,
     obtener_kpis_jud,
+    obtener_oficios_atendidos_del_subdirector,
 )
-from app.models.usuario import obtener_juds_por_area
+from app.models.usuario import obtener_juds_por_area, buscar_usuario_por_id
 
 # Creamos el Blueprint
 bp_oficios = Blueprint("oficios", __name__, url_prefix="/oficios")
@@ -54,6 +58,8 @@ def panel_control():
         mis_kpis = obtener_kpis_subdirector(current_user.id)
         # Obtener las peticiones de mis juds
         peticiones_de_mis_juds = obtener_solicitudes_de_mis_juds(current_user.id)
+        # Obtener el historial de atendidos (Oficios que ya no están en estatus 1)
+        mis_atendidos = obtener_oficios_atendidos_del_subdirector(current_user.id_area)
 
         return render_template(
             "oficios/dashboard_subdirector.html",
@@ -61,6 +67,7 @@ def panel_control():
             oficios=mis_oficios,
             kpis=mis_kpis,
             peticiones=peticiones_de_mis_juds,
+            atendidos=mis_atendidos,
         )
 
     # 3. Verificación para JUD
@@ -204,7 +211,46 @@ def turnar_oficio_a_jud(id_oficio):
     if asignar_oficio_a_jud_db(
         id_oficio, id_jud_seleccionado, current_user.id, instrucciones
     ):
-        flash("Oficio asignado al JUD correctamente.", "success")
+        # ENVIO DE CORREO AL JUD CON ARCHIVOS
+        try:
+            # Obtener los datos del jud (correo)
+            jud = buscar_usuario_por_id(id_jud_seleccionado)
+            # Obtener los detalles del oficio (asunto y folio)
+            detalles_oficio = obtenter_los_detalles_de_un_oficio(id_oficio)
+            # Obtener los archivos de este oficio (las rutas)
+            archivos = obtener_documentos_de_un_oficio(id_oficio)
+
+            # Crear la lista de rutas para los archivos
+            rutas_para_correo = []
+            if archivos:
+                for archivo in archivos:
+                    ruta_relativa = archivo["ruta_almacenamiento"]
+                    ruta_absoluta = os.path.join(
+                        current_app.root_path, "static", ruta_relativa
+                    )
+                    rutas_para_correo.append(ruta_absoluta)
+
+            datos_email = {
+                "folio_interno": detalles_oficio["folio_interno"],
+                "asunto": detalles_oficio["asunto"],
+                "descripcion": detalles_oficio["descripcion_solicitud"],
+            }
+            # Enviar correo
+            enviar_notificacion_oficio_turnado(
+                datos_email, jud.correo_electronico, rutas_para_correo
+            )
+
+            flash(
+                "Oficio asignado al JUD y notificado por correo correctamente.",
+                "success",
+            )
+
+        except Exception as e:
+            flash(
+                "Oficio asignado correctamente, pero hubo un error al notificar por correo al JUD.",
+                "error",
+            )
+            print(f"Error al enviar correo al jud: {e}")
     else:
         flash("Ocurrió un error al intentar asignar el oficio.", "error")
 

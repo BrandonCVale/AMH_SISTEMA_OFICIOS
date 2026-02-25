@@ -390,6 +390,33 @@ def obtener_bandeja_entrada_subdirector(id_usuario):
         return cursor.fetchall()
 
 
+def obtener_oficios_atendidos_del_subdirector(id_area):
+    """
+    Recupera los oficios del área que ya fueron procesados (Estatus != 1).
+    Sirve para llenar la tabla de 'Asignaciones Atendidas' del Subdirector.
+    """
+    conexion = obtener_conexion()
+    sql = """
+    SELECT
+        o.id_oficio,
+        o.folio_interno,
+        o.asunto,
+        ce.nombre AS estatus
+    FROM
+        oficios o
+    JOIN cat_estatus ce ON
+        o.id_estatus_actual = ce.id_estatus
+    WHERE
+        o.id_area_asignada = %s
+        AND o.id_estatus_actual != 1
+    ORDER BY
+        o.fecha_creacion DESC;
+    """
+    with conexion.cursor() as cursor:
+        cursor.execute(sql, (id_area,))
+        return cursor.fetchall()
+
+
 def asignar_oficio_a_jud_db(id_oficio, id_jud, id_subdirector, instrucciones):
     """
     Asigna el oficio a un JUD, cambia el estatus a 'En Proceso' (2)
