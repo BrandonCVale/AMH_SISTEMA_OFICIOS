@@ -55,11 +55,13 @@ def panel_control():
     elif current_user.es_subdirector:
         # BUSCAR LOS OFICIOS DE SU AREA
         mis_oficios = obtener_bandeja_entrada_subdirector(current_user.id)
-        mis_kpis = obtener_kpis_subdirector(current_user.id)
+        mis_kpis = obtener_kpis_subdirector(current_user.id, current_user.id_area)
         # Obtener las peticiones de mis juds
         peticiones_de_mis_juds = obtener_solicitudes_de_mis_juds(current_user.id)
         # Obtener el historial de atendidos (Oficios que ya no están en estatus 1)
         mis_atendidos = obtener_oficios_atendidos_del_subdirector(current_user.id_area)
+
+        print(mis_kpis)
 
         return render_template(
             "oficios/dashboard_subdirector.html",

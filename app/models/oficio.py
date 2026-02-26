@@ -248,7 +248,7 @@ def obtener_kpis_gestor(id_usuario):
             oficios
         WHERE
             id_usuario_creador = %s
-            AND id_estatus_actual IN (1, 2, 3);
+            AND id_estatus_actual IN (1, 3);
         """
         cursor.execute(sql_en_revision, (id_usuario,))
         conteo_kpis["En Revisión"] = cursor.fetchone()["en_revision"]
@@ -272,11 +272,11 @@ def obtener_kpis_gestor(id_usuario):
 # -- AQUI TERMINA
 
 
-def obtener_kpis_subdirector(id_usuario):
+def obtener_kpis_subdirector(id_usuario, id_area):
     """Cuenta los oficios creados por el Subdirector para sus KPIs."""
 
     conexion = obtener_conexion()
-    conteo_kpis = {"Recibidos": 0, "Por Asignar": 0, "En Proceso": 0}
+    conteo_kpis = {"Recibidos": 0, "Por Asignar": 0, "Peticiones": 0}
 
     with conexion.cursor() as cursor:
         # 1. Recibidos
@@ -286,9 +286,9 @@ def obtener_kpis_subdirector(id_usuario):
         FROM
             oficios
         WHERE
-            id_usuario_asignado = %s;
+            id_area_asignada = %s;
         """
-        cursor.execute(sql_recibidos, (id_usuario,))
+        cursor.execute(sql_recibidos, (id_area, ))
         conteo_kpis["Recibidos"] = cursor.fetchone()["recibidos"]
 
         # 2. Por asignar

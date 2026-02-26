@@ -17,19 +17,18 @@ Dashboard - Subdirección
         </div>
     </div>
     {# KPIs #}
-    {# Nota: Asegúrate de pasar 'kpis' desde Python #}
     {% with
-    titulo1="Oficios Atendidos", valor1 = kpis['Atendidos'],
-    titulo2="Por Asignar", valor2 = kpis['Por Asignar'],
-    titulo3="Peticiones JUDs", valor3 = kpis['Peticiones']
-    %}
-    {% include "fragments/kpis.html" %}
-    {% endwith %}
+            titulo1="Pendientes",    valor1=kpis['Por Asignar'],   
+            titulo2="Peticiones JUDS",    valor2=kpis['Peticiones'],
+            titulo3="Total (Atendidos y Pendientes)", valor3=kpis['Recibidos']
+            %}
+            {% include "fragments/kpis.html" %}
+        {% endwith %}
     {# --- SISTEMA DE PESTAÑAS --- #}
     <div class="contenedor-tabs">
         <button class="tab-btn activo"
-            onclick="abrirPestana(event, 'tab-asignar')">Oficios por
-            Asignar</button>
+            onclick="abrirPestana(event, 'tab-asignar')">Solicitudes pendientes por
+            asignar</button>
         <button class="tab-btn"
             onclick="abrirPestana(event, 'tab-peticiones')">Solicitudes de
             JUDs</button>
@@ -159,7 +158,8 @@ Dashboard - Subdirección
                             {% elif atendido.estatus == 'ASIGNADO' %}
                             <span class="badge badge-azul">Asignado</span>
                             {% else %}
-                            <span class="badge badge-gris">{{ atendido.estatus }}</span>
+                            <span class="badge badge-gris">{{ atendido.estatus
+                                }}</span>
                             {% endif %}
                         </td>
                     </tr>
