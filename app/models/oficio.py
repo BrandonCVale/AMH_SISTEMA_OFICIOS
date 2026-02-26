@@ -695,3 +695,4 @@ def guardar_archivo_peticion_db(
         VALUES (%s, %s, %s, %s, %s)
     """
     cursor.execute(sql, (id_peticion, id_usuario, nombre, ruta, extension))
+
