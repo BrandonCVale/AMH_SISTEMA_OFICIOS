@@ -573,7 +573,7 @@ def obtener_peticiones_del_jud(id_jud):
                 p.asunto,
                 p.descripcion,
                 ce.nombre AS estatus,
-                p.respuesta_subdirector
+                p.respuesta_recibida
             FROM
                 peticiones p
             JOIN cat_estatus ce ON

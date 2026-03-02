@@ -346,6 +346,20 @@ class ServicioOficio:
             current_app.logger.error(f"Error en procesar_peticion_jud: {e}")
             return False, f"Error al procesar la petición: {str(e)}"
 
+    def procesar_peticion_subdirector(self, formulario, archivo, usuario_subdirector):
+        """Guarda una peticion del subdirector en la tabla 'peticiones' y su archivo en 'archivos_peticion'."""
+        conexion = obtener_conexion()
+        try:
+            # Obtener gestor/es
+            pass
+        except IntegrityError:
+            conexion.rollback()
+            return False, f"El folio '{formulario['folio']}' ya existe."
+        except Exception as e:
+            conexion.rollback()
+            current_app.logger.error(f"Error en procesar_peticion_subdirector: {e}")
+            return False, f"Error al procesar la petición: {str(e)}"
+
     def _guardar_archivo_en_disco(self, archivo, id_oficio):
         """
         Método auxiliar privado. Solo se encarga de mover el archivo al disco duro.

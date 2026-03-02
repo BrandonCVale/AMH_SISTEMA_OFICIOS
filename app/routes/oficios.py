@@ -322,6 +322,31 @@ def nueva_peticion():
     return render_template("oficios/peticion_jud.html", usuario=current_user)
 
 
+@bp_oficios.route("/nueva_peticion_subdirector", methods=["GET", "POST"])
+@login_required
+def nueva_peticion_subdirector():
+    if request.method == "POST":
+        formulario = {
+            "asunto": request.form["asunto"],
+            "folio": request.form["folio"],
+            "descripcion_solicitud": request.form["descripcion_solicitud"],
+        }
+        archivo = request.files.get("archivo")
+
+        servicio = ServicioOficio()
+        exito, mensaje = servicio.procesar_peticion_subdirector(
+            formulario, archivo, current_user
+        )
+
+        if exito:
+            flash(mensaje, "success")
+            return redirect(url_for("oficios.panel_control"))
+        else:
+            flash(mensaje, "error")
+
+    return render_template("oficios/peticion_subdirector.html", usuario=current_user)
+
+
 @bp_oficios.route(
     "/responder_peticion_de_jud/<int:id_peticion>", methods=["GET", "POST"]
 )
