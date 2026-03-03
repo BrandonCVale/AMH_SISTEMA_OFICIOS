@@ -24,6 +24,7 @@ from app.models.oficio import (
     registrar_respuesta_peticion_db,
     obtener_kpis_jud,
     obtener_oficios_atendidos_del_subdirector,
+    obtener_a_todos_los_gestores,
 )
 from app.models.usuario import obtener_juds_por_area, buscar_usuario_por_id
 
@@ -325,6 +326,8 @@ def nueva_peticion():
 @bp_oficios.route("/nueva_peticion_subdirector", methods=["GET", "POST"])
 @login_required
 def nueva_peticion_subdirector():
+    lista_gestores = obtener_a_todos_los_gestores()
+
     if request.method == "POST":
         formulario = {
             "asunto": request.form["asunto"],
@@ -344,7 +347,11 @@ def nueva_peticion_subdirector():
         else:
             flash(mensaje, "error")
 
-    return render_template("oficios/peticion_subdirector.html", usuario=current_user)
+    return render_template(
+        "oficios/peticion_subdirector.html",
+        usuario=current_user,
+        gestores=lista_gestores,
+    )
 
 
 @bp_oficios.route(

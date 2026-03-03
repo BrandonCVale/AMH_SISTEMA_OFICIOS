@@ -2,6 +2,7 @@
 {% block titulo %}
 Peticiones Subdirector
 {% endblock titulo %}
+
 {% block css_adicional %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/panel.css') }}">
 {% endblock css_adicional %}
@@ -10,46 +11,80 @@ Peticiones Subdirector
 <div class="contenedor-principal">
     {# Header #}
     <div class="header-seccion">
-        <h1 class="titulo-panel">Nueva Petición</h1>
-        <p class="subtitulo-panel">Rellena los siguientes campos para realizar
-            una nueva petición</p>
+        <div>
+            <h1 class="titulo-panel">Nueva Petición</h1>
+            <p class="subtitulo-panel">Rellena los siguientes campos para
+                realizar una nueva petición</p>
+        </div>
+        <a href="{{ url_for('oficios.panel_control') }}"
+            class="btn-gris">Volver</a>
     </div>
-    <a href="{{ url_for('oficios.panel_control') }}" class="btn-gris">Volver</a>
-</div>
-{# FORMULARIO INICIO #}
-<div class="tarjeta-contenido">
-    <div class="titulo-tarjeta">
-        <h3>Selecciona al gestor</h3>
-    </div>
-    <form action="POST" enctype="multipart/form-data">
-        <div>
-            <label class="detalle-grupo">Asunto de la petición:</label>
-            <input type="text" name="asunto" class="form-control" required>
-        </div>
-        <div>
-            <label class="detalle-grupo">Folio:</label>
-            <input type="text" name="folio" class="form-control" required>
-        </div>
-        <div>
-            <label class="detalle-grupo">Descripción de la Petición:</label>
-            <textarea name="descripcion_solicitud" rows="6" class="form-control"
-                required></textarea>
-        </div>
-        <div class="input-archivo-wrapper">
-            <label class="detalle-grupo">Adjuntar Oficio de Petición
-                (PDF):</label>
-            <input type="file"
-                name="archivo"
-                id="archivo"
-                class="form-control"
-                accept=".pdf"
-                required>
-        </div>
-        <div class="acciones-formulario">
-            <button type="submit" class="btn-primario">Enviar</button>
-        </div>
-        {# boton enviar fin#}
-    </form>
-</div>
 
+    {# FORMULARIO INICIO #}
+    <div class="tarjeta-contenido contenedor-formulario tarjeta-destacada">
+
+        <div class="titulo-tarjeta">
+            <h3 class="titulo-seccion">Detalles de la Petición</h3>
+        </div>
+
+        <form method="POST"
+            action="{{ url_for('oficios.nueva_peticion_subdirector') }}"
+            enctype="multipart/form-data" class="formulario-estandar">
+
+            <div class="grupo-formulario">
+                <label class="etiqueta-formulario">Selecciona al gestor
+                    asignado:</label>
+                <select name="id_usuario" class="form-control" required>
+                    <option value disabled selected>Selecciona a un gestor de la
+                        lista...</option>
+                    {% for gestor in gestores %}
+                    <option value="{{gestor.id_usuario}}">{{
+                        gestor.nombre_completo }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <hr class="separador-horizontal">
+
+            <div class="grupo-formulario">
+                <label class="etiqueta-formulario">Asunto de la
+                    petición:</label>
+                <input type="text" name="asunto" class="form-control"
+                    placeholder="Ej. Solicitud de insumos..." required>
+            </div>
+
+            <div class="grupo-formulario">
+                <label class="etiqueta-formulario">Folio:</label>
+                <input type="text" name="folio" class="form-control input-folio"
+                    required>
+            </div>
+
+            <div class="grupo-formulario">
+                <label class="etiqueta-formulario">Descripción de la
+                    Petición:</label>
+                <textarea name="descripcion_solicitud" rows="6"
+                    class="form-control"
+                    placeholder="Detalla los requerimientos aquí..."
+                    required></textarea>
+            </div>
+
+            <div class="grupo-formulario input-archivo-wrapper">
+                <label class="etiqueta-formulario">Adjuntar Oficio de Petición
+                    (PDF):</label>
+                <input type="file" name="archivo" id="archivo"
+                    class="form-control input-archivo" accept=".pdf" required>
+                <span class="texto-ayuda">Solo se permiten archivos en formato
+                    .pdf</span>
+            </div>
+
+            <div class="acciones-formulario" style="margin-top: 15px;">
+                <a href="{{ url_for('oficios.panel_control') }}"
+                    class="btn-cancelar">Cancelar</a>
+                <button type="submit" class="btn-primario">Enviar
+                    Petición</button>
+            </div>
+
+        </form>
+    </div>
+</div>
 {% endblock contenido_principal %}

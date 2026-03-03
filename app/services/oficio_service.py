@@ -350,7 +350,9 @@ class ServicioOficio:
         """Guarda una peticion del subdirector en la tabla 'peticiones' y su archivo en 'archivos_peticion'."""
         conexion = obtener_conexion()
         try:
-            # Obtener gestor/es
+            # Insertar peticion
+            # conexion.begin()
+            # with conexion.cursor() as cursor:
             pass
         except IntegrityError:
             conexion.rollback()

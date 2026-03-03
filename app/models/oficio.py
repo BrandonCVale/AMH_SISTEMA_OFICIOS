@@ -288,7 +288,7 @@ def obtener_kpis_subdirector(id_usuario, id_area):
         WHERE
             id_area_asignada = %s;
         """
-        cursor.execute(sql_recibidos, (id_area, ))
+        cursor.execute(sql_recibidos, (id_area,))
         conteo_kpis["Recibidos"] = cursor.fetchone()["recibidos"]
 
         # 2. Por asignar
@@ -696,3 +696,27 @@ def guardar_archivo_peticion_db(
     """
     cursor.execute(sql, (id_peticion, id_usuario, nombre, ruta, extension))
 
+
+def obtener_a_todos_los_gestores():
+    """Regresa una lista con todos los usuarios de tipo gestor"""
+    conexion = obtener_conexion()
+
+    sql = """
+        SELECT
+            id_usuario,
+            nombre_completo,
+            correo_electronico,
+            activo
+        FROM
+            usuarios
+        WHERE
+            id_rol = 1;
+    """
+
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute(sql)
+            return cursor.fetchall()
+    except Exception as e:
+        print(f"Error al obtener la lista de gestores: {e}")
+        return None
