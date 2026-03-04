@@ -333,6 +333,7 @@ def nueva_peticion_subdirector():
             "asunto": request.form["asunto"],
             "folio": request.form["folio"],
             "descripcion_solicitud": request.form["descripcion_solicitud"],
+            "id_destinatario": request.form.get("id_gestor_destinatario"),
         }
         archivo = request.files.get("archivo")
 
@@ -391,6 +392,48 @@ def responder_peticion_de_jud(id_peticion):
     # Si es GET
     return render_template(
         "oficios/responder_peticion_jud.html",
+        peticion=info_peticion,
+        archivos=archivos_peticion,
+    )
+
+
+@bp_oficios.route(
+    "/responder_peticion_subdirector/<int:id_peticion>", methods=["GET", "POST"]
+)
+@login_required
+def responder_peticion_subdirector(id_peticion):
+    # Obtenemos la informacion de la peticion
+    info_peticion = obtener_detalles_peticion(id_peticion)
+    archivos_peticion = obtener_archivos_peticion(id_peticion)
+
+    if request.method == "POST":
+        # Recibir los datos del formualario (id_et)
+        id_peticion = request.form.get("id_peticion")
+        texto_respuesta = request.form.get("respuesta_texto")
+        decision_boton = request.form.get("decision")
+
+        # Validacion del boton y asignas el nuevo estatus
+        if decision_boton == "APROBADO":
+            id_nuevo_estatus = 6
+            mensaje = "Solicitud aprobada exitosamente"
+            tipo = "success"
+        else:
+            id_nuevo_estatus = 5
+            mensaje = "Solicitud rechazada exitosamente"
+            tipo = "danger"
+
+        # Guardar los cambios en la bd
+        registrar_respuesta_peticion_db(
+            id_peticion=id_peticion,
+            texto_respuesta=texto_respuesta,
+            id_estatus_final=id_nuevo_estatus,
+        )
+        flash(mensaje, tipo)
+        return redirect(url_for("oficios.panel_control"))
+
+    # Si es GET
+    return render_template(
+        "oficios/responder_peticion_subdirector.html",
         peticion=info_peticion,
         archivos=archivos_peticion,
     )
