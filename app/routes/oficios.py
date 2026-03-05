@@ -25,6 +25,7 @@ from app.models.oficio import (
     obtener_kpis_jud,
     obtener_oficios_atendidos_del_subdirector,
     obtener_a_todos_los_gestores,
+    obtener_solicitudes_de_mis_subdirectores,
 )
 from app.models.usuario import obtener_juds_por_area, buscar_usuario_por_id
 
@@ -44,12 +45,14 @@ def panel_control():
         # Obtenemos los oficios del gestor para pasarselos a la tabla en su html
         mis_oficios = obtener_oficios_del_gestor(current_user.id)
         mis_kpis = obtener_kpis_gestor(current_user.id)
+        mis_peticiones = obtener_solicitudes_de_mis_subdirectores(current_user.id)
 
         return render_template(
             "oficios/dashboard_gestor.html",
             usuario=current_user,
             oficios=mis_oficios,
             kpis=mis_kpis,
+            peticiones=mis_peticiones,
         )
 
     # 2. Verificación para SUBDIRECTOR
@@ -405,6 +408,9 @@ def responder_peticion_subdirector(id_peticion):
     # Obtenemos la informacion de la peticion
     info_peticion = obtener_detalles_peticion(id_peticion)
     archivos_peticion = obtener_archivos_peticion(id_peticion)
+    peticiones_de_mis_subdirectores = obtener_solicitudes_de_mis_subdirectores(
+        current_user.id
+    )
 
     if request.method == "POST":
         # Recibir los datos del formualario (id_et)
@@ -436,6 +442,7 @@ def responder_peticion_subdirector(id_peticion):
         "oficios/responder_peticion_subdirector.html",
         peticion=info_peticion,
         archivos=archivos_peticion,
+        peticiones = peticiones_de_mis_subdirectores,
     )
 
 

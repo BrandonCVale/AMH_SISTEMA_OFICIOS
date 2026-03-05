@@ -68,6 +68,7 @@
                 <h3 class="titulo-seccion">Gestionar Peticiones</h3>
                 <a href="{{ url_for('oficios.nueva_peticion') }}" class="btn-primario">Nueva Solicitud</a>
             </div>
+            {# TABLA #}
             <div class="tarjeta-tabla">
                 <table class="tabla-moderna">
                     <thead>
@@ -97,8 +98,8 @@
                                     {% endif %}
                                 </td>
                                 <td>
-                                    {% if peticion.respuesta_subdirector %}
-                                        {{ peticion.respuesta_subdirector }}
+                                    {% if peticion.respuesta_recibida %}
+                                        {{ peticion.respuesta_recibida }}
                                     {% else %}
                                         <span class="texto-gris">Sin respuesta aún</span>
                                     {% endif %}

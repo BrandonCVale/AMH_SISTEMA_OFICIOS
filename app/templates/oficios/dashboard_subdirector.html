@@ -175,10 +175,13 @@ Dashboard - Subdirección
     </div>
     {# --- CONTENIDO 4: REALIZAR PETICIONES --- #}
     <div id="tab-realizar_peticion" class="contenido-tab">
-        <div>
-            <a href="{{ url_for('oficios.nueva_peticion_subdirector') }}" class="btn-primario">Realizar petición</a>
+        <div class="header-seccion">
+            <h3 class="titulo-seccion">Gestionar Peticiones</h3>
+            <a href="{{ url_for('oficios.nueva_peticion_subdirector') }}"
+                class="btn-primario">Nueva Solicitud</a>
         </div>
-        <div class="tarjeta-tabla">
+        {# TABLA #}
+        <div class="tabla-moderna">
             <table class="tabla-moderna">
                 <thead>
                     <tr>
@@ -186,6 +189,7 @@ Dashboard - Subdirección
                         <th>Asunto</th>
                         <th>Descripción</th>
                         <th>Estatus</th>
+                        <th>Respuesta</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -194,15 +198,29 @@ Dashboard - Subdirección
                         <td>
                             <strong>{{ peticion.folio_peticion }}</strong>
                         </td>
+                        <td>{{ peticion.asunto }}</td>
+                        <td>{{ peticion.descripcion }}</td>
                         <td>
-                            {{ peticion.asunto }}
+                            {% if peticion.estatus == 'EN_REVISION' %}
+                            <span class="badge-amarillo">En revisión</span>
+                            {% elif peticion.estatus == 'APROBADO' %}
+                            <span class="badge-verde">Aprobado</span>
+                            {% else %}
+                            <span class="badge-rojo">Rechazado</span>
+                            {% endif %}
                         </td>
                         <td>
-                            {{ peticion.descripcion }}
+                            {% if peticion.respuesta_recibida %}
+                            {{ peticion.respuesta_recibida }}
+                            {% else %}
+                            <span class="texto-gris">Sin respuesta aún</span>
+                            {% endif %}
                         </td>
-                        <td>
-                            {{ peticion.estatus}}
-                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" class="fila-vacia">No has realizado
+                            ninguna petición</td>
                     </tr>
                     {% endfor %}
                 </tbody>

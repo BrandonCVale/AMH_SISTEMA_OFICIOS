@@ -617,6 +617,32 @@ def obtener_solicitudes_de_mis_juds(id_subdirector):
         return cursor.fetchall()
 
 
+def obtener_solicitudes_de_mis_subdirectores(id_gestor):
+    """Obtiene las peticiones hechas por los subdirectores en donde el usuario gestor
+    es el asignado por el subdirector"""
+    conexion = obtener_conexion()
+    sql = """
+        SELECT
+            p.id_peticion,
+            p.folio_peticion,
+            p.asunto,
+            p.descripcion,
+            ce.nombre AS estatus,
+            p.respuesta_recibida
+        FROM
+            peticiones p
+        JOIN cat_estatus ce ON
+            p.id_estatus = ce.id_estatus
+        WHERE
+            p.id_destinatario = %s
+        ORDER BY 
+            p.fecha_creacion ASC;
+    """
+    with conexion.cursor() as cursor:
+        cursor.execute(sql, (id_gestor,))
+        return cursor.fetchall()
+
+
 def obtener_detalles_peticion(id_peticion):
     """Obtiene los detalles de una peticion"""
     conexion = obtener_conexion()
