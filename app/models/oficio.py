@@ -647,21 +647,27 @@ def obtener_detalles_peticion(id_peticion):
     """Obtiene los detalles de una peticion"""
     conexion = obtener_conexion()
     sql = """
-            SELECT
-                p.id_peticion ,
-                p.folio_peticion ,
-                u.nombre_completo AS solicitante,
-                p.fecha_creacion ,
-                p.asunto,
-                p.descripcion
-            FROM
-                peticiones p
-            JOIN usuarios u ON
-                p.id_usuario_creador = u.id_usuario
-            WHERE
-                p.id_peticion = %s
-            ORDER BY
-                p.fecha_creacion DESC;
+        SELECT
+            p.id_peticion ,
+            p.folio_peticion ,
+            u.nombre_completo AS solicitante,
+            p.fecha_creacion ,
+            p.asunto,
+            p.descripcion,
+            ce.nombre AS estatus,
+            u2.nombre_completo AS destinatario
+        FROM
+            peticiones p
+        JOIN usuarios u ON
+            p.id_usuario_creador = u.id_usuario
+        JOIN cat_estatus ce ON
+            p.id_estatus = ce.id_estatus
+        JOIN usuarios u2 ON
+            p.id_destinatario = u2.id_usuario
+        WHERE
+            p.id_peticion = %s
+        ORDER BY
+            p.fecha_creacion DESC;
     """
     with conexion.cursor() as cursor:
         cursor.execute(sql, (id_peticion,))
@@ -696,7 +702,7 @@ def registrar_respuesta_peticion_db(id_peticion, texto_respuesta, id_estatus_fin
             UPDATE
                 peticiones p
             SET
-                p.respuesta_subdirector = %s,
+                p.respuesta_recibida = %s,
                 p.id_estatus = %s
             WHERE
                 p.id_peticion = %s;

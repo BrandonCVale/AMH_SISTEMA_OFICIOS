@@ -167,6 +167,19 @@ def ver_detalles_oficio(id_oficio):
         historial=historial,
     )
 
+@bp_oficios.route("/ver_detalles_peticion/<int:id_peticion>")
+@login_required
+def ver_detalles_peticion(id_peticion):
+    # 1. Obtener los detalles y archivos de un oficio
+    detalles_peticion = obtener_detalles_peticion(id_peticion)
+    archivos_peticion = obtener_archivos_peticion(id_peticion)
+    # 2. Renderizar plantilla
+    return render_template(
+        "oficios/ver_detalles_peticion.html",
+        peticion = detalles_peticion,
+        archivos_peticion = archivos_peticion
+    )
+
 
 @bp_oficios.route("/reasignar_oficio/<int:id_oficio>", methods=["GET", "POST"])
 @login_required

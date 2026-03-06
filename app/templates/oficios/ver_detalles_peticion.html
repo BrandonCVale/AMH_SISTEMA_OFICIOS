@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block titulo %}
+Ver detalles peticion
+{% endblock titulo %}
+
+{% block css_adicional %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/panel.css') }}">
+<link rel="stylesheet"
+    href="{{ url_for('static', filename='css/detalle_oficio.css') }}">
+{% endblock css_adicional %}
+
+{% block contenido_principal %}
+<div class="contenedor-principal">
+    <div class="flex-header">
+        <div>
+            <h1 class="titulo-panel">Petición: {{ peticion.folio_peticion }}</h1>
+            <p class="subtitulo-panel">Seguimiento de la petición</p>
+        </div>
+        <a href="{{ url_for('oficios.panel_control')}}" class="btn-gris">Volver
+            al Panel</a>
+    </div>
+
+    <div
+        class="banner-estado {% if peticion.estatus == 'Finalizado' %}borde-verde{% elif peticion.estatus == 'En Revisión' %}borde-amarillo{% else %}borde-azul{% endif %}">
+        <div class="info-estado">
+            <span class="texto-etiqueta">Estatus Actual:</span>
+            <br>
+            <span
+                class="badge-estado-lg {% if peticion.estatus == 'Finalizado' %}bg-verde{% elif peticion.estatus == 'En Revisión' %}bg-amarillo{% else %}bg-azul{% endif %}">
+                {{ peticion.estatus }}
+            </span>
+        </div>
+        <div class="info-responsable">
+            <span class="texto-etiqueta">Responsable Actual:</span>
+            <br>
+            <strong class="dato-texto">{{ peticion.destinatario }}</strong>
+        </div>
+        <div class="info-fecha">
+            <span class="texto-etiqueta">Fecha Creación:</span>
+            <br>
+            <strong class="dato-texto">{{ peticion.fecha_creacion }}</strong>
+        </div>
+    </div>
+
+    <div class="grid-detalle">
+        <div class="columna-info">
+            <div class="tarjeta-blanca">
+                <h3 class="titulo-tarjeta">Información General</h3>
+                <div class="grupo-dato">
+                    <label class="texto-etiqueta">Asunto:</label>
+                    <p class="dato-texto">{{ peticion.asunto }}</p>
+                </div>
+                <div class="grupo-dato">
+                    <label class="texto-etiqueta">Descripción /
+                        Solicitud:</label>
+                    <div class="descripcion-larga">
+                        {{ peticion.descripcion }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="tarjeta-blanca">
+                <h3 class="titulo-tarjeta">Archivos Adjuntos</h3>
+                {% if archivos_peticion %}
+                <ul class="lista-archivos">
+                    {% for doc in archivos_peticion %}
+                    <li class="item-archivo">
+                        <div class="info-archivo">
+                            <span>
+                                {% if 'pdf' in doc.nombre_archivo.lower() %}
+                                🔴
+                                {% else %}
+                                🔵
+                                {% endif %}
+                                {{ doc.nombre_archivo }}
+                            </span>
+                        </div>
+                        <a
+                            href="{{ url_for('static', filename=doc.ruta_almacenamiento)}}"
+                            class="btn-descargar" target="_blank">Descargar</a>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="texto-gris-pequeno">No se adjuntaron archivos a esta
+                    petición.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock contenido_principal %}
