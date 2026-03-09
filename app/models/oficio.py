@@ -382,7 +382,7 @@ def obtener_bandeja_entrada_subdirector(id_usuario):
         o.id_usuario_asignado = %s
         AND o.id_estatus_actual = 1
     ORDER BY
-        o.fecha_creacion ASC;
+        o.fecha_creacion DESC;
     """
 
     with conexion.cursor() as cursor:

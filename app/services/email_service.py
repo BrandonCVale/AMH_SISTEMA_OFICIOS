@@ -40,6 +40,7 @@ def enviar_notificacion_de_nuevo_oficio(
     Folio:    {datos['folio']}
     Asunto:   {datos['asunto']}
     Área:     {datos['area']}
+    Cuerpo:   {datos['descripcion']}
     --------------------------------------
     
     Ingrese al sistema para atenderlo.
@@ -91,10 +92,10 @@ def enviar_notificacion_oficio_turnado(datos, correo_jud, lista_rutas_adjuntos=N
         Detalles:
         Folio: {datos['folio_interno']}
         Asunto: {datos['asunto']}
-        Descripcion de la solicitud: {datos['descripcion']}
+        Instrucciones del subdirector: {datos['instrucciones_subdirector']}
         
                 
-        Adjunto a este correo encontrará la solicitud oficial (PDF) y sus anexos correspondientes.
+        Adjunto a este correo encontrará la solicitud oficial (PDF) SELLADA por el sistema y sus anexos correspondientes.
         Ingrese al sistema para dar respuesta a esta solicitud.
         """
 

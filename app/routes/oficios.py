@@ -253,6 +253,7 @@ def turnar_oficio_a_jud(id_oficio):
                 "folio_interno": detalles_oficio["folio_interno"],
                 "asunto": detalles_oficio["asunto"],
                 "descripcion": detalles_oficio["descripcion_solicitud"],
+                "instrucciones_subdirector": instrucciones,
             }
             # Enviar correo
             enviar_notificacion_oficio_turnado(

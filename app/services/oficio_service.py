@@ -190,6 +190,7 @@ class ServicioOficio:
                     "folio": folio_manual,
                     "asunto": formulario["asunto"],
                     "area": nombre_area,
+                    "descripcion": formulario["descripcion_solicitud"],
                 }
                 # Preparammos los correos
                 correo_sub = subdirector["correo_electronico"]
