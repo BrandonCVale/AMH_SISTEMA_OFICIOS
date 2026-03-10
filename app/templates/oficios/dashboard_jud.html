@@ -1,171 +1,182 @@
 {% extends "base.html" %}
 {% block titulo %}
-Panel JUD
+    Panel JUD
 {% endblock titulo %}
 {% block css_adicional %}
-<link rel="stylesheet"
-    href="{{ url_for('static', filename='css/panel.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/panel.css') }}">
 {% endblock css_adicional %}
 {% block contenido_principal %}
-<div class="contenedor-principal">
-    <div class="header-seccion">
-        <div>
-            <h1 class="titulo-panel">Mi Dashboard</h1>
-        </div>
-    </div>
-    {# KPIs #}
-    {% with
-    titulo1="Asignaciones Pendientes", valor1 = kpis['Pendientes'],
-    titulo2="Asignaciones Atendidas", valor2=kpis['Atendidos'],
-    titulo3="Peticiones", valor3=kpis['Peticiones']
-    %}
-    {% include "fragments/kpis.html" %}
-    {% endwith %}
-    {# --- TABS DE NAVEGACIÓN (3 Pestañas) --- #}
-    <div class="contenedor-tabs">
-        <button class="tab-btn activo"
-            onclick="abrirPestana(event, 'tab-asignaciones')">Mis
-            Asignaciones</button>
-        <button class="tab-btn"
-            onclick="abrirPestana(event, 'tab-peticiones')">Mis
-            Peticiones</button>
-        <button class="tab-btn"
-            onclick="abrirPestana(event, 'tab-atendidos')">Asignaciones
-            Atendidas</button>
-    </div>
-    {# --- CONTENIDO 1: ASIGNACIONES PENDIENTES --- #}
-    <div id="tab-asignaciones" class="contenido-tab activo">
-        <div class="tarjeta-tabla">
-            <table class="tabla-moderna">
-                <thead>
-                    <tr>
-                        <th>Folio</th>
-                        <th>Asunto</th>
-                        <th>Descripción</th>
-                        <th class="alinear-derecha">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for oficio in oficios %}
-                    <tr>
-                        <td>
-                            <span class="dato-folio">{{ oficio.folio_interno
-                                }}</span>
-                        </td>
-                        <td>{{ oficio.asunto }}</td>
-                        <td>{{ oficio.descripcion_solicitud }}</td>
-                        <td class="alinear-derecha">
-                            <a
-                                href="{{ url_for('oficios.atender_oficio', id_oficio=oficio.id_oficio) }}"
-                                class="btn-accion">Atender</a>
-                        </td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="4" class="fila-vacia">Sin asignaciones
-                            pendientes</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-    {# --- CONTENIDO 2: MIS PETICIONES --- #}
-    <div id="tab-peticiones" class="contenido-tab">
+    <div class="contenedor-principal">
         <div class="header-seccion">
-            <h3 class="titulo-seccion">Gestionar Peticiones</h3>
-            <a href="{{ url_for('oficios.nueva_peticion') }}"
-                class="btn-primario">Nueva Solicitud</a>
+            <div>
+                <h1 class="titulo-panel">Mi Dashboard</h1>
+            </div>
         </div>
-        {# TABLA #}
-        <div class="tarjeta-tabla">
-            <table class="tabla-moderna">
-                <thead>
-                    <tr>
-                        <th>Folio</th>
-                        <th>Asunto</th>
-                        <th>Descripción</th>
-                        <th>Estatus</th>
-                        <th>Respuesta Subdirector</th>
-                        <th class="alinear-derecha">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for peticion in peticiones %}
-                    <tr>
-                        <td>
-                            <strong>{{ peticion.folio_peticion }}</strong>
-                        </td>
-                        <td>{{ peticion.asunto }}</td>
-                        <td>{{ peticion.descripcion }}</td>
-                        <td>
-                            {% if peticion.estatus == 'EN_REVISION' %}
-                            <span class="badge-amarillo">En revisión</span>
-                            {% elif peticion.estatus == 'APROBADO' %}
-                            <span class="badge-verde">Aprobado</span>
-                            {% else %}
-                            <span class="badge-rojo">Rechazado</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if peticion.respuesta_recibida %}
-                            {{ peticion.respuesta_recibida }}
-                            {% else %}
-                            <span class="texto-gris">Sin respuesta aún</span>
-                            {% endif %}
-                        </td>
-                        <td class="alinear-derecha">
-                            <a
-                                href="{{ url_for('oficios.ver_detalles_peticion', id_peticion=peticion.id_peticion) }}"
-                                class="btn-accion">Ver</a>
-                        </td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="4" class="fila-vacia">No has realizado
-                            ninguna petición</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        {# KPIs #}
+        {% with
+            titulo1="Asignaciones Pendientes", valor1 = kpis['Pendientes'],
+            titulo2="Asignaciones Atendidas", valor2=kpis['Atendidos'],
+            titulo3="Peticiones", valor3=kpis['Peticiones']
+            %}
+            {% include "fragments/kpis.html" %}
+        {% endwith %}
+        {# --- TABS DE NAVEGACIÓN (3 Pestañas) --- #}
+        <div class="contenedor-tabs">
+            <button class="tab-btn activo"
+                    onclick="abrirPestana(event, 'tab-asignaciones')">
+                Mis
+                Asignaciones
+            </button>
+            <button class="tab-btn" onclick="abrirPestana(event, 'tab-peticiones')">
+                Mis
+                Peticiones
+            </button>
+            <button class="tab-btn" onclick="abrirPestana(event, 'tab-atendidos')">
+                Asignaciones
+                Atendidas
+            </button>
+        </div>
+        {# --- CONTENIDO 1: ASIGNACIONES PENDIENTES --- #}
+        <div id="tab-asignaciones" class="contenido-tab activo">
+            <div class="tarjeta-tabla">
+                <table class="tabla-moderna">
+                    <thead>
+                        <tr>
+                            <th>Folio</th>
+                            <th>Asunto</th>
+                            <th>Descripción</th>
+                            <th class="alinear-derecha">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for oficio in oficios %}
+                            <tr>
+                                <td>
+                                    <span class="dato-folio">{{ oficio.folio_interno
+                                    }}</span>
+                                </td>
+                                <td>{{ oficio.asunto }}</td>
+                                <td>{{ oficio.descripcion_solicitud }}</td>
+                                <td class="alinear-derecha">
+                                    <a href="{{ url_for('oficios.atender_oficio', id_oficio=oficio.id_oficio) }}"
+                                       class="btn-primario">Atender</a>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="4" class="fila-vacia">
+                                    Sin asignaciones
+                                    pendientes
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {# --- CONTENIDO 2: MIS PETICIONES --- #}
+        <div id="tab-peticiones" class="contenido-tab">
+            <div class="header-seccion">
+                <h3 class="titulo-seccion">Gestionar Peticiones</h3>
+                <a href="{{ url_for('oficios.nueva_peticion') }}" class="btn-primario">Nueva Solicitud</a>
+            </div>
+            {# TABLA #}
+            <div class="tarjeta-tabla">
+                <table class="tabla-moderna">
+                    <thead>
+                        <tr>
+                            <th>Folio</th>
+                            <th>Asunto</th>
+                            <th>Descripción</th>
+                            <th>Estatus</th>
+                            <th>Respuesta Subdirector</th>
+                            <th class="alinear-derecha">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for peticion in peticiones %}
+                            <tr>
+                                <td>
+                                    <strong class="dato-folio">{{ peticion.folio_peticion }}</strong>
+                                </td>
+                                <td>{{ peticion.asunto }}</td>
+                                <td>{{ peticion.descripcion }}</td>
+                                <td>
+                                    {% if peticion.estatus == 'EN_REVISION' %}
+                                        <span class="badge-amarillo">En revisión</span>
+                                    {% elif peticion.estatus == 'APROBADO' %}
+                                        <span class="badge-verde">Aprobado</span>
+                                    {% else %}
+                                        <span class="badge-rojo">Rechazado</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if peticion.respuesta_recibida %}
+                                        {{ peticion.respuesta_recibida }}
+                                    {% else %}
+                                        <span class="texto-gris">Sin respuesta aún</span>
+                                    {% endif %}
+                                </td>
+                                <td class="alinear-derecha">
+                                    <a href="{{ url_for('oficios.ver_detalles_peticion', id_peticion=peticion.id_peticion) }}"
+                                       class="btn-primario">Ver</a>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="4" class="fila-vacia">
+                                    No has realizado
+                                    ninguna petición
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {# --- CONTENIDO 3: HISTORIAL ASIGNACIONES ATENDIDAS --- #}
+        <div id="tab-atendidos" class="contenido-tab">
+            <div class="tarjeta-tabla">
+                <table class="tabla-moderna">
+                    <thead>
+                        <tr>
+                            <th>Folio</th>
+                            <th>Asunto</th>
+                            <th class="alinear-derecha">Estatus</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for atendido in atendidos %}
+                            <tr>
+                                <td>
+                                    <span class="dato-folio">{{ atendido.folio_interno }}</span>
+                                </td>
+                                <td>{{ atendido.asunto }}</td>
+                                {# <td>{{ atendido.texto_respuesta }}</td> #}
+                                <td class="alinear-derecha">
+                                    <button class="btn-gris" disabled>Atendido</button>
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('oficios.ver_detalles_oficio', id_oficio=atendido.id_oficio) }}"
+                                       class="btn-primario">Ver detalles</a>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="4" class="fila-vacia">
+                                    No has atendido
+                                    oficios aún
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-    {# --- CONTENIDO 3: HISTORIAL ASIGNACIONES ATENDIDAS --- #}
-    <div id="tab-atendidos" class="contenido-tab">
-        <div class="tarjeta-tabla">
-            <table class="tabla-moderna">
-                <thead>
-                    <tr>
-                        <th>Folio</th>
-                        <th>Asunto</th>
-                        <th class="alinear-derecha">Estatus</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for atendido in atendidos %}
-                    <tr>
-                        <td>
-                            <span class="dato-folio">{{ atendido.folio_interno
-                                }}</span>
-                        </td>
-                        <td>{{ atendido.asunto }}</td>
-                        {# <td>{{ atendido.texto_respuesta }}</td> #}
-                        <td class="alinear-derecha">
-                            <button class="btn-gris" disabled>Atendido</button>
-                        </td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="4" class="fila-vacia">No has atendido
-                            oficios aún</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
 {% endblock contenido_principal %}
 {% block script_adicional %}
-<script src="{{ url_for('static', filename='js/tabs.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tabs.js') }}"></script>
 {% endblock script_adicional %}

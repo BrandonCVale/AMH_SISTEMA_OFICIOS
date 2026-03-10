@@ -88,7 +88,7 @@ Panel del Gestor - Sistema de Oficios
                         <td class="texto-derecha">
                             <a
                                 href="{{ url_for('oficios.ver_detalles_oficio', id_oficio=oficio.id_oficio) }}"
-                                class="btn-accion">Ver detalles</a>
+                                class="btn-primario">Ver detalles</a>
                         </td>
                     </tr>
                     {% else %}
@@ -124,7 +124,7 @@ Panel del Gestor - Sistema de Oficios
                     {% for peticion in peticiones %}
                     <tr>
                         <td>
-                            <strong>{{ peticion.folio_peticion }}</strong>
+                            <strong class="dato-folio">{{ peticion.folio_peticion }}</strong>
                         </td>
                         <td>{{ peticion.asunto }}</td>
                         <td>{{ peticion.descripcion }}</td>
@@ -147,7 +147,7 @@ Panel del Gestor - Sistema de Oficios
                         <td class="texto-derecha">
                             <a
                                 href="{{ url_for('oficios.responder_peticion_subdirector', id_peticion=peticion.id_peticion) }}"
-                                class="btn-accion">Ver detalles</a>
+                                class="btn-primario">Ver detalles</a>
                         </td>
                     </tr>
                     {% else %}

@@ -87,7 +87,7 @@ def enviar_notificacion_oficio_turnado(datos, correo_jud, lista_rutas_adjuntos=N
     )
     msg.body = f"""
         Saludos, 
-        Te han turnado una solicitud para su atención y seguimiento.
+        Se te ha turnado una solicitud para su atención y seguimiento.
         
         Detalles:
         Folio: {datos['folio_interno']}
@@ -115,3 +115,21 @@ def enviar_notificacion_oficio_turnado(datos, correo_jud, lista_rutas_adjuntos=N
                     )
     mail.send(msg)
     return True
+
+
+def enviar_notificacion_de_nueva_peticion(
+    datos, correo_subdirector=None, correo_gestor=None, lista_rutas_adjuntos=None
+):
+    """Funcion que permite enviar notificaciones por correo cuando un usuario subdirector o jud
+    realiza una peticion. Si el JUD es quien realiza la peticion se usa el parametro correo_subdirector,
+    si es usuario es SUBDIRECTOR se usa el correo_gestor."""
+
+    # Definir al destinatario final
+    destinatario = []
+
+    if correo_subdirector:
+        destinatario.append(correo_subdirector)
+    elif correo_gestor:
+        destinatario.append(correo_gestor)
+    else:
+        return False

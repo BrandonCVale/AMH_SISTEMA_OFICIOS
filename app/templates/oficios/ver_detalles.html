@@ -1,142 +1,172 @@
 {% extends "base.html" %}
 {% block titulo %}
-Detalle del Oficio {{ oficio.folio_interno }}
+    Detalle del Oficio {{ oficio.folio_interno }}
 {% endblock titulo %}
 {% block css_adicional %}
-<link rel="stylesheet"
-    href="{{ url_for('static', filename='css/panel.css') }}">
-<link rel="stylesheet"
-    href="{{ url_for('static', filename='css/detalle_oficio.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/panel.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/detalle_oficio.css') }}">
 {% endblock css_adicional %}
 {% block contenido_principal %}
-<div class="contenedor-principal">
-    <div class="flex-header">
-        <div>
-            <h1 class="titulo-panel">Oficio: {{ oficio.folio_interno }}</h1>
-            <p class="subtitulo-panel">Seguimiento de la solicitud con folio
-                interno: # {{ oficio.folio_consecutivo }}</p>
-        </div>
-        <a href="{{ url_for('oficios.panel_control') }}" class="btn-gris">Volver
-            al Panel</a>
-    </div>
-    <div
-        class="banner-estado {% if oficio.estatus == 'Finalizado' %}borde-verde {% elif oficio.estatus == 'En Revisión' %}borde-amarillo {% else %}borde-azul{% endif %}">
-        <div class="info-estado">
-            <span class="texto-etiqueta">Estatus Actual:</span>
-            <br>
-            <span
-                class="badge-estado-lg {% if oficio.estatus == 'Finalizado' %}bg-verde {% elif oficio.estatus == 'En Revisión' %}bg-amarillo {% else %}bg-azul{% endif %}">
-                {{ oficio.estatus }}
-            </span>
-        </div>
-        <div class="info-responsable">
-            <span class="texto-etiqueta">Responsable Actual:</span>
-            <br>
-            <strong class="dato-texto">{{ oficio.destinatario }}</strong>
-        </div>
-        <div class="info-fecha">
-            <span class="texto-etiqueta">Fecha Creación:</span>
-            <br>
-            <strong class="dato-texto">{{ oficio.fecha_creacion }}</strong>
-        </div>
-    </div>
-    <div class="grid-detalle">
-        <div class="columna-info">
-            <div class="tarjeta-blanca">
-                <h3 class="titulo-tarjeta">Información General</h3>
-                <div class="grupo-dato">
-                    <label class="texto-etiqueta">Asunto:</label>
-                    <p class="dato-texto">{{ oficio.asunto }}</p>
-                </div>
-                <div class="grupo-dato">
-                    <label class="texto-etiqueta">Descripción /
-                        Solicitud:</label>
-                    <div class="descripcion-larga">{{
-                        oficio.descripcion_solicitud }}</div>
-                </div>
-                {% if oficio.texto_respuesta %}
-                <div class="texto-respuesta">
-                    <span class="titulo-automatico">Respuesta Final:</span>
-                    <p class="dato-texto">{{ oficio.texto_respuesta }}</p>
-                    <small class="texto-gris-pequeno">Respondido el: {{
-                        oficio.fecha_respuesta }}</small>
-                </div>
-                {% endif %}
+    <div class="contenedor-principal">
+        <div class="flex-header">
+            <div>
+                <h1 class="titulo-panel">Oficio: {{ oficio.folio_interno }}</h1>
+                <p class="subtitulo-panel">
+                    Seguimiento de la solicitud con folio
+                    interno: # {{ oficio.folio_consecutivo }}
+                </p>
             </div>
-            <div class="tarjeta-blanca">
-                <h3 class="titulo-tarjeta">Archivos Adjuntos</h3>
-                {% if archivos_del_oficio %}
-                <ul class="lista-archivos">
-                    {% for doc in archivos_del_oficio %}
-                    <li class="item-archivo">
-                        <div class="info-archivo">
-                            <span>
-                                {% if 'pdf' in doc.nombre_archivo_original %}
-                                🔴
-                                {% else %}
-                                🔵
-                                {% endif %}
-                            </span>
-                            {# Nombre del archivo #}
-                            <span>{{ doc.nombre_archivo_original }}</span>
-                            {# Tipo de archivo #}
-                            {% if doc.tipo_documento == 'SOLICITUD' %}
-                            <span class="badge badge-azul">Solicitud
-                                Original</span>
-                            {% elif doc.tipo_documento == 'RESPUESTA_OFICIAL' %}
-                            <span class="badge badge-verde">Respuesta</span>
-                            {% elif doc.tipo_documento == 'ANEXO_SOLICITUD' %}
-                            <span class="badge badge-gris">Anexo</span>
+            <a href="{{ url_for('oficios.panel_control') }}" class="btn-gris">Volver
+            al Panel</a>
+        </div>
+        <div class="banner-estado {% if oficio.estatus == 'Finalizado' %}borde-verde {% elif oficio.estatus == 'En Revisión' %}borde-amarillo {% else %}borde-azul{% endif %}">
+            <div class="info-estado">
+                <span class="texto-etiqueta">Estatus Actual:</span>
+                <br>
+                <span class="badge-estado-lg {% if oficio.estatus == 'Finalizado' %}bg-verde {% elif oficio.estatus == 'En Revisión' %}bg-amarillo {% else %}bg-azul{% endif %}">
+                    {{ oficio.estatus }}
+                </span>
+            </div>
+            <div class="info-responsable">
+                <span class="texto-etiqueta">Responsable Actual:</span>
+                <br>
+                <strong class="dato-texto">{{ oficio.destinatario }}</strong>
+            </div>
+            <div class="info-fecha">
+                <span class="texto-etiqueta">Fecha Creación:</span>
+                <br>
+                <strong class="dato-texto">{{ oficio.fecha_creacion }}</strong>
+            </div>
+        </div>
+        <div class="grid-detalle">
+            <div class="columna-info">
+                <div class="tarjeta-blanca">
+                    <h3 class="titulo-tarjeta">Información General</h3>
+                    <div class="grupo-dato">
+                        <label class="texto-etiqueta">Asunto:</label>
+                        <p class="dato-texto">{{ oficio.asunto }}</p>
+                    </div>
+                    <div class="grupo-dato">
+                        <label class="texto-etiqueta">
+                            Descripción /
+                            Solicitud:
+                        </label>
+                        <div class="descripcion-larga">
+                            {{
+                            oficio.descripcion_solicitud }}
+                        </div>
+                    </div>
+                    {% if oficio.texto_respuesta %}
+                        <div class="texto-respuesta">
+                            <span class="titulo-automatico">Respuesta Final:</span>
+                            <p class="dato-texto">{{ oficio.texto_respuesta }}</p>
+                            <small class="texto-gris-pequeno">Respondido el: {{
+                            oficio.fecha_respuesta }}</small>
+                        </div>
+                    {% endif %}
+                </div>
+                {# MOSTRAR INSTRUCCIONES DEL SUBDIRECTOR SI ES UN JUD #}
+                {% if current_user.es_jud %}
+                    <div class="tarjeta-blanca">
+                        <h3 class="titulo-tarjeta">Instrucciones de mi subdirector</h3>
+                        <div class="grupo-dato">
+                            <span class="texto-etiqueta">Instrucciones:</span>
+                            {% if oficio.instrucciones_subdirector %}
+                                <p class="dato-texto">{{ oficio.instrucciones_subdirector }}</p>
+                            {% else %}
+                                <p class="dato-texto">Sin respuesta</p>
                             {% endif %}
                         </div>
-                        {# BTN DESCARGAR #}
-                        <a
-                            href="{{ url_for('static', filename=doc.ruta_almacenamiento) }}"
-                            class="btn-descargar"
-                            target="_blank">Descargar</a>
-                    </li>
-                    {% endfor %}
-                </ul>
-                {% else %}
-                <p class="texto-gris-pequeno">No se adjuntaron archivos a este
-                    oficio.</p>
-                {% endif %}
-            </div>
-        </div>
-        <div class="columna-historial">
-            <div class="tarjeta-blanca">
-                <h3 class="titulo-tarjeta">Historial</h3>
-                <div class="timeline">
-                    {% if historial %}
-                    {% for evento in historial %}
-                    <div class="evento">
-                        <div class="fecha-evento">{{ evento.fecha_movimiento
-                            }}</div>
-                        <div class="titulo-evento">{{ evento.nombre_usuario
-                            }}</div>
-                        <div class="detalle-evento">
-                            Cambió estatus a: <strong>{{ evento.nuevo_estatus
-                                }}</strong>
-                        </div>
-                        {% if evento.comentarios %}<div
-                            class="comentario-evento">"{{ evento.comentarios }}"</div>{%
-                        endif %}
                     </div>
-                    {% endfor %}
+                {% endif %}
+                <div class="tarjeta-blanca">
+                    <h3 class="titulo-tarjeta">Archivos Adjuntos</h3>
+                    {% if archivos_del_oficio %}
+                        <ul class="lista-archivos">
+                            {% for doc in archivos_del_oficio %}
+                                <li class="item-archivo">
+                                    <div class="info-archivo">
+                                        <span>
+                                            {% if 'pdf' in doc.nombre_archivo_original %}
+                                                🔴
+                                            {% else %}
+                                                🔵
+                                            {% endif %}
+                                        </span>
+                                        {# Nombre del archivo #}
+                                        <span>{{ doc.nombre_archivo_original }}</span>
+                                        {# Tipo de archivo #}
+                                        {% if doc.tipo_documento == 'SOLICITUD' %}
+                                            <span class="badge badge-azul">Solicitud
+                                            Original</span>
+                                        {% elif doc.tipo_documento == 'RESPUESTA_OFICIAL' %}
+                                            <span class="badge badge-verde">Respuesta</span>
+                                        {% elif doc.tipo_documento == 'ANEXO_SOLICITUD' %}
+                                            <span class="badge badge-gris">Anexo</span>
+                                        {% endif %}
+                                    </div>
+                                    {# BTN DESCARGAR #}
+                                    <a href="{{ url_for('static', filename=doc.ruta_almacenamiento) }}"
+                                       class="btn-descargar"
+                                       target="_blank">Descargar</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
                     {% else %}
-                    <p class="texto-gris-pequeno">Sin movimientos
-                        registrados.</p>
+                        <p class="texto-gris-pequeno">
+                            No se adjuntaron archivos a este
+                            oficio.
+                        </p>
                     {% endif %}
-                    <div class="evento">
-                        <div class="fecha-evento">{{ oficio.fecha_creacion
-                            }}</div>
-                        <div class="titulo-evento">Oficio Creado</div>
-                        <div class="detalle-evento">Registro inicial en el
-                            sistema.</div>
+                </div>
+            </div>
+            <div class="columna-historial">
+                <div class="tarjeta-blanca">
+                    <h3 class="titulo-tarjeta">Historial</h3>
+                    <div class="timeline">
+                        {% if historial %}
+                            {% for evento in historial %}
+                                <div class="evento">
+                                    <div class="fecha-evento">
+                                        {{ evento.fecha_movimiento
+                                        }}
+                                    </div>
+                                    <div class="titulo-evento">
+                                        {{ evento.nombre_usuario
+                                        }}
+                                    </div>
+                                    <div class="detalle-evento">
+                                        Cambió estatus a: <strong>{{ evento.nuevo_estatus
+                                    }}</strong>
+                                </div>
+                                {% if evento.comentarios %}
+                                    <div class="comentario-evento">"{{ evento.comentarios }}"</div>
+                                    {%
+                                    endif %}
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="texto-gris-pequeno">
+                                Sin movimientos
+                                registrados.
+                            </p>
+                        {% endif %}
+                        <div class="evento">
+                            <div class="fecha-evento">
+                                {{ oficio.fecha_creacion
+                                }}
+                            </div>
+                            <div class="titulo-evento">Oficio Creado</div>
+                            <div class="detalle-evento">
+                                Registro inicial en el
+                                sistema.
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 {% endblock contenido_principal %}
