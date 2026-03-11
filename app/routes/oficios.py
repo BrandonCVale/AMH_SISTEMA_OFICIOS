@@ -26,6 +26,8 @@ from app.models.oficio import (
     obtener_oficios_atendidos_del_subdirector,
     obtener_a_todos_los_gestores,
     obtener_solicitudes_de_mis_subdirectores,
+    obtener_correo_usuario_por_id,
+    obtener_correo_subdirector_por_area,
 )
 from app.models.usuario import obtener_juds_por_area, buscar_usuario_por_id
 
@@ -167,6 +169,7 @@ def ver_detalles_oficio(id_oficio):
         historial=historial,
     )
 
+
 @bp_oficios.route("/ver_detalles_peticion/<int:id_peticion>")
 @login_required
 def ver_detalles_peticion(id_peticion):
@@ -176,8 +179,8 @@ def ver_detalles_peticion(id_peticion):
     # 2. Renderizar plantilla
     return render_template(
         "oficios/ver_detalles_peticion.html",
-        peticion = detalles_peticion,
-        archivos_peticion = archivos_peticion
+        peticion=detalles_peticion,
+        archivos_peticion=archivos_peticion,
     )
 
 
@@ -316,6 +319,7 @@ def atender_oficio(id_oficio):
 @bp_oficios.route("/nueva_peticion", methods=["GET", "POST"])
 @login_required
 def nueva_peticion():
+    correo_subdirector = obtener_correo_subdirector_por_area(current_user.id_area)
     if request.method == "POST":
         # 1. Recolectar datos
         formulario = {
@@ -332,12 +336,32 @@ def nueva_peticion():
         )
 
         if exito:
+            # Enviar notificación por correo al subdirector
+            try:
+                if correo_subdirector:
+                    datos_email = {
+                        "folio_interno": formulario["folio"],
+                        "asunto": formulario["asunto"],
+                        "descripcion_solicitud": formulario["descripcion_solicitud"],
+                        "instrucciones_subdirector": "Petición interna de JUD",
+                    }
+
+                    enviar_notificacion_oficio_turnado(
+                        datos_email, correo_subdirector["correo_electronico"]
+                    )
+            except Exception as e:
+                print(f"Error al enviar correo de petición: {e}")
+
             flash(mensaje, "success")
             return redirect(url_for("oficios.panel_control"))
         else:
             flash(mensaje, "error")
 
-    return render_template("oficios/peticion_jud.html", usuario=current_user)
+    return render_template(
+        "oficios/peticion_jud.html",
+        usuario=current_user,
+        correo_subdirector_area=correo_subdirector,
+    )
 
 
 @bp_oficios.route("/nueva_peticion_subdirector", methods=["GET", "POST"])
@@ -456,7 +480,7 @@ def responder_peticion_subdirector(id_peticion):
         "oficios/responder_peticion_subdirector.html",
         peticion=info_peticion,
         archivos=archivos_peticion,
-        peticiones = peticiones_de_mis_subdirectores,
+        peticiones=peticiones_de_mis_subdirectores,
     )
 
 

@@ -23,6 +23,13 @@
                 <h3>Las peticiones pasan en automático a tu subdirector</h3>
             </div>
             <form method="POST" enctype="multipart/form-data">
+                <div class="detalle-grupo">
+                    <label class="detalle-grupo">Correo del subdirector:</label>
+                    <input type="text"
+                           class="form-control"
+                           value="{{ correo_subdirector_area['correo_electronico'] }}"
+                           readonly>
+                </div>
                 <div>
                     <label class="detalle-grupo">Asunto de la petición:</label>
                     <input type="text" name="asunto" class="form-control" required>

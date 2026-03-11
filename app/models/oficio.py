@@ -752,3 +752,47 @@ def obtener_a_todos_los_gestores():
     except Exception as e:
         print(f"Error al obtener la lista de gestores: {e}")
         return None
+
+
+def obtener_correo_usuario_por_id(id_usuario):
+    """Obtiene el correo de un usuario basandose en su id.
+    Ideal para el Gestor"""
+    conexion = obtener_conexion()
+    sql = """
+    SELECT
+        nombre_completo ,
+        correo_electronico ,
+        activo
+    FROM
+        usuarios
+    WHERE
+        id_usuario = %s;
+    """
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute(sql, (id_usuario,))
+            return cursor.fetchall()
+    except Exception as e:
+        print(
+            f"Error al intentar obtener el correo de un usuario por su iden funcion obtener_correo_usuario_por_id. Error: {e}"
+        )
+        return None
+
+
+def obtener_correo_subdirector_por_area(id_area):
+    conexion = obtener_conexion()
+    sql = """
+    SELECT
+        u.correo_electronico
+    FROM
+        usuarios u
+    WHERE
+        u.id_area = %s
+        AND u.id_rol = 2;
+    """
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute(sql, (id_area,))
+        return cursor.fetchone()
+    except Exception as e:
+        print(f"Error al obtener el correo del subdirector: {e}")

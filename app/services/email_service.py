@@ -1,8 +1,9 @@
 import os
 import mimetypes
-from flask import current_app
+from flask import current_app, flash
 from flask_mail import Message
 from app import mail
+from flask_login import current_user, login_required
 
 
 def enviar_notificacion_de_nuevo_oficio(
@@ -117,19 +118,69 @@ def enviar_notificacion_oficio_turnado(datos, correo_jud, lista_rutas_adjuntos=N
     return True
 
 
+@login_required
 def enviar_notificacion_de_nueva_peticion(
     datos, correo_subdirector=None, correo_gestor=None, lista_rutas_adjuntos=None
 ):
-    """Funcion que permite enviar notificaciones por correo cuando un usuario subdirector o jud
-    realiza una peticion. Si el JUD es quien realiza la peticion se usa el parametro correo_subdirector,
-    si es usuario es SUBDIRECTOR se usa el correo_gestor."""
+    """Funcion que permite enviar notificaciones por correo cuando un usuario subdirector o jud realiza una peticion. Si el JUD es quien realiza la peticion se usa el parametro correo_subdirector, si el usuario es SUBDIRECTOR se usa el correo_gestor."""
 
-    # Definir al destinatario final
-    destinatario = []
+    # Si el usuario es un JUD
+    if current_user.es_jud:
 
-    if correo_subdirector:
-        destinatario.append(correo_subdirector)
-    elif correo_gestor:
-        destinatario.append(correo_gestor)
+        # asunto = f"Nuevo Oficio Asignado: {datos['folio']}"
+
+        # # 3. Creamos el objeto Mensaje
+        # msg = Message(
+        #     subject=asunto,
+        #     sender=current_app.config["MAIL_USERNAME"],
+        #     recipients=destinatarios,
+        # )
+
+        # # 4. Cuerpo del correo
+        # msg.body = f"""         
+        # A quien corresponda,
+
+        # Se le ha dado seguimiento a su solicitud.
+
+        # DETALLES DE LA SOLICITUD:
+        # --------------------------------------
+        # Folio:    {datos['folio']}
+        # Asunto:   {datos['asunto']}
+        # Área:     {datos['area']}
+        # Cuerpo:   {datos['descripcion']}
+        # --------------------------------------
+        
+        # Ingrese al sistema para atenderlo.
+        # Adjunto a este correo encontrará el documento original sellado por el sistema.
+        # """
+
+        # if lista_archivos_adjuntos:
+        #     for ruta_archivo in lista_archivos_adjuntos:
+        #         # Verificamos que exista
+        #         if os.path.exists(ruta_archivo):
+        #             nombre_archivo = os.path.basename(ruta_archivo)
+
+        #             # Extraemos el mimetype (tipo de archivo)
+        #             # Un MIME type consta de dos partes: Tipo: categoría general del contenido y Subtipo: especifica el formato exacto dentro de esa categoría
+        #             # Ej: image/png
+        #             mime_type, _ = mimetypes.guess_type(ruta_archivo)
+
+        #             if not mime_type:
+        #                 # Tipo generico por si no lo reconoce
+        #                 mime_type = "application/octet-stream"
+
+        #             with open(ruta_archivo, "rb") as archivo:
+        #                 msg.attach(
+        #                     filename=nombre_archivo,
+        #                     content_type=mime_type,
+        #                     data=archivo.read(),
+        #                 )
+
+        #     # 6. Enviamos (Si falla aquí, lanzará una excepción que capturará la otra función)
+        #     mail.send(msg)
+        #     return True
+
+    elif current_user.es_subdirector:
+        pass
     else:
-        return False
+        flash("No tienes permiso para esta accion", "warning")
