@@ -306,7 +306,7 @@ class ServicioOficio:
             # 1. Obtener destinatario (Subdirector del área)
             subdirector = obtener_subdirector_por_area(usuario_jud.id_area)
             if not subdirector:
-                return False, "No se encontró un Subdirector activo en tu área."
+                return False, "No se encontró un Subdirector activo en tu área.", None
 
             conexion.begin()
             with conexion.cursor() as cursor:
@@ -340,15 +340,15 @@ class ServicioOficio:
                     )
 
             conexion.commit()
-            return True, f"Petición {datos_peticion['folio']} enviada correctamente."
+            return True, f"Petición {datos_peticion['folio']} enviada correctamente.", ruta
 
         except IntegrityError:
             conexion.rollback()
-            return False, f"El folio '{formulario['folio']}' ya existe."
+            return False, f"El folio '{formulario['folio']}' ya existe.", None
         except Exception as e:
             conexion.rollback()
             current_app.logger.error(f"Error en procesar_peticion_jud: {e}")
-            return False, f"Error al procesar la petición: {str(e)}"
+            return False, f"Error al procesar la petición: {str(e)}", None
 
     def procesar_peticion_subdirector(self, formulario, archivo, usuario_subdirector):
         """Guarda una peticion del subdirector en la tabla 'peticiones' y su archivo en 'archivos_peticion'."""

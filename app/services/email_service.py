@@ -77,7 +77,7 @@ def enviar_notificacion_de_nuevo_oficio(
 
 def enviar_notificacion_oficio_turnado(datos, correo_jud, lista_rutas_adjuntos=None):
     """
-    Envia una notificacion por correo al JUD con los archivos adjuntos.
+    Envía una notificación por correo al JUD con los archivos adjuntos.
     """
     asunto = f"Se te ha asignado un oficio para su atención: {datos['folio_interno']}"
 
@@ -90,7 +90,8 @@ def enviar_notificacion_oficio_turnado(datos, correo_jud, lista_rutas_adjuntos=N
         Saludos, 
         Se te ha turnado una solicitud para su atención y seguimiento.
         
-        Detalles:
+        DETALLES:
+        
         Folio: {datos['folio_interno']}
         Asunto: {datos['asunto']}
         Instrucciones del subdirector: {datos['instrucciones_subdirector']}
@@ -118,69 +119,60 @@ def enviar_notificacion_oficio_turnado(datos, correo_jud, lista_rutas_adjuntos=N
     return True
 
 
-@login_required
-def enviar_notificacion_de_nueva_peticion(
-    datos, correo_subdirector=None, correo_gestor=None, lista_rutas_adjuntos=None
+def enviar_notificacion_peticion_jud(
+    datos, correo_subdirector, lista_archivos_adjuntos=None
 ):
-    """Funcion que permite enviar notificaciones por correo cuando un usuario subdirector o jud realiza una peticion. Si el JUD es quien realiza la peticion se usa el parametro correo_subdirector, si el usuario es SUBDIRECTOR se usa el correo_gestor."""
+    """Envía una notificación por correo al subdirector de un JUD con los archivos adjuntos."""
+    asunto = f"Nueva petición de JUD: {datos['folio_interno']}"
 
-    # Si el usuario es un JUD
-    if current_user.es_jud:
+    msg = Message(
+        subject=asunto,
+        sender=current_app.config["MAIL_USERNAME"],
+        recipients=[correo_subdirector],
+    )
 
-        # asunto = f"Nuevo Oficio Asignado: {datos['folio']}"
-
-        # # 3. Creamos el objeto Mensaje
-        # msg = Message(
-        #     subject=asunto,
-        #     sender=current_app.config["MAIL_USERNAME"],
-        #     recipients=destinatarios,
-        # )
-
-        # # 4. Cuerpo del correo
-        # msg.body = f"""         
-        # A quien corresponda,
-
-        # Se le ha dado seguimiento a su solicitud.
-
-        # DETALLES DE LA SOLICITUD:
-        # --------------------------------------
-        # Folio:    {datos['folio']}
-        # Asunto:   {datos['asunto']}
-        # Área:     {datos['area']}
-        # Cuerpo:   {datos['descripcion']}
-        # --------------------------------------
+    msg.body = f"""
+    Un JUD te ha realizado una nueva petición, 
         
-        # Ingrese al sistema para atenderlo.
-        # Adjunto a este correo encontrará el documento original sellado por el sistema.
-        # """
+    DETALLES:
+    
+        Folio: {datos['folio_interno']}
+        Asunto: {datos['asunto']}
+        Cuerpo: {datos['descripcion']}
+        
+    Adjunto a este correo encontrará la solicitud en PDF.
+        
+    Ingrese al sistema para dar respuesta a esta petición.
+    """
 
-        # if lista_archivos_adjuntos:
-        #     for ruta_archivo in lista_archivos_adjuntos:
-        #         # Verificamos que exista
-        #         if os.path.exists(ruta_archivo):
-        #             nombre_archivo = os.path.basename(ruta_archivo)
+    # ARCHIVOS ADJUNTOS
+    if lista_archivos_adjuntos:
+        for ruta_relativa in lista_archivos_adjuntos:
+            # 1. Armamos la ruta real y completa hacia tu carpeta static
+            ruta_absoluta = os.path.join(current_app.static_folder, ruta_relativa)
 
-        #             # Extraemos el mimetype (tipo de archivo)
-        #             # Un MIME type consta de dos partes: Tipo: categoría general del contenido y Subtipo: especifica el formato exacto dentro de esa categoría
-        #             # Ej: image/png
-        #             mime_type, _ = mimetypes.guess_type(ruta_archivo)
+            # 2. Imprimimos para asegurarnos de dónde lo está buscando (Ver terminal)
+            print(f"Intentando adjuntar archivo desde: {ruta_absoluta}")
 
-        #             if not mime_type:
-        #                 # Tipo generico por si no lo reconoce
-        #                 mime_type = "application/octet-stream"
+            if os.path.exists(ruta_absoluta):
+                nombre_archivo = os.path.basename(ruta_absoluta)
+                mime_type, _ = mimetypes.guess_type(ruta_absoluta)
 
-        #             with open(ruta_archivo, "rb") as archivo:
-        #                 msg.attach(
-        #                     filename=nombre_archivo,
-        #                     content_type=mime_type,
-        #                     data=archivo.read(),
-        #                 )
+                if not mime_type:
+                    mime_type = "application/octet-stream"
 
-        #     # 6. Enviamos (Si falla aquí, lanzará una excepción que capturará la otra función)
-        #     mail.send(msg)
-        #     return True
+                with open(ruta_absoluta, "rb") as archivo:
+                    msg.attach(
+                        filename=nombre_archivo,
+                        content_type=mime_type,
+                        data=archivo.read(),
+                    )
+                print("¡Archivo adjuntado con éxito!")
+            else:
+                # 3. Si falla, ¡ahora sí nos va a avisar!
+                print(
+                    f"ERROR: No se encontró el archivo físico en la ruta: {ruta_absoluta}"
+                )
 
-    elif current_user.es_subdirector:
-        pass
-    else:
-        flash("No tienes permiso para esta accion", "warning")
+    mail.send(msg)
+    return True

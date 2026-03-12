@@ -793,6 +793,11 @@ def obtener_correo_subdirector_por_area(id_area):
     try:
         with conexion.cursor() as cursor:
             cursor.execute(sql, (id_area,))
-        return cursor.fetchone()
+            resultado = cursor.fetchone()
+            
+            if resultado: 
+                return resultado['correo_electronico']
+            return None
+
     except Exception as e:
         print(f"Error al obtener el correo del subdirector: {e}")

@@ -4,7 +4,10 @@ from flask import Blueprint, jsonify, redirect, render_template, request, url_fo
 from flask_login import login_required, current_user
 from app.models.catalogo import obtener_areas_activas
 from app.services.oficio_service import ServicioOficio
-from app.services.email_service import enviar_notificacion_oficio_turnado
+from app.services.email_service import (
+    enviar_notificacion_oficio_turnado,
+    enviar_notificacion_peticion_jud,
+)
 from app.models.oficio import (
     obtener_oficios_del_gestor,
     obtener_bandeja_entrada_subdirector,
@@ -331,7 +334,7 @@ def nueva_peticion():
 
         # 2. Llamar al servicio específico de peticiones
         servicio = ServicioOficio()
-        exito, mensaje = servicio.procesar_peticion_jud(
+        exito, mensaje, ruta_pdf = servicio.procesar_peticion_jud(
             formulario, archivo, current_user
         )
 
@@ -342,13 +345,15 @@ def nueva_peticion():
                     datos_email = {
                         "folio_interno": formulario["folio"],
                         "asunto": formulario["asunto"],
-                        "descripcion_solicitud": formulario["descripcion_solicitud"],
-                        "instrucciones_subdirector": "Petición interna de JUD",
+                        "descripcion": formulario["descripcion_solicitud"],
                     }
 
-                    enviar_notificacion_oficio_turnado(
-                        datos_email, correo_subdirector["correo_electronico"]
+                    enviar_notificacion_peticion_jud(
+                        datos_email,
+                        correo_subdirector,
+                        lista_archivos_adjuntos=[ruta_pdf],
                     )
+
             except Exception as e:
                 print(f"Error al enviar correo de petición: {e}")
 
