@@ -150,7 +150,7 @@ def enviar_notificacion_peticion_jud(
         for ruta_relativa in lista_archivos_adjuntos:
             # 1. Armamos la ruta real y completa hacia tu carpeta static
             ruta_absoluta = os.path.join(current_app.static_folder, ruta_relativa)
-
+    
             # 2. Imprimimos para asegurarnos de dónde lo está buscando (Ver terminal)
             print(f"Intentando adjuntar archivo desde: {ruta_absoluta}")
 
@@ -169,7 +169,7 @@ def enviar_notificacion_peticion_jud(
                     )
                 print("¡Archivo adjuntado con éxito!")
             else:
-                # 3. Si falla, ¡ahora sí nos va a avisar!
+                # 3. Si falla
                 print(
                     f"ERROR: No se encontró el archivo físico en la ruta: {ruta_absoluta}"
                 )

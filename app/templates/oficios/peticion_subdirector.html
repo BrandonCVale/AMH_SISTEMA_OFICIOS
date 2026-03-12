@@ -1,90 +1,128 @@
 {% extends "base.html" %}
 {% block titulo %}
-Peticiones Subdirector
+    Peticiones Subdirector
 {% endblock titulo %}
-
 {% block css_adicional %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/panel.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/panel.css') }}">
 {% endblock css_adicional %}
-
 {% block contenido_principal %}
-<div class="contenedor-principal">
-    {# Header #}
-    <div class="header-seccion">
-        <div>
-            <h1 class="titulo-panel">Nueva Petición</h1>
-            <p class="subtitulo-panel">Rellena los siguientes campos para
-                realizar una nueva petición</p>
+    <div class="contenedor-principal">
+        {# Header #}
+        <div class="header-seccion">
+            <div>
+                <h1 class="titulo-panel">Nueva Petición</h1>
+                <p class="subtitulo-panel">
+                    Rellena los siguientes campos para
+                    realizar una nueva petición
+                </p>
+            </div>
+            <a href="{{ url_for('oficios.panel_control') }}" class="btn-gris">Volver</a>
         </div>
-        <a href="{{ url_for('oficios.panel_control') }}"
-            class="btn-gris">Volver</a>
-    </div>
-
-    {# FORMULARIO INICIO #}
-    <div class="tarjeta-contenido contenedor-formulario tarjeta-destacada">
-
-        <div class="titulo-tarjeta">
-            <h3 class="titulo-seccion">Detalles de la Petición</h3>
-        </div>
-
-        <form method="POST"
-            action="{{ url_for('oficios.nueva_peticion_subdirector') }}"
-            enctype="multipart/form-data" class="formulario-estandar">
-
-            <div class="grupo-formulario">
-                <label class="etiqueta-formulario">Selecciona al gestor
-                    asignado:</label>
-                <select name="id_gestor_destinatario" class="form-control" required>
-                    <option value disabled selected>Selecciona a un gestor de la
-                        lista...</option>
-                    {% for gestor in gestores %}
-                    <option value="{{gestor.id_usuario}}">{{
-                        gestor.nombre_completo }}</option>
-                    {% endfor %}
-                </select>
+        {# FORMULARIO INICIO #}
+        <div class="tarjeta-contenido contenedor-formulario tarjeta-destacada">
+            <div class="titulo-tarjeta">
+                <h3 class="titulo-seccion">Detalles de la Petición</h3>
             </div>
-
-            <hr class="separador-horizontal">
-
-            <div class="grupo-formulario">
-                <label class="etiqueta-formulario">Asunto de la
-                    petición:</label>
-                <input type="text" name="asunto" class="form-control"
-                    placeholder="Ej. Solicitud de insumos..." required>
-            </div>
-
-            <div class="grupo-formulario">
-                <label class="etiqueta-formulario">Folio:</label>
-                <input type="text" name="folio" class="form-control input-folio"
-                    required>
-            </div>
-
-            <div class="grupo-formulario">
-                <label class="etiqueta-formulario">Descripción de la
-                    Petición:</label>
-                <textarea name="descripcion_solicitud" rows="6"
-                    class="form-control"
-                    placeholder="Detalla los requerimientos aquí..."
-                    required></textarea>
-            </div>
-
-            <div class="grupo-formulario input-archivo-wrapper">
-                <label class="etiqueta-formulario">Adjuntar Oficio de Petición
-                    (PDF):</label>
-                <input type="file" name="archivo" id="archivo"
-                    class="form-control input-archivo" accept=".pdf" required>
-                <span class="texto-ayuda">Solo se permiten archivos en formato
+            <form method="POST"
+                  action="{{ url_for('oficios.nueva_peticion_subdirector') }}"
+                  enctype="multipart/form-data"
+                  class="formulario-estandar">
+                {# SELECT DEL GESTOR Y CORREO DEL GESTOR #}
+                <div class="grupo-formulario">
+                    <label class="etiqueta-formulario">Selecciona al gestor asignado:</label>
+                    <select name="id_gestor_destinatario"
+                            class="form-control"
+                            id="select-gestor"
+                            required>
+                        <option value="" disabled selected>Selecciona a un gestor de la lista...</option>
+                        {% for gestor in gestores %}
+                            <option value="{{ gestor.id_usuario }}"
+                                    data-correo="{{ gestor.correo_electronico }}">{{ gestor.nombre_completo }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="grupo-formulario" id="grupo-correo-gestor">
+                    <label class="etiqueta-formulario">Correo del Gestor Seleccionado:</label>
+                    <input type="text" id="input-correo-gestor" class="form-control" readonly>
+                </div>
+                <hr class="separador-horizontal">
+                <div class="grupo-formulario">
+                    <label class="etiqueta-formulario">
+                        Asunto de la
+                        petición:
+                    </label>
+                    <input type="text"
+                           name="asunto"
+                           class="form-control"
+                           placeholder="Ej. Solicitud de insumos..."
+                           required>
+                </div>
+                <div class="grupo-formulario">
+                    <label class="etiqueta-formulario">Folio:</label>
+                    <input type="text" name="folio" class="form-control input-folio" required>
+                </div>
+                <div class="grupo-formulario">
+                    <label class="etiqueta-formulario">
+                        Descripción de la
+                        Petición:
+                    </label>
+                    <textarea name="descripcion_solicitud"
+                              rows="6"
+                              class="form-control"
+                              placeholder="Detalla los requerimientos aquí..."
+                              required></textarea>
+                </div>
+                <div class="grupo-formulario input-archivo-wrapper">
+                    <label class="etiqueta-formulario">
+                        Adjuntar Oficio de Petición
+                        (PDF):
+                    </label>
+                    <input type="file"
+                           name="archivo"
+                           id="archivo"
+                           class="form-control input-archivo"
+                           accept=".pdf"
+                           required>
+                    <span class="texto-ayuda">Solo se permiten archivos en formato
                     .pdf</span>
-            </div>
-
-            <div class="acciones-formulario" style="margin-top: 15px;">
-                <a href="{{ url_for('oficios.panel_control') }}"
-                    class="btn-cancelar">Cancelar</a>
-                <button type="submit" class="btn-primario">Enviar
-                    Petición</button>
-            </div>
-
-        </form>
+                </div>
+                <div class="acciones-formulario">
+                    <a href="{{ url_for('oficios.panel_control') }}" class="btn-cancelar">Cancelar</a>
+                    <button type="submit" class="btn-primario">
+                        Enviar
+                        Petición
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 {% endblock contenido_principal %}
+{% block script_adicional %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Obtenemos los elementos de la pantalla
+            const selectGestor = document.getElementById('select-gestor');
+            const inputCorreo = document.getElementById('input-correo-gestor');
+            const grupoCorreo = document.getElementById('grupo-correo-gestor');
+
+            // Escuchamos cuando el usuario cambie la opción
+            selectGestor.addEventListener('change', function() {
+                // Obtenemos la opción que seleccionó
+                const opcionSeleccionada = this.options[this.selectedIndex];
+
+                // Sacamos el correo que escondimos en el data-correo
+                const correo = opcionSeleccionada.getAttribute('data-correo');
+
+                // Si hay un correo, lo mostramos en el cuadro
+                if (correo) {
+                    inputCorreo.value = correo;
+                    grupoCorreo.style.display = 'block'; // Hacemos visible el cuadro
+                } else {
+                    inputCorreo.value = '';
+                    grupoCorreo.style.display = 'none'; // Lo ocultamos si elige "Selecciona..."
+                }
+            });
+        });
+    </script>
+{% endblock script_adicional %}
