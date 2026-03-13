@@ -7,6 +7,7 @@ from app.services.oficio_service import ServicioOficio
 from app.services.email_service import (
     enviar_notificacion_oficio_turnado,
     enviar_notificacion_peticion_jud,
+    enviar_notificacion_peticion_subdirector,
 )
 from app.models.oficio import (
     obtener_oficios_del_gestor,
@@ -375,22 +376,39 @@ def nueva_peticion_subdirector():
     lista_gestores = obtener_a_todos_los_gestores()
 
     if request.method == "POST":
+        # Obtener el id afuera del formulario para buscar su correo
+        id_gestor = request.form.get("id_gestor_destinatario")
+        correo_del_gestor = obtener_correo_usuario_por_id(id_gestor)
+
         formulario = {
             "asunto": request.form["asunto"],
             "folio": request.form["folio"],
             "descripcion_solicitud": request.form["descripcion_solicitud"],
-            "id_destinatario": request.form.get("id_gestor_destinatario"),
+            "id_destinatario": id_gestor,
         }
         archivo = request.files.get("archivo")
 
         servicio = ServicioOficio()
-        exito, mensaje = servicio.procesar_peticion_subdirector(
+        exito, mensaje, ruta_archivo = servicio.procesar_peticion_subdirector(
             formulario, archivo, current_user
         )
 
         if exito:
-            flash(mensaje, "success")
-            return redirect(url_for("oficios.panel_control"))
+            if correo_del_gestor:
+                datos_email = {
+                    "asunto": formulario["asunto"],
+                    "folio_interno": formulario["folio"],
+                    "descripcion": formulario["descripcion_solicitud"],
+                }
+
+                enviar_notificacion_peticion_subdirector(
+                    datos=datos_email,
+                    correo_gestor=correo_del_gestor[0]["correo_electronico"],
+                    lista_archivos_adjuntos=[ruta_archivo]
+                )
+
+                flash(mensaje, "success")
+                return redirect(url_for("oficios.panel_control"))
         else:
             flash(mensaje, "error")
 

@@ -353,7 +353,7 @@ class ServicioOficio:
     def procesar_peticion_subdirector(self, formulario, archivo, usuario_subdirector):
         """Guarda una peticion del subdirector en la tabla 'peticiones' y su archivo en 'archivos_peticion'."""
         conexion = obtener_conexion()
-        ruta_absoluta_archivo = None  # Variable para guardar la ruta del archivo para el correo
+        ruta = None
         try:
             # Insertar peticion
             conexion.begin()
@@ -376,10 +376,6 @@ class ServicioOficio:
                     ruta, nombre, ext = self._guardar_archivo_peticion_en_disco(
                         archivo, id_peticion
                     )
-                    # Guardamos la ruta absoluta para enviarla por correo despues
-                    ruta_absoluta_archivo = os.path.join(
-                        current_app.root_path, "static", ruta
-                    )
 
                     guardar_archivo_peticion_db(
                         cursor, id_peticion, usuario_subdirector.id, nombre, ruta, ext
@@ -390,24 +386,7 @@ class ServicioOficio:
                     )
             conexion.commit()
 
-            # --- ENVIO DE CORREO AL GESTOR ---
-            try:
-                destinatario = buscar_usuario_por_id(datos_peticion["id_destinatario"])
-                if destinatario:
-                    datos_email = {
-                        "folio_interno": datos_peticion["folio"],
-                        "asunto": datos_peticion["asunto"],
-                        "descripcion": datos_peticion["descripcion"],
-                    }
-                    lista_adjuntos = [ruta_absoluta_archivo] if ruta_absoluta_archivo else []
-                    
-                    enviar_notificacion_oficio_turnado(
-                        datos_email, destinatario.correo_electronico, lista_adjuntos
-                    )
-            except Exception as e:
-                print(f"Advertencia: La petición se guardó, pero falló el envío de correo: {e}")
-
-            return True, f"Petición {datos_peticion['folio']} enviada correctamente."
+            return True, f"Petición {datos_peticion['folio']} enviada correctamente.", ruta
         
         except IntegrityError as e:
             conexion.rollback()
@@ -416,7 +395,7 @@ class ServicioOficio:
         except Exception as e:
             conexion.rollback()
             current_app.logger.error(f"Error en procesar_peticion_subdirector: {e}")
-            return False, f"Error al procesar la petición: {str(e)}"
+            return False, f"Error al procesar la petición: {str(e)}", None
 
     def _guardar_archivo_en_disco(self, archivo, id_oficio):
         """
