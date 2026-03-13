@@ -636,7 +636,7 @@ def obtener_solicitudes_de_mis_subdirectores(id_gestor):
         WHERE
             p.id_destinatario = %s
         ORDER BY 
-            p.fecha_creacion ASC;
+            p.fecha_creacion DESC;
     """
     with conexion.cursor() as cursor:
         cursor.execute(sql, (id_gestor,))

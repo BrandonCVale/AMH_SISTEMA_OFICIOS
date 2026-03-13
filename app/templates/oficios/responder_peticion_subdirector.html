@@ -76,8 +76,8 @@
             <div>
                 <div class="tarjeta-blanca tarjeta-destacada">
                     <h3 class="titulo-tarjeta">Escribe tu respuesta</h3>
-                    <form action="#" method="POST">
-                        <input type="hidden" name="id_peticion" value="{{ peticion.id_peticion }}">
+                    <form action="{{ url_for('oficios.responder_peticion_subdirector', id_peticion=peticion.id_peticion) }}"
+                          method="POST">
                         <div class="grupo-formulario">
                             <label class="etiqueta">
                                 Instrucciones o
@@ -92,12 +92,12 @@
                         <div style="margin-top: 20px;">
                             <button type="submit"
                                     name="decision"
-                                    value="APROBADO"
+                                    value="ACEPTADA"
                                     class="btn-primario btn-full"
                                     style="background-color: #10b981;
                                            border-color: #10b981;
                                            margin-bottom: 10px">
-                                Aprobar
+                                Aceptar
                                 Solicitud
                             </button>
                             <button type="submit"

@@ -211,6 +211,10 @@
     background-color: #fef3c7;
     color: #92400e;
 }
+.badge-rojo {
+    background-color: #ff0000;
+    color: #ffffff;
+}
 
 .btn-accion {
     display: inline-block;

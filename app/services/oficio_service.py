@@ -457,7 +457,6 @@ class ServicioOficio:
             WHERE anio = %s
         """
         cursor.execute(sql_update, (anio,))
-
         # B. VERIFICAMOS SI EL AÑO EXISTÍA
         # Si es el primer oficio del año y no existe la fila, la creamos
         if cursor.rowcount == 0:

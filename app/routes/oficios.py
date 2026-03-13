@@ -475,20 +475,30 @@ def responder_peticion_subdirector(id_peticion):
 
     if request.method == "POST":
         # Recibir los datos del formualario (id_et)
-        id_peticion = request.form.get("id_peticion")
         texto_respuesta = request.form.get("respuesta_texto")
         decision_boton = request.form.get("decision")
 
         # Validacion del boton y asignas el nuevo estatus
-        if decision_boton == "APROBADO":
+        if decision_boton == "ACEPTADA":
             id_nuevo_estatus = 6
             mensaje = "Solicitud aprobada exitosamente"
             tipo = "success"
-        else:
+        elif decision_boton == "RECHAZADO":
             id_nuevo_estatus = 5
             mensaje = "Solicitud rechazada exitosamente"
             tipo = "danger"
-
+        else:
+            flash("Debes hacer click en uno de los botones para enviar tu respuesta", "warning")
+            return redirect(url_for("oficios.responder_peticion_subdirector", id_peticion = id_peticion))
+        
+        # --- CÁMARAS DE SEGURIDAD (Agrega estos prints) ---
+        print("\n" + "="*40)
+        print(f"🔍 DIAGNÓSTICO DE GUARDADO:")
+        print(f"1. Botón detectado: '{decision_boton}'")
+        print(f"2. ID Petición a afectar: {id_peticion}")
+        print(f"3. Estatus FINAL que se enviará a MySQL: {id_nuevo_estatus}")
+        print("="*40 + "\n")
+        
         # Guardar los cambios en la bd
         registrar_respuesta_peticion_db(
             id_peticion=id_peticion,

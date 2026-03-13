@@ -131,10 +131,10 @@ Panel del Gestor - Sistema de Oficios
                         <td>
                             {% if peticion.estatus == 'EN_REVISION' %}
                             <span class="badge badge-amarillo">En revisión</span>
-                            {% elif peticion.estatus == 'APROBADO' %}
+                            {% elif peticion.estatus == 'ACEPTADA' %}
                             <span class="badge badge-verde">Aprobado</span>
                             {% else %}
-                            <span class="badge badge-gris">Rechazado</span>
+                            <span class="badge badge-rojo">Rechazado</span>
                             {% endif %}
                         </td>
                         <td>
