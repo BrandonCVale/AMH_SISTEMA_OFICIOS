@@ -72,8 +72,16 @@ Ver detalles peticion
                                 {% else %}
                                 🔵
                                 {% endif %}
-                                {{ doc.nombre_archivo }}
                             </span>
+                            <span>{{ doc.nombre_archivo }}</span>
+                            {# Tipo de archivo #}
+                            {% if doc.tipo_documento == 'SOLICITUD' %}
+                                <span class="badge badge-azul">Solicitud Original</span>
+                            {% elif doc.tipo_documento == 'RESPUESTA_OFICIAL' %}
+                                <span class="badge badge-verde">Respuesta</span>
+                            {% elif doc.tipo_documento == 'ANEXO_SOLICITUD' %}
+                                <span class="badge badge-gris">Anexo</span>
+                            {% endif %}
                         </div>
                         <a
                             href="{{ url_for('static', filename=doc.ruta_almacenamiento)}}"

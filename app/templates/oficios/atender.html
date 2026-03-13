@@ -70,16 +70,18 @@
             {% if documentos %}
                 <table class="tabla-moderna">
                     {% for documento in documentos %}
-                        {# Tipo de archivo #}
-                        {% if documento.tipo_documento == 'SOLICITUD' %}
-                            <span class="badge badge-azul">Solicitud Original</span>
-                        {% elif documento.tipo_documento == 'RESPUESTA_OFICIAL' %}
-                            <span class="badge badge-verde">Respuesta</span>
-                        {% elif documento.tipo_documento == 'ANEXO_SOLICITUD' %}
-                            <span class="badge badge-gris">Anexo</span>
-                        {% endif %}
                         <tr>
-                            <td>{{ documento.nombre_archivo_original }}</td>
+                            <td>
+                                {{ documento.nombre_archivo_original }}
+                                {# Tipo de archivo #}
+                                {% if documento.tipo_documento == 'SOLICITUD' %}
+                                    <span class="badge badge-azul">Solicitud Original</span>
+                                {% elif documento.tipo_documento == 'RESPUESTA_OFICIAL' %}
+                                    <span class="badge badge-verde">Respuesta</span>
+                                {% elif documento.tipo_documento == 'ANEXO_SOLICITUD' %}
+                                    <span class="badge badge-gris">Anexo</span>
+                                {% endif %}
+                            </td>
                             <td class="texto-derecha">
                                 <a href="{{ url_for('static', filename=documento.ruta_almacenamiento) }}"
                                    target="_blank"

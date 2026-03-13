@@ -58,6 +58,13 @@
                                 <li class="item-archivo">
                                     <div class="info-archivo">
                                         <span class="nombre-archivo">{{ archivo.nombre_archivo }}</span>
+                                        {% if archivo.tipo_documento == 'SOLICITUD' %}
+                                            <span class="badge badge-azul">Solicitud Original</span>
+                                        {% elif archivo.tipo_documento == 'RESPUESTA_OFICIAL' %}
+                                            <span class="badge badge-verde">Respuesta</span>
+                                        {% elif archivo.tipo_documento == 'ANEXO_SOLICITUD' %}
+                                            <span class="badge badge-gris">Anexo</span>
+                                        {% endif %}
                                     </div>
                                     <a href="{{ url_for('static', filename=archivo.ruta_almacenamiento) }}"
                                        class="btn-descargar"

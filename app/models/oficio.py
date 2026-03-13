@@ -683,7 +683,8 @@ def obtener_archivos_peticion(id_peticion):
                 ap.id_peticion ,
                 ap.nombre_archivo ,
                 ap.ruta_almacenamiento ,
-                ap.extension
+                ap.extension,
+                'SOLICITUD' as tipo_documento
             FROM
                 archivos_peticion ap
             WHERE
