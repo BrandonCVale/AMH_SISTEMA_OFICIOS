@@ -1,168 +1,182 @@
 {% extends "base.html" %}
 {% block titulo %}
-Panel del Gestor - Sistema de Oficios
+    Panel del Gestor - Sistema de Oficios
 {% endblock titulo %}
 {% block css_adicional %}
-<link rel="stylesheet"
-    href="{{ url_for('static', filename='css/panel.css') }}">
+    {# 1. PRIMERO LA LIBRERÍA DE LA TABLA #}
+    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css"
+          rel="stylesheet"
+          type="text/css">
+    {# 2. CSS PERSONAL #}
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/panel.css') }}">
 {% endblock css_adicional %}
 {% block contenido_principal %}
-<div class="contenedor-principal">
-    <div class="header-seccion">
-        <div>
-            <h1 class="titulo-panel">Panel de Control</h1>
-            <p class="subtitulo-panel">Resumen de actividad reciente</p>
-        </div>
-        <a href="{{ url_for('oficios.crear_oficio') }}" class="btn-primario">+
-            Nueva Solicitud</a>
-    </div>
-    {# KPIs #}
-    {% with
-    titulo1="Total Enviados", valor1=kpis['Enviados'],
-    titulo2="En Revisión", valor2=kpis['En Revisión'],
-    titulo3="Finalizados", valor3=kpis['Finalizados']
-    %}
-    {% include "fragments/kpis.html" %}
-    {% endwith %}
-    {# --- TABS DE NAVEGACIÓN (3 Pestañas) --- #}
-    <div class="contenedor-tabs">
-        <button class="tab-btn activo"
-            onclick="abrirPestana(event, 'tab-asignaciones')">Asignaciones</button>
-        <button class="tab-btn"
-            onclick="abrirPestana(event, 'tab-peticiones')">Peticiones</button>
-    </div>
-    {# --- CONTENIDO 1: ASIGNACIONES PENDIENTES --- #}
-    <div id="tab-asignaciones" class="contenido-tab activo">
-        {# Tabla inicio #}
-        <div class="tarjeta-tabla">
-            <table class="tabla-moderna">
-                <thead>
-                    <tr>
-                        <th>Folio</th>
-                        <th>Asunto</th>
-                        <th>Destinatario</th>
-                        <th>Respuesta</th>
-                        <th>Fecha Creación</th>
-                        <th class="texto-centro">Estatus</th>
-                        <th class="texto-derecha">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for oficio in oficios %}
-                    <tr>
-                        <td>
-                            <span class="dato-folio">{{ oficio.folio_interno
-                                }}</span>
-                        </td>
-                        <td>{{ oficio.asunto }}</td>
-                        <td>{{ oficio.destinatario }}</td>
-                        <td>
-                            {% if oficio.texto_respuesta %}
-                            <span class="badge badge-verde">Respondido</span>
-                            <div class="rol-usuario">{{
-                                oficio.fecha_respuesta.strftime("%d/%m/%Y")
-                                }}</div>
-                            {% else %}
-                            <span class="badge badge-gris">Pendiente</span>
-                            {% endif %}
-                        </td>
-                        <td>{{ oficio.fecha_creacion.strftime("%d/%m/%Y")
-                            }}</td>
-                        <td class="texto-centro">
-                            {% if oficio.estatus == 'EN_REVISION' %}
-                            <span class="badge badge-amarillo">En
-                                Revisión</span>
-                            {% elif oficio.estatus == 'ASIGNADO' %}
-                            <span class="badge badge-azul">Asignado</span>
-                            {% elif oficio.estatus == 'ATENDIDO' %}
-                            <span class="badge badge-azul">Atendido</span>
-                            {% elif oficio.estatus == 'FINALIZADO' %}
-                            <span class="badge badge-verde">Finalizado</span>
-                            {% elif oficio.estatus == 'RECHAZADO' %}
-                            <span class="badge badge-gris">Rechazado</span>
-                            {% else %}
-                            <span class="badge badge-gris">{{ oficio.estatus
-                                }}</span>
-                            {% endif %}
-                        </td>
-                        <td class="texto-derecha">
-                            <a
-                                href="{{ url_for('oficios.ver_detalles_oficio', id_oficio=oficio.id_oficio) }}"
-                                class="btn-primario">Ver detalles</a>
-                        </td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="7" class="fila-vacia">No has creado oficios
-                            todavía.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {# Tabla fin #}
-    </div>
-    {#-- CONTENIDO 2: MIS PETICIONES --- #}
-    <div id="tab-peticiones" class="contenido-tab">
+    <div class="contenedor-principal">
         <div class="header-seccion">
-            <h3 class="titulo-seccion">Gestiona las peticiones de tu equipo</h3>
+            <div>
+                <h1 class="titulo-panel">Panel de Control</h1>
+                <p class="subtitulo-panel">Resumen de actividad reciente</p>
+            </div>
+            <a href="{{ url_for('oficios.crear_oficio') }}" class="btn-primario">+ Nueva Solicitud</a>
         </div>
-        {# TABLA #}
-        <div class="tarjeta-tabla">
-            <table class="tabla-moderna">
-                <thead>
-                    <tr>
-                        <th>Folio</th>
-                        <th>Asunto</th>
-                        <th>Descripción</th>
-                        <th>Estatus</th>
-                        <th>Respuesta</th>
-                        <th class="texto-derecha">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for peticion in peticiones %}
-                    <tr>
-                        <td>
-                            <strong class="dato-folio">{{ peticion.folio_peticion }}</strong>
-                        </td>
-                        <td>{{ peticion.asunto }}</td>
-                        <td>{{ peticion.descripcion }}</td>
-                        <td>
-                            {% if peticion.estatus == 'EN_REVISION' %}
-                            <span class="badge badge-amarillo">En revisión</span>
-                            {% elif peticion.estatus == 'ACEPTADA' %}
-                            <span class="badge badge-verde">Aprobado</span>
-                            {% else %}
-                            <span class="badge badge-rojo">Rechazado</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if peticion.respuesta_recibida %}
-                            {{ peticion.respuesta_recibida }}
-                            {% else %}
-                            <span class="texto-gris">Sin respuesta aún</span>
-                            {% endif %}
-                        </td>
-                        <td class="texto-derecha">
-                            <a
-                                href="{{ url_for('oficios.responder_peticion_subdirector', id_peticion=peticion.id_peticion) }}"
-                                class="btn-primario">Ver detalles</a>
-                        </td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="6" class="fila-vacia">No has realizado
-                            ninguna petición</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        {# KPIs #}
+        {% with
+            titulo1="Total Enviados", valor1=kpis['Enviados'],
+            titulo2="En Revisión", valor2=kpis['En Revisión'],
+            titulo3="Finalizados", valor3=kpis['Finalizados']
+            %}
+            {% include "fragments/kpis.html" %}
+        {% endwith %}
+        {# --- TABS DE NAVEGACIÓN (3 Pestañas) --- #}
+        <div class="contenedor-tabs">
+            <button class="tab-btn activo"
+                    onclick="abrirPestana(event, 'tab-asignaciones')">Asignaciones</button>
+            <button class="tab-btn" onclick="abrirPestana(event, 'tab-peticiones')">Peticiones</button>
+        </div>
+        {# --- CONTENIDO 1: ASIGNACIONES PENDIENTES --- #}
+        <div id="tab-asignaciones" class="contenido-tab activo">
+            <div class="tarjeta-tabla">
+                {# AQUÍ ESTÁ LA PRIMERA CLASE tabla-inteligente #}
+                <table class="tabla-moderna tabla-inteligente">
+                    <thead>
+                        <tr>
+                            <th>Folio</th>
+                            <th>Asunto</th>
+                            <th>Destinatario</th>
+                            <th>Respuesta</th>
+                            <th>Fecha Creación</th>
+                            <th class="texto-centro">Estatus</th>
+                            <th class="texto-derecha">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for oficio in oficios %}
+                            <tr>
+                                <td>
+                                    <span class="dato-folio">{{ oficio.folio_interno }}</span>
+                                </td>
+                                <td>{{ oficio.asunto }}</td>
+                                <td>{{ oficio.destinatario }}</td>
+                                <td>
+                                    {% if oficio.texto_respuesta %}
+                                        <span class="badge badge-verde">Respondido</span>
+                                        <div class="rol-usuario">{{ oficio.fecha_respuesta.strftime("%d/%m/%Y") }}</div>
+                                    {% else %}
+                                        <span class="badge badge-gris">Pendiente</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ oficio.fecha_creacion.strftime("%d/%m/%Y") }}</td>
+                                <td class="texto-centro">
+                                    {% if oficio.estatus == 'EN_REVISION' %}
+                                        <span class="badge badge-amarillo">En Revisión</span>
+                                    {% elif oficio.estatus == 'ASIGNADO' %}
+                                        <span class="badge badge-azul">Asignado</span>
+                                    {% elif oficio.estatus == 'ATENDIDO' %}
+                                        <span class="badge badge-azul">Atendido</span>
+                                    {% elif oficio.estatus == 'FINALIZADO' %}
+                                        <span class="badge badge-verde">Finalizado</span>
+                                    {% elif oficio.estatus == 'RECHAZADO' %}
+                                        <span class="badge badge-gris">Rechazado</span>
+                                    {% else %}
+                                        <span class="badge badge-gris">{{ oficio.estatus }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="texto-derecha">
+                                    <a href="{{ url_for('oficios.ver_detalles_oficio', id_oficio=oficio.id_oficio) }}"
+                                       class="btn-primario">Ver detalles</a>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="7" class="fila-vacia">No has creado oficios todavía.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {#-- CONTENIDO 2: MIS PETICIONES --- #}
+        <div id="tab-peticiones" class="contenido-tab">
+            <div class="header-seccion">
+                <h3 class="titulo-seccion">Gestiona las peticiones de tu equipo</h3>
+            </div>
+            <div class="tarjeta-tabla">
+                {# AQUÍ ESTÁ LA SEGUNDA CLASE tabla-inteligente #}
+                <table class="tabla-moderna tabla-inteligente">
+                    <thead>
+                        <tr>
+                            <th>Folio</th>
+                            <th>Asunto</th>
+                            <th>Descripción</th>
+                            <th>Estatus</th>
+                            <th>Respuesta</th>
+                            <th class="texto-derecha">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for peticion in peticiones %}
+                            <tr>
+                                <td>
+                                    <strong class="dato-folio">{{ peticion.folio_peticion }}</strong>
+                                </td>
+                                <td>{{ peticion.asunto }}</td>
+                                <td>{{ peticion.descripcion }}</td>
+                                <td>
+                                    {% if peticion.estatus == 'EN_REVISION' %}
+                                        <span class="badge badge-amarillo">En revisión</span>
+                                    {% elif peticion.estatus == 'ACEPTADA' %}
+                                        <span class="badge badge-verde">Aprobado</span>
+                                    {% else %}
+                                        <span class="badge badge-rojo">Rechazado</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if peticion.respuesta_recibida %}
+                                        {{ peticion.respuesta_recibida }}
+                                    {% else %}
+                                        <span class="texto-gris">Sin respuesta aún</span>
+                                    {% endif %}
+                                </td>
+                                <td class="texto-derecha">
+                                    <a href="{{ url_for('oficios.responder_peticion_subdirector', id_peticion=peticion.id_peticion) }}"
+                                       class="btn-primario">Ver detalles</a>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="fila-vacia">No has realizado ninguna petición</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-
-</div>
 {% endblock contenido_principal %}
 {% block script_adicional %}
-<script src="{{ url_for('static', filename='js/tabs.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tabs.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest"
+            type="text/javascript"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // 1. Buscamos TODAS las tablas que tengan la clase 'tabla-inteligente'
+            const misTablas = document.querySelectorAll(".tabla-inteligente");
+
+            // 2. Usamos un ciclo para activarlas una por una
+            misTablas.forEach(function(tabla) {
+                new simpleDatatables.DataTable(tabla, {
+                    searchable: true, // Activa el buscador de texto
+                    fixedHeight: false, // Ajusta la altura automáticamente
+                    perPage: 5, // 5 registros por página
+                    labels: {
+                        placeholder: "Buscar registro...",
+                        perPage: "registros por página",
+                        noRows: "No se encontraron registros",
+                        info: "Mostrando {start} a {end} de {rows} registros"
+                    }
+                });
+            });
+        });
+    </script>
 {% endblock script_adicional %}

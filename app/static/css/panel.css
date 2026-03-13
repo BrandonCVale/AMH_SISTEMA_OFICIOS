@@ -211,6 +211,7 @@
     background-color: #fef3c7;
     color: #92400e;
 }
+
 .badge-rojo {
     background-color: #ff0000;
     color: #ffffff;
@@ -498,8 +499,10 @@
     font-size: 0.95rem;
     transition: border-color 0.2s, box-shadow 0.2s;
     font-family: inherit;
-    resize: vertical; /* Para textareas */
-    box-sizing: border-box; /* Asegura que el padding no rompa el ancho */
+    resize: vertical;
+    /* Para textareas */
+    box-sizing: border-box;
+    /* Asegura que el padding no rompa el ancho */
 }
 
 .form-control:focus {
@@ -511,4 +514,43 @@
 .input-archivo-wrapper {
     margin-top: 10px;
     margin-bottom: 20px;
+}
+
+/* =========================================
+   ESTILOS PARA LA TABLA INTELIGENTE
+   ========================================= */
+
+/* Contenedor superior (Buscador y selector) */
+.dataTable-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 0 15px 0;
+    margin-bottom: 10px;
+}
+
+/* El cuadro de texto del buscador */
+.dataTable-input {
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    outline: none;
+    font-size: 0.9rem;
+    transition: border-color 0.3s ease;
+    width: 250px;
+}
+
+.dataTable-input:focus {
+    border-color: #6366f1;
+    /* Color morado de tu sistema */
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+/* El selector de "registros por página" */
+.dataTable-selector {
+    padding: 6px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    outline: none;
+    margin-right: 5px;
 }

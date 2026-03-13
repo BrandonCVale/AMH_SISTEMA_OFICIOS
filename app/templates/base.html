@@ -13,6 +13,12 @@
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/normalize.css') }}" />
     {% block css_adicional %}
+      {# JS DE TABLA #}
+      <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css"
+            rel="stylesheet">
+      <link rel="stylesheet"
+            href="{{ url_for('static', filename='css/panel.css') }}">
+      {# JS DE TABLA FIN #}
     {% endblock css_adicional %}
   </head>
   <body>
@@ -46,6 +52,6 @@
     </div>
     <script src="{{ url_for('static', filename='js/notificaciones.js') }}"></script>
     {% block script_adicional %}
-    {% endblock script_adicional %}
+    {% endblock script_adicional %}                     
   </body>
 </html>

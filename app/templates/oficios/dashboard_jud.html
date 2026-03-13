@@ -3,6 +3,11 @@
     Panel JUD
 {% endblock titulo %}
 {% block css_adicional %}
+    {# 1. PRIMERO LA LIBRERÍA DE LA TABLA #}
+    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css"
+          rel="stylesheet"
+          type="text/css">
+    {# 2. CSS #}
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/panel.css') }}">
 {% endblock css_adicional %}
@@ -24,23 +29,15 @@
         {# --- TABS DE NAVEGACIÓN (3 Pestañas) --- #}
         <div class="contenedor-tabs">
             <button class="tab-btn activo"
-                    onclick="abrirPestana(event, 'tab-asignaciones')">
-                Mis
-                Asignaciones
-            </button>
-            <button class="tab-btn" onclick="abrirPestana(event, 'tab-peticiones')">
-                Mis
-                Peticiones
-            </button>
-            <button class="tab-btn" onclick="abrirPestana(event, 'tab-atendidos')">
-                Asignaciones
-                Atendidas
-            </button>
+                    onclick="abrirPestana(event, 'tab-asignaciones')">Mis Asignaciones</button>
+            <button class="tab-btn" onclick="abrirPestana(event, 'tab-peticiones')">Mis Peticiones</button>
+            <button class="tab-btn" onclick="abrirPestana(event, 'tab-atendidos')">Asignaciones Atendidas</button>
         </div>
         {# --- CONTENIDO 1: ASIGNACIONES PENDIENTES --- #}
         <div id="tab-asignaciones" class="contenido-tab activo">
             <div class="tarjeta-tabla">
-                <table class="tabla-moderna">
+                {# CLASE AGREGADA AQUÍ #}
+                <table class="tabla-moderna tabla-inteligente">
                     <thead>
                         <tr>
                             <th>Folio</th>
@@ -53,8 +50,7 @@
                         {% for oficio in oficios %}
                             <tr>
                                 <td>
-                                    <span class="dato-folio">{{ oficio.folio_interno
-                                    }}</span>
+                                    <span class="dato-folio">{{ oficio.folio_interno }}</span>
                                 </td>
                                 <td>{{ oficio.asunto }}</td>
                                 <td>{{ oficio.descripcion_solicitud }}</td>
@@ -65,10 +61,7 @@
                             </tr>
                         {% else %}
                             <tr>
-                                <td colspan="4" class="fila-vacia">
-                                    Sin asignaciones
-                                    pendientes
-                                </td>
+                                <td colspan="4" class="fila-vacia">Sin asignaciones pendientes</td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -81,9 +74,9 @@
                 <h3 class="titulo-seccion">Gestionar Peticiones</h3>
                 <a href="{{ url_for('oficios.nueva_peticion') }}" class="btn-primario">Nueva Solicitud</a>
             </div>
-            {# TABLA #}
             <div class="tarjeta-tabla">
-                <table class="tabla-moderna">
+                {# CLASE AGREGADA AQUÍ #}
+                <table class="tabla-moderna tabla-inteligente">
                     <thead>
                         <tr>
                             <th>Folio</th>
@@ -103,12 +96,15 @@
                                 <td>{{ peticion.asunto }}</td>
                                 <td>{{ peticion.descripcion }}</td>
                                 <td>
+                                    {# CORRECCIÓN DE ESTATUS Y CLASES BADGE AQUÍ #}
                                     {% if peticion.estatus == 'EN_REVISION' %}
-                                        <span class="badge-amarillo">En revisión</span>
-                                    {% elif peticion.estatus == 'APROBADO' %}
-                                        <span class="badge-verde">Aprobado</span>
+                                        <span class="badge badge-amarillo">En revisión</span>
+                                    {% elif peticion.estatus == 'ACEPTADA' %}
+                                        <span class="badge badge-verde">Aceptada</span>
+                                    {% elif peticion.estatus == 'RECHAZADO' %}
+                                        <span class="badge badge-rojo">Rechazado</span>
                                     {% else %}
-                                        <span class="badge-rojo">Rechazado</span>
+                                        <span class="badge badge-gris">{{ peticion.estatus }}</span>
                                     {% endif %}
                                 </td>
                                 <td>
@@ -125,10 +121,7 @@
                             </tr>
                         {% else %}
                             <tr>
-                                <td colspan="4" class="fila-vacia">
-                                    No has realizado
-                                    ninguna petición
-                                </td>
+                                <td colspan="6" class="fila-vacia">No has realizado ninguna petición</td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -138,7 +131,8 @@
         {# --- CONTENIDO 3: HISTORIAL ASIGNACIONES ATENDIDAS --- #}
         <div id="tab-atendidos" class="contenido-tab">
             <div class="tarjeta-tabla">
-                <table class="tabla-moderna">
+                {# CLASE AGREGADA AQUÍ #}
+                <table class="tabla-moderna tabla-inteligente">
                     <thead>
                         <tr>
                             <th>Folio</th>
@@ -154,7 +148,6 @@
                                     <span class="dato-folio">{{ atendido.folio_interno }}</span>
                                 </td>
                                 <td>{{ atendido.asunto }}</td>
-                                {# <td>{{ atendido.texto_respuesta }}</td> #}
                                 <td class="alinear-derecha">
                                     <button class="btn-gris" disabled>Atendido</button>
                                 </td>
@@ -165,10 +158,7 @@
                             </tr>
                         {% else %}
                             <tr>
-                                <td colspan="4" class="fila-vacia">
-                                    No has atendido
-                                    oficios aún
-                                </td>
+                                <td colspan="4" class="fila-vacia">No has atendido oficios aún</td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -179,4 +169,28 @@
 {% endblock contenido_principal %}
 {% block script_adicional %}
     <script src="{{ url_for('static', filename='js/tabs.js') }}"></script>
+    {# SCRIPTS DE LA TABLA INTELIGENTE #}
+    <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest"
+            type="text/javascript"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Buscamos TODAS las tablas que tengan la clase 'tabla-inteligente'
+            const misTablas = document.querySelectorAll(".tabla-inteligente");
+
+            // Las activamos una por una con el mismo diseño
+            misTablas.forEach(function(tabla) {
+                new simpleDatatables.DataTable(tabla, {
+                    searchable: true,
+                    fixedHeight: false,
+                    perPage: 5,
+                    labels: {
+                        placeholder: "Buscar registro...",
+                        perPage: "registros por página",
+                        noRows: "No se encontraron registros",
+                        info: "Mostrando {start} a {end} de {rows} registros"
+                    }
+                });
+            });
+        });
+    </script>
 {% endblock script_adicional %}
