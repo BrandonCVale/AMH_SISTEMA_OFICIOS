@@ -649,6 +649,7 @@ def obtener_detalles_peticion(id_peticion):
     sql = """
         SELECT
             p.id_peticion ,
+            p.respuesta_recibida ,
             p.folio_peticion ,
             u.nombre_completo AS solicitante,
             p.fecha_creacion ,

@@ -13,7 +13,8 @@ Ver detalles peticion
 <div class="contenedor-principal">
     <div class="flex-header">
         <div>
-            <h1 class="titulo-panel">Petición: {{ peticion.folio_peticion }}</h1>
+            <h1 class="titulo-panel">Petición: {{ peticion.folio_peticion
+                }}</h1>
             <p class="subtitulo-panel">Seguimiento de la petición</p>
         </div>
         <a href="{{ url_for('oficios.panel_control')}}" class="btn-gris">Volver
@@ -60,6 +61,17 @@ Ver detalles peticion
             </div>
 
             <div class="tarjeta-blanca">
+                <h3 class="titulo-tarjeta">Respuesta obtenida</h3>
+                {% if peticion.respuesta_recibida %}
+                <div class="descripcion-larga">
+                    {{peticion.respuesta_recibida}}
+                </div>
+                {% else %}
+                <p class="grupo-dato">Sin respuesta</p>
+                {% endif %}
+            </div>
+
+            <div class="tarjeta-blanca">
                 <h3 class="titulo-tarjeta">Archivos Adjuntos</h3>
                 {% if archivos_peticion %}
                 <ul class="lista-archivos">
@@ -76,11 +88,12 @@ Ver detalles peticion
                             <span>{{ doc.nombre_archivo }}</span>
                             {# Tipo de archivo #}
                             {% if doc.tipo_documento == 'SOLICITUD' %}
-                                <span class="badge badge-azul">Solicitud Original</span>
+                            <span class="badge badge-azul">Solicitud
+                                Original</span>
                             {% elif doc.tipo_documento == 'RESPUESTA_OFICIAL' %}
-                                <span class="badge badge-verde">Respuesta</span>
+                            <span class="badge badge-verde">Respuesta</span>
                             {% elif doc.tipo_documento == 'ANEXO_SOLICITUD' %}
-                                <span class="badge badge-gris">Anexo</span>
+                            <span class="badge badge-gris">Anexo</span>
                             {% endif %}
                         </div>
                         <a

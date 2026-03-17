@@ -1,126 +1,142 @@
 {% extends "base.html" %}
 {% block titulo %}
-    Revisar Petición
+Revisar Petición
 {% endblock titulo %}
 {% block css_adicional %}
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/panel.css') }}">
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/detalle_oficio.css') }}">
+<link rel="stylesheet"
+    href="{{ url_for('static', filename='css/panel.css') }}">
+<link rel="stylesheet"
+    href="{{ url_for('static', filename='css/detalle_oficio.css') }}">
 {% endblock css_adicional %}
 {% block contenido_principal %}
-    <div class="contenedor-principal">
-        {# ENCABEZADO Y BOTÓN DE RETORNO #}
-        <div class="header-seccion">
-            <div>
-                <h1 class="titulo-panel">Evaluación de la petición</h1>
-                <p class="subtitulo-panel">
-                    Revisa los detalles y emita una
-                    respuesta.
-                </p>
-            </div>
-            <div>
-                <a href="{{ url_for('oficios.panel_control') }}" class="btn-gris">Volver al Tablero</a>
-            </div>
+<div class="contenedor-principal">
+    {# ENCABEZADO Y BOTÓN DE RETORNO #}
+    <div class="header-seccion">
+        <div>
+            <h1 class="titulo-panel">Evaluación de la petición</h1>
+            <p class="subtitulo-panel">
+                Revisa los detalles y emita una
+                respuesta.
+            </p>
         </div>
-        <div class="grid-detalle">
-            {# COLUMNA IZQUIERDA: INFORMACIÓN DE LA PETICIÓN #}
-            <div>
-                <div class="tarjeta-blanca">
-                    <h3 class="titulo-tarjeta">Detalles de la Petición</h3>
-                    <div class="lista-detalles">
-                        <div class="item-detalle">
-                            <strong>Folio:</strong> {{ peticion.folio_peticion }}
-                        </div>
-                        <div class="item-detalle">
-                            <strong>Solicitante:</strong> {{ peticion.solicitante }}
-                        </div>
-                        <div class="item-detalle">
-                            <strong>Fecha de Solicitud:</strong> {{
-                            peticion.fecha_creacion }}
-                        </div>
-                        <div class="item-detalle">
-                            <strong>Asunto:</strong> {{ peticion.asunto }}
-                        </div>
-                        <div class="item-detalle">
-                            <strong>Estatus:</strong> {{ peticion.estatus }}
-                        </div>
-                        <div class="separador-horizontal"></div>
-                        <div class="item-detalle">
-                            <strong>Descripción / Justificación:</strong>
-                            <div class="descripcion-larga">{{ peticion.descripcion }}</div>
-                        </div>
+        <div>
+            <a href="{{ url_for('oficios.panel_control') }}"
+                class="btn-gris">Volver al Tablero</a>
+        </div>
+    </div>
+    <div class="grid-detalle">
+        {# COLUMNA IZQUIERDA: INFORMACIÓN DE LA PETICIÓN #}
+        <div>
+            <div class="tarjeta-blanca">
+                <h3 class="titulo-tarjeta">Detalles de la Petición</h3>
+                <div class="lista-detalles">
+                    <div class="item-detalle">
+                        <strong>Folio:</strong> {{ peticion.folio_peticion }}
+                    </div>
+                    <div class="item-detalle">
+                        <strong>Solicitante:</strong> {{ peticion.solicitante }}
+                    </div>
+                    <div class="item-detalle">
+                        <strong>Fecha de Solicitud:</strong> {{
+                        peticion.fecha_creacion }}
+                    </div>
+                    <div class="item-detalle">
+                        <strong>Asunto:</strong> {{ peticion.asunto }}
+                    </div>
+                    <div class="item-detalle">
+                        <strong>Estatus:</strong> {{ peticion.estatus }}
+                    </div>
+                    <div class="separador-horizontal"></div>
+                    <div class="item-detalle">
+                        <strong>Descripción / Justificación:</strong>
+                        <div class="descripcion-larga">{{ peticion.descripcion
+                            }}</div>
                     </div>
                 </div>
-                {# BLOQUE DE ARCHIVOS ADJUNTOS (Si existen) #}
-                {% if archivos %}
-                    <div class="tarjeta-blanca">
-                        <h3 class="titulo-tarjeta">Documentos de Evidencia</h3>
-                        <ul class="lista-archivos">
-                            {% for archivo in archivos %}
-                                <li class="item-archivo">
-                                    <div class="info-archivo">
-                                        <span class="nombre-archivo">{{
-                                        archivo.nombre_archivo }}</span>
-                                        {% if archivo.tipo_documento == 'SOLICITUD' %}
-                                            <span class="badge badge-azul">Solicitud
-                                            Original</span>
-                                        {% elif archivo.tipo_documento == 'RESPUESTA_OFICIAL' %}
-                                            <span class="badge badge-verde">Respuesta</span>
-                                        {% elif archivo.tipo_documento == 'ANEXO_SOLICITUD' %}
-                                            <span class="badge badge-gris">Anexo</span>
-                                        {% endif %}
-                                    </div>
-                                    <a href="{{ url_for('static', filename=archivo.ruta_almacenamiento) }}"
-                                       class="btn-descargar"
-                                       target="_blank">Descargar</a>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
+            </div>
+            <div class="tarjeta-blanca">
+                <h3 class="titulo-tarjeta">Respuesta obtenida</h3>
+                {% if peticion.respuesta_recibida %}
+                <div class="descripcion-larga">
+                    {{peticion.respuesta_recibida}}
+                </div>
+                {% else %}
+                <p class="grupo-dato">Sin respuesta</p>
                 {% endif %}
             </div>
-            {# COLUMNA DERECHA: FORMULARIO DE RESPUESTA #}
-            <div>
-                <div class="tarjeta-blanca tarjeta-destacada">
-                    <h3 class="titulo-tarjeta">Escribe tu respuesta</h3>
-                    <form action="{{ url_for('oficios.responder_peticion_subdirector', id_peticion=peticion.id_peticion) }}"
-                          method="POST">
-                        <div class="grupo-formulario">
-                            <label class="etiqueta">
-                                Instrucciones o
-                                Comentarios:
-                            </label>
-                            <textarea name="respuesta_texto"
-                                      class="input-area"
-                                      rows="6"
-                                      required
-                                      placeholder="Escribe aquí tu respuesta para el solicitante..."></textarea>
+            {# BLOQUE DE ARCHIVOS ADJUNTOS (Si existen) #}
+            {% if archivos %}
+            <div class="tarjeta-blanca">
+                <h3 class="titulo-tarjeta">Documentos de Evidencia</h3>
+                <ul class="lista-archivos">
+                    {% for archivo in archivos %}
+                    <li class="item-archivo">
+                        <div class="info-archivo">
+                            <span class="nombre-archivo">{{
+                                archivo.nombre_archivo }}</span>
+                            {% if archivo.tipo_documento == 'SOLICITUD' %}
+                            <span class="badge badge-azul">Solicitud
+                                Original</span>
+                            {% elif archivo.tipo_documento ==
+                            'RESPUESTA_OFICIAL' %}
+                            <span class="badge badge-verde">Respuesta</span>
+                            {% elif archivo.tipo_documento == 'ANEXO_SOLICITUD'
+                            %}
+                            <span class="badge badge-gris">Anexo</span>
+                            {% endif %}
                         </div>
-                        <div style="margin-top: 20px;">
-                            <button type="submit"
-                                    name="decision"
-                                    value="ACEPTADA"
-                                    class="btn-primario btn-full"
-                                    style="background-color: #10b981;
+                        <a
+                            href="{{ url_for('static', filename=archivo.ruta_almacenamiento) }}"
+                            class="btn-descargar"
+                            target="_blank">Descargar</a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+        {# COLUMNA DERECHA: FORMULARIO DE RESPUESTA #}
+        <div>
+            <div class="tarjeta-blanca tarjeta-destacada">
+                <h3 class="titulo-tarjeta">Escribe tu respuesta</h3>
+                <form
+                    action="{{ url_for('oficios.responder_peticion_subdirector', id_peticion=peticion.id_peticion) }}"
+                    method="POST">
+                    <div class="grupo-formulario">
+                        <label class="etiqueta">
+                            Instrucciones o
+                            Comentarios:
+                        </label>
+                        <textarea name="respuesta_texto"
+                            class="input-area"
+                            rows="6"
+                            required
+                            placeholder="Escribe aquí tu respuesta para el solicitante..."></textarea>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <button type="submit"
+                            name="decision"
+                            value="ACEPTADA"
+                            class="btn-primario btn-full"
+                            style="background-color: #10b981;
                                            border-color: #10b981;
                                            margin-bottom: 10px">
-                                Aceptar
-                                Solicitud
-                            </button>
-                            <button type="submit"
-                                    name="decision"
-                                    value="RECHAZADO"
-                                    class="btn-primario btn-full"
-                                    style="background-color: #ef4444;
+                            Aceptar
+                            Solicitud
+                        </button>
+                        <button type="submit"
+                            name="decision"
+                            value="RECHAZADO"
+                            class="btn-primario btn-full"
+                            style="background-color: #ef4444;
                                            border-color: #ef4444">
-                                Rechazar
-                                Solicitud
-                            </button>
-                        </div>
-                    </form>
-                </div>
+                            Rechazar
+                            Solicitud
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
+</div>
 {% endblock contenido_principal %}
