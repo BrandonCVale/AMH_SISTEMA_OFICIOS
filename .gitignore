@@ -1,17 +1,14 @@
 # Archivos de entorno y secretos
-# .env
+.env
 
 # Archivos compilados de Python (Basura)
 __pycache__/
 *.py[cod]
+*.pyc
 
 # Entorno Virtual
 venv/
 env/
 
 # Carpetas de subidas (Opcional: Si no quieres subir los PDFs de prueba a GitHub)
-# app/static/uploads/
-
-# Base de datos
-# *.sqlite3
-# *.db
+app/static/uploads/
