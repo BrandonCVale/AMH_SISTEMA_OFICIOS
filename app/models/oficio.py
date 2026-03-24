@@ -192,6 +192,7 @@ def obtener_oficios_del_gestor(id_usuario_gestor):
     sql = """
         SELECT
             o.id_oficio,
+            o.folio_consecutivo,
             o.folio_interno,
             o.asunto,
             o.texto_respuesta,
@@ -200,20 +201,26 @@ def obtener_oficios_del_gestor(id_usuario_gestor):
             o.fecha_creacion,
             o.id_usuario_asignado,
             o.id_estatus_actual,
-            
             -- PASA LOS ID A VALORES
-            u.nombre_completo AS destinatario, -- En lugar de id_usuario_asignado
-            e.nombre AS estatus -- En lugar de id_estatus_actual
-                
-        FROM oficios o
-        -- 1. UNIMOS CON USUARIOS PARA OBTENER U.NOMBRE_COMPLETO
-        INNER JOIN usuarios u ON o.id_usuario_asignado = u.id_usuario
-        
-        -- 2 UNIMOS CON CAT_ESTATUS PARA OBTENER E.NOMBRE
-        INNER JOIN cat_estatus e ON o.id_estatus_actual = e.id_estatus
-        
-        WHERE o.id_usuario_creador = %s
-        ORDER BY o.fecha_creacion DESC;
+            u.nombre_completo AS destinatario,
+            -- En lugar de id_usuario_asignado
+            e.nombre AS estatus,
+            -- En lugar de id_estatus_actual
+            ca.nombre AS area_destinataria
+        FROM
+            oficios o
+            -- 1. UNIMOS CON USUARIOS PARA OBTENER U.NOMBRE_COMPLETO
+        INNER JOIN usuarios u ON
+            o.id_usuario_asignado = u.id_usuario
+            -- 2 UNIMOS CON CAT_ESTATUS PARA OBTENER E.NOMBRE
+        INNER JOIN cat_estatus e ON
+            o.id_estatus_actual = e.id_estatus
+        INNER JOIN cat_areas ca ON
+            o.id_area_asignada = ca.id_area
+        WHERE
+            o.id_usuario_creador = %s
+        ORDER BY
+            o.fecha_creacion DESC;
     """
 
     with conexion.cursor() as cursor:
@@ -366,6 +373,7 @@ def obtener_bandeja_entrada_subdirector(id_usuario):
     sql = """
     SELECT
         o.id_oficio,
+        o.folio_consecutivo,
         u.nombre_completo AS remitente,
         o.fecha_creacion,
         o.folio_interno,
@@ -399,6 +407,7 @@ def obtener_oficios_atendidos_del_subdirector(id_area):
     sql = """
     SELECT
         o.id_oficio,
+        o.folio_consecutivo,
         o.folio_interno,
         o.asunto,
         ce.nombre AS estatus
@@ -461,6 +470,7 @@ def obtener_oficios_asignados_a_un_jud(id_jud):
     sql_pendientes = """
         SELECT
             o.id_oficio ,
+            o.folio_consecutivo ,
             o.folio_interno ,
             o.asunto ,
             o.descripcion_solicitud
@@ -484,6 +494,7 @@ def oficios_atendidos_por_un_jud(id_jud):
     sql_atendidos = """
                 SELECT
                     o.id_oficio ,
+                    o.folio_consecutivo ,
                     o.folio_interno ,
                     o.asunto ,
                     o.descripcion_solicitud

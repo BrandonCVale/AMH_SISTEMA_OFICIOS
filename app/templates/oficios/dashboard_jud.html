@@ -40,7 +40,8 @@
                 <table class="tabla-moderna tabla-inteligente">
                     <thead>
                         <tr>
-                            <th>Folio</th>
+                            <th>ID</th>
+                            <th>No. Oficio</th>
                             <th>Asunto</th>
                             <th>Descripción</th>
                             <th class="alinear-derecha">Acciones</th>
@@ -49,6 +50,7 @@
                     <tbody>
                         {% for oficio in oficios %}
                             <tr>
+                                <td>{{ oficio.folio_consecutivo }}</td>
                                 <td>
                                     <span class="dato-folio">{{ oficio.folio_interno }}</span>
                                 </td>
@@ -79,7 +81,8 @@
                 <table class="tabla-moderna tabla-inteligente">
                     <thead>
                         <tr>
-                            <th>Folio</th>
+                            <th>ID</th>
+                            <th>No. Oficio</th>
                             <th>Asunto</th>
                             <th>Descripción</th>
                             <th>Estatus</th>
@@ -90,6 +93,7 @@
                     <tbody>
                         {% for peticion in peticiones %}
                             <tr>
+                                <td>{{ peticion.id_peticion }}</td>
                                 <td>
                                     <strong class="dato-folio">{{ peticion.folio_peticion }}</strong>
                                 </td>
@@ -135,7 +139,8 @@
                 <table class="tabla-moderna tabla-inteligente">
                     <thead>
                         <tr>
-                            <th>Folio</th>
+                            <th>ID</th>
+                            <th>No. Oficio</th>
                             <th>Asunto</th>
                             <th class="alinear-derecha">Estatus</th>
                             <th>Acciones</th>
@@ -144,6 +149,7 @@
                     <tbody>
                         {% for atendido in atendidos %}
                             <tr>
+                                <td>{{ atendido.folio_consecutivo }}</td>
                                 <td>
                                     <span class="dato-folio">{{ atendido.folio_interno }}</span>
                                 </td>
@@ -182,7 +188,7 @@
                 new simpleDatatables.DataTable(tabla, {
                     searchable: true,
                     fixedHeight: false,
-                    perPage: 5,
+                    perPage: 10,
                     labels: {
                         placeholder: "Buscar registro...",
                         perPage: "registros por página",

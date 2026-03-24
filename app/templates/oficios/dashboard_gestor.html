@@ -41,9 +41,11 @@
                 <table class="tabla-moderna tabla-inteligente">
                     <thead>
                         <tr>
-                            <th>Folio</th>
+                            <th>ID</th>
+                            <th>No. Oficio</th>
                             <th>Asunto</th>
                             <th>Destinatario</th>
+                            <th>Área Destinataria</th>
                             <th>Respuesta</th>
                             <th>Fecha Creación</th>
                             <th class="texto-centro">Estatus</th>
@@ -53,11 +55,13 @@
                     <tbody>
                         {% for oficio in oficios %}
                             <tr>
+                                <td>{{oficio.folio_consecutivo}}</td>
                                 <td>
                                     <span class="dato-folio">{{ oficio.folio_interno }}</span>
                                 </td>
                                 <td>{{ oficio.asunto }}</td>
                                 <td>{{ oficio.destinatario }}</td>
+                                <td>{{ oficio.area_destinataria }}</td>
                                 <td>
                                     {% if oficio.texto_respuesta %}
                                         <span class="badge badge-verde">Respondido</span>
@@ -168,7 +172,7 @@
                 new simpleDatatables.DataTable(tabla, {
                     searchable: true, // Activa el buscador de texto
                     fixedHeight: false, // Ajusta la altura automáticamente
-                    perPage: 5, // 5 registros por página
+                    perPage: 10, // 10 registros por página
                     labels: {
                         placeholder: "Buscar registro...",
                         perPage: "registros por página",
