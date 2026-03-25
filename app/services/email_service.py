@@ -7,18 +7,15 @@ from flask_login import current_user, login_required
 
 
 def enviar_notificacion_de_nuevo_oficio(
-    datos, correo_subdirector, correo_adicional, lista_archivos_adjuntos=None
+    datos, correo_subdirector,  lista_archivos_adjuntos=None
 ):
     """
-    Envía la notificación y envia los archivos adjuntos.
+    Envía una notificación por correo al subdirector cuando se crea un oficio.
+    Se envia la informacion del oficio y sus archivos adjuntos.
     """
 
     # 1. Validar y limpiar destinatarios
     destinatarios = [correo_subdirector]  # El subdirector siempre va
-
-    # Solo agregamos el adicional si existe y no está vacío
-    if correo_adicional and correo_adicional.strip():
-        destinatarios.append(correo_adicional)
 
     # 2. Definimos el Asunto
     asunto = f"Nuevo Oficio Asignado: {datos['folio']}"
@@ -32,20 +29,16 @@ def enviar_notificacion_de_nuevo_oficio(
 
     # 4. Cuerpo del correo
     msg.body = f"""         
-    A quien corresponda,
+    Te han asignado un nuevo oficio. Ingresa al sistema para atenderlo.
 
-    Se le ha dado seguimiento a su solicitud.
-
-    DETALLES DE LA SOLICITUD:
-    --------------------------------------
+    DETALLES:
+    
     Folio:    {datos['folio']}
     Asunto:   {datos['asunto']}
     Área:     {datos['area']}
     Cuerpo:   {datos['descripcion']}
-    --------------------------------------
     
-    Ingrese al sistema para atenderlo.
-    Adjunto a este correo encontrará el documento original sellado por el sistema.
+    Adjunto a este correo encontrará el documento original sellado por el sistema y sus anexos.
     """
 
     if lista_archivos_adjuntos:
@@ -71,6 +64,60 @@ def enviar_notificacion_de_nuevo_oficio(
                     )
 
     # 6. Enviamos (Si falla aquí, lanzará una excepción que capturará la otra función)
+    mail.send(msg)
+    return True
+
+
+def enviar_notificacion_correo_externo(
+    datos, correo_solicitante, lista_archivos_adjuntos=None
+):
+    """
+    Envia un mail al correo del solicitante que adjunten.
+    Se envia informacion de la solicitud y archivos.
+    """
+    asunto = f"AMH - SEGUIMIENTO DE SOLICITUD"
+
+    msg = Message(
+        subject=asunto,
+        sender=current_app.config["MAIL_USERNAME"],
+        recipients=[correo_solicitante],
+    )
+
+    msg.body = f"""
+    A quien corresponda,
+    
+    Se le ha dado seguimiento a su solicitud.
+    
+    DETALLES:
+    
+    Folio:    {datos['folio']}
+    Asunto:   {datos['asunto']}
+    Área:     {datos['area']}
+    
+    Adjunto a este correo encontrará el documento original sellado por el sistema."""
+
+    if lista_archivos_adjuntos:
+        for ruta_archivo in lista_archivos_adjuntos:
+            # Verificamos que exista
+            if os.path.exists(ruta_archivo):
+                nombre_archivo = os.path.basename(ruta_archivo)
+
+                # Extraemos el mimetype (tipo de archivo)
+                # Un MIME type consta de dos partes: Tipo: categoría general del contenido y Subtipo: especifica el formato exacto dentro de esa categoría
+                # Ej: image/png
+                mime_type, _ = mimetypes.guess_type(ruta_archivo)
+
+                if not mime_type:
+                    # Tipo generico por si no lo reconoce
+                    mime_type = "application/octet-stream"
+
+                with open(ruta_archivo, "rb") as archivo:
+                    msg.attach(
+                        filename=nombre_archivo,
+                        content_type=mime_type,
+                        data=archivo.read(),
+                    )
+
     mail.send(msg)
     return True
 

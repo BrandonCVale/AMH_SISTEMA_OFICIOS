@@ -28,6 +28,7 @@ from app.models.catalogo import obtener_nombre_del_area
 from app.services.email_service import (
     enviar_notificacion_de_nuevo_oficio,
     enviar_notificacion_oficio_turnado,
+    enviar_notificacion_correo_externo,
 )
 
 
@@ -121,7 +122,6 @@ class ServicioOficio:
                         )
 
                         if not exito_estampado:
-                            # Opcional: Podrías hacer un current_app.logger.warning aquí
                             print(
                                 "Advertencia: No se pudo estampar el acuse en el PDF."
                             )
@@ -200,9 +200,16 @@ class ServicioOficio:
                 enviar_notificacion_de_nuevo_oficio(
                     datos_email,
                     correo_sub,
-                    correo_adicional,
                     lista_archivos_adjuntos=rutas_para_correo,
                 )
+                if correo_adicional and correo_adicional.strip() != "":
+                    enviar_notificacion_correo_externo(
+                        datos_email,
+                        correo_adicional.strip(),
+                        lista_archivos_adjuntos=rutas_para_correo,
+                    )
+                else:
+                    print("El correo adicional no esta llegando")
 
                 return True, f"Oficio {folio_manual} creado y notificado correctamente."
 
@@ -340,7 +347,11 @@ class ServicioOficio:
                     )
 
             conexion.commit()
-            return True, f"Petición {datos_peticion['folio']} enviada correctamente.", ruta
+            return (
+                True,
+                f"Petición {datos_peticion['folio']} enviada correctamente.",
+                ruta,
+            )
 
         except IntegrityError:
             conexion.rollback()
@@ -386,8 +397,12 @@ class ServicioOficio:
                     )
             conexion.commit()
 
-            return True, f"Petición {datos_peticion['folio']} enviada correctamente.", ruta
-        
+            return (
+                True,
+                f"Petición {datos_peticion['folio']} enviada correctamente.",
+                ruta,
+            )
+
         except IntegrityError as e:
             conexion.rollback()
             print(f"Error {e}")
