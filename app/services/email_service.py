@@ -7,7 +7,7 @@ from flask_login import current_user, login_required
 
 
 def enviar_notificacion_de_nuevo_oficio(
-    datos, correo_subdirector,  lista_archivos_adjuntos=None
+    datos, correo_subdirector, lista_archivos_adjuntos=None
 ):
     """
     Envía una notificación por correo al subdirector cuando se crea un oficio.

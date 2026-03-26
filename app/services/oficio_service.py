@@ -247,7 +247,7 @@ class ServicioOficio:
             with conexion.cursor() as cursor:
                 # 1. Actualizar el oficio (Texto y Estatus a Finalizado)
                 actualizar_respuesta_oficio_db(cursor, id_oficio, texto_respuesta)
-
+   
                 # 2. Guardar Archivo de Respuesta (Si existe)
                 if archivo and archivo.filename != "":
                     if not self._archivo_es_permitido(archivo.filename):
