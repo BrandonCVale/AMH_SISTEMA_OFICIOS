@@ -20,17 +20,60 @@
         {# Formulario inicio #}
         <div class="tarjeta-contenido">
             <div class="titulo-tarjeta">
-                <h3>Las peticiones pasan en automático a tu subdirector</h3>
+                <h3>Elige el destinatario y completa los datos</h3>
             </div>
             <form method="POST" enctype="multipart/form-data">
+                {# SELECTOR DE DESTINATARIO JS #}
                 <div class="detalle-grupo">
+                    <label class="detalle-grupo">¿A quién va dirigida esta petición?</label>
+                    <select name="tipo-destinatario"
+                            id="tipo-destinatario"
+                            class="form-control"
+                            required
+                            onchange="cambiarDestinatario()">
+                        <option value="">Selecciona un destinatario</option>
+                        <option value="subdirector">Mi subdirector</option>
+                        <option value="gestor">Gestor</option>
+                    </select>
+                </div>
+                {# Si elige subdirector (OCULTO POR DEFECTO) #}
+                <div id="div-subdirector"
+                     class="detalle-grupo"
+                     style="display: none;
+                            margin-top: 15px">
                     <label class="detalle-grupo">Correo del subdirector:</label>
                     <input type="text"
                            class="form-control"
                            value="{{ correo_subdirector_area }}"
                            readonly>
                 </div>
-                <div>
+                {# Si elige Gestor (OCULTO POR DEFECTO) #}
+                <div id="div-gestor"
+                     class="detalle-grupo"
+                     style="display: none;
+                            margin-top: 15px">
+                    <label class="detalle-grupo">Selecciona al Gestor:</label>
+                    <select name="id_gestor"
+                            id="id_gestor"
+                            class="form-control"
+                            onchange="mostrarCorreoGestor()">
+                        <option value="" data-correo="">Elige un Gestor</option>
+                        {% for gestor in gestores %}
+                            <option value="{{ gestor.id_usuario }}"
+                                    data-correo="{{ gestor.correo_electronico }}">{{ gestor.nombre_completo }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {# Caja para mostrar el correo del Gestor seleccionado (OCULTO POR DEFECTO) #}
+                <div id="div-correo-gestor"
+                     class="detalle-grupo"
+                     style="display: none;
+                            margin-top: 15px">
+                    <label class="detalle-grupo">Correo del Gestor:</label>
+                    <input type="text" id="correo-gestor-display" class="form-control" readonly>
+                </div>
+                {# -------------------------------------------------------- #}
+                <div style="margin-top: 15px;">
                     <label class="detalle-grupo">Asunto de la petición:</label>
                     <input type="text" name="asunto" class="form-control" required>
                 </div>
@@ -61,3 +104,62 @@
         {# Formulario fin #}
     </div>
 {% endblock contenido_principal %}
+{# JS #}
+{% block script_adicional %}
+    <script>
+        // Función 1: Mostrar el correo del gestor elegido
+        function mostrarCorreoGestor() {
+            const selectGestor = document.getElementById("id_gestor");
+            const divCorreo = document.getElementById("div-correo-gestor");
+            const inputCorreo = document.getElementById("correo-gestor-display");
+
+            // Averiguamos qué <option> seleccionó el usuario y sacamos su 'data-correo'
+            const opcionSeleccionada = selectGestor.options[selectGestor.selectedIndex];
+            const correo = opcionSeleccionada.getAttribute("data-correo");
+
+            if (correo) {
+                inputCorreo.value = correo; // Escribimos el correo
+                divCorreo.style.display = "block"; // Mostramos la caja
+            } else {
+                inputCorreo.value = ""; // Limpiamos la caja
+                divCorreo.style.display = "none"; // Ocultamos la caja
+            }
+        }
+
+        // Función 2: Alternar entre Subdirector y Gestor
+        function cambiarDestinatario() {
+            const tipo = document.getElementById("tipo-destinatario").value;
+            const divSub = document.getElementById("div-subdirector");
+            const divGestor = document.getElementById("div-gestor");
+            const selectGestor = document.getElementById("id_gestor");
+            const divCorreoGestor = document.getElementById("div-correo-gestor");
+
+            if (tipo === "subdirector") {
+                divSub.style.display = "block";
+                divGestor.style.display = "none";
+                divCorreoGestor.style.display = "none";
+
+                selectGestor.required = false;
+                selectGestor.value = ""; // Limpiamos la selección del gestor
+                mostrarCorreoGestor(); // Ejecutamos la función para asegurar que se limpie el correo visualmente
+            } else if (tipo === "gestor") {
+                divSub.style.display = "none";
+                divGestor.style.display = "block";
+                selectGestor.required = true;
+            } else {
+                divSub.style.display = "none";
+                divGestor.style.display = "none";
+                divCorreoGestor.style.display = "none";
+
+                selectGestor.required = false;
+                selectGestor.value = "";
+                mostrarCorreoGestor();
+            }
+        }
+
+        // Ejecutar la rutina de limpieza inmediatamente al cargar la página
+        document.addEventListener("DOMContentLoaded", function() {
+            cambiarDestinatario();
+        });
+    </script>
+{% endblock script_adicional %}

@@ -324,6 +324,8 @@ def atender_oficio(id_oficio):
 @login_required
 def nueva_peticion():
     correo_subdirector = obtener_correo_subdirector_por_area(current_user.id_area)
+    gestores = obtener_a_todos_los_gestores()
+
     if request.method == "POST":
         # 1. Recolectar datos
         formulario = {
@@ -367,6 +369,7 @@ def nueva_peticion():
         "oficios/peticion_jud.html",
         usuario=current_user,
         correo_subdirector_area=correo_subdirector,
+        gestores=gestores,
     )
 
 
@@ -404,7 +407,7 @@ def nueva_peticion_subdirector():
                 enviar_notificacion_peticion_subdirector(
                     datos=datos_email,
                     correo_gestor=correo_del_gestor[0]["correo_electronico"],
-                    lista_archivos_adjuntos=[ruta_archivo]
+                    lista_archivos_adjuntos=[ruta_archivo],
                 )
 
                 flash(mensaje, "success")
@@ -488,17 +491,24 @@ def responder_peticion_subdirector(id_peticion):
             mensaje = "Solicitud rechazada exitosamente"
             tipo = "danger"
         else:
-            flash("Debes hacer click en uno de los botones para enviar tu respuesta", "warning")
-            return redirect(url_for("oficios.responder_peticion_subdirector", id_peticion = id_peticion))
-        
+            flash(
+                "Debes hacer click en uno de los botones para enviar tu respuesta",
+                "warning",
+            )
+            return redirect(
+                url_for(
+                    "oficios.responder_peticion_subdirector", id_peticion=id_peticion
+                )
+            )
+
         # --- CÁMARAS DE SEGURIDAD (Agrega estos prints) ---
-        print("\n" + "="*40)
+        print("\n" + "=" * 40)
         print(f"🔍 DIAGNÓSTICO DE GUARDADO:")
         print(f"1. Botón detectado: '{decision_boton}'")
         print(f"2. ID Petición a afectar: {id_peticion}")
         print(f"3. Estatus FINAL que se enviará a MySQL: {id_nuevo_estatus}")
-        print("="*40 + "\n")
-        
+        print("=" * 40 + "\n")
+
         # Guardar los cambios en la bd
         registrar_respuesta_peticion_db(
             id_peticion=id_peticion,
