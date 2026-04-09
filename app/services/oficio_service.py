@@ -310,10 +310,17 @@ class ServicioOficio:
         """
         conexion = obtener_conexion()
         try:
-            # 1. Obtener destinatario (Subdirector del área)
-            subdirector = obtener_subdirector_por_area(usuario_jud.id_area)
-            if not subdirector:
-                return False, "No se encontró un Subdirector activo en tu área.", None
+            tipo_destinatario = formulario.get("tipo_destinatario")
+            id_destinatario = None
+            
+            if tipo_destinatario == "gestor":
+                id_destinatario = formulario.get("id_gestor")
+            else:
+                # 1. Obtener destinatario (Subdirector del área)
+                subdirector = obtener_subdirector_por_area(usuario_jud.id_area)
+                if not subdirector:
+                    return False, "No se encontró un Subdirector activo en tu área.", None
+                id_destinatario = subdirector["id_usuario"]
 
             conexion.begin()
             with conexion.cursor() as cursor:
@@ -323,7 +330,7 @@ class ServicioOficio:
                     "folio": formulario["folio"].strip(),
                     "descripcion": formulario["descripcion_solicitud"],
                     "id_creador": usuario_jud.id,
-                    "id_destinatario": subdirector["id_usuario"],
+                    "id_destinatario": id_destinatario,
                 }
                 id_peticion = crear_peticion_db(cursor, datos_peticion)
 

@@ -44,8 +44,7 @@ Dashboard - Subdirección
             onclick="abrirPestana(event, 'tab-atendidos')">Asignaciones
             atendidas</button>
         <button class="tab-btn"
-            onclick="abrirPestana(event, 'tab-realizar_peticion')">Realizar
-            Petición</button>
+            onclick="abrirPestana(event, 'tab-realizar_peticion')">Mis Peticiones</button>
     </div>
 
     {# --- CONTENIDO 1: OFICIOS POR ASIGNAR --- #}
@@ -197,7 +196,7 @@ Dashboard - Subdirección
         </div>
     </div>
 
-    {# --- CONTENIDO 4: REALIZAR PETICIONES --- #}
+    {# --- CONTENIDO 4: MIS PETICIONES --- #}
     <div id="tab-realizar_peticion" class="contenido-tab">
         <div class="header-seccion">
             <h3 class="titulo-seccion">Gestionar Peticiones</h3>
@@ -217,7 +216,7 @@ Dashboard - Subdirección
                     </tr>
                 </thead>
                 <tbody>
-                    {% for peticion in peticiones %}
+                    {% for peticion in peticiones_del_subdir %}
                     <tr>
                         <td>{{ peticion.id_peticion }}</td>
                         <td>

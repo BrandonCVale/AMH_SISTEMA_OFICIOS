@@ -8,6 +8,7 @@ from app.services.email_service import (
     enviar_notificacion_oficio_turnado,
     enviar_notificacion_peticion_jud,
     enviar_notificacion_peticion_subdirector,
+    enviar_notificacion_peticion_jud_a_gestor,
 )
 from app.models.oficio import (
     obtener_oficios_del_gestor,
@@ -15,6 +16,7 @@ from app.models.oficio import (
     obtener_documentos_de_un_oficio,
     obtener_kpis_gestor,
     obtener_kpis_subdirector,
+    obtener_peticiones_hechas_por_un_subdirector,
     obtenter_los_detalles_de_un_oficio,
     marcar_oficio_como_visto,
     asignar_oficio_a_jud_db,
@@ -68,6 +70,8 @@ def panel_control():
         mis_kpis = obtener_kpis_subdirector(current_user.id, current_user.id_area)
         # Obtener las peticiones de mis juds
         peticiones_de_mis_juds = obtener_solicitudes_de_mis_juds(current_user.id)
+        # Obtener mis peticiones
+        mis_peticiones = obtener_peticiones_hechas_por_un_subdirector(current_user.id)
         # Obtener el historial de atendidos (Oficios que ya no están en estatus 1)
         mis_atendidos = obtener_oficios_atendidos_del_subdirector(current_user.id_area)
 
@@ -80,6 +84,7 @@ def panel_control():
             kpis=mis_kpis,
             peticiones=peticiones_de_mis_juds,
             atendidos=mis_atendidos,
+            peticiones_del_subdir=mis_peticiones,
         )
 
     # 3. Verificación para JUD
@@ -323,7 +328,9 @@ def atender_oficio(id_oficio):
 @bp_oficios.route("/nueva_peticion", methods=["GET", "POST"])
 @login_required
 def nueva_peticion():
+    # Obtener correo del subdirector
     correo_subdirector = obtener_correo_subdirector_por_area(current_user.id_area)
+    # Obtener a todos los gestores y tambien sus correos
     gestores = obtener_a_todos_los_gestores()
 
     if request.method == "POST":
@@ -332,6 +339,8 @@ def nueva_peticion():
             "asunto": request.form["asunto"],
             "folio": request.form["folio"],
             "descripcion_solicitud": request.form["descripcion_solicitud"],
+            "tipo_destinatario": request.form.get("tipo-destinatario"),
+            "id_gestor": request.form.get("id_gestor"),
         }
         archivo = request.files.get("archivo")
 
@@ -342,20 +351,30 @@ def nueva_peticion():
         )
 
         if exito:
-            # Enviar notificación por correo al subdirector
+            # Enviar notificación por correo al destinatario
             try:
-                if correo_subdirector:
-                    datos_email = {
-                        "folio_interno": formulario["folio"],
-                        "asunto": formulario["asunto"],
-                        "descripcion": formulario["descripcion_solicitud"],
-                    }
-
-                    enviar_notificacion_peticion_jud(
-                        datos_email,
-                        correo_subdirector,
-                        lista_archivos_adjuntos=[ruta_pdf],
-                    )
+                datos_email = {
+                    "folio_interno": formulario["folio"],
+                    "asunto": formulario["asunto"],
+                    "descripcion": formulario["descripcion_solicitud"],
+                }
+                
+                if formulario.get("tipo_destinatario") == "gestor":
+                    info_gestor = obtener_correo_usuario_por_id(formulario.get("id_gestor"))
+                    if info_gestor:
+                        correo_gestor = info_gestor[0]["correo_electronico"]
+                        enviar_notificacion_peticion_jud_a_gestor(
+                            datos_email,
+                            correo_gestor,
+                            lista_archivos_adjuntos=[ruta_pdf],
+                        )
+                else:
+                    if correo_subdirector:
+                        enviar_notificacion_peticion_jud(
+                            datos_email,
+                            correo_subdirector,
+                            lista_archivos_adjuntos=[ruta_pdf],
+                        )
 
             except Exception as e:
                 print(f"Error al enviar correo de petición: {e}")
