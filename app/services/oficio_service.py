@@ -17,6 +17,8 @@ from app.utils.pdf_tools import estampar_acuse_en_disco
 from app.models.oficio import (
     crear_oficio_db,
     guardar_documento_db,
+    obtener_correo_subdirector_por_area,
+    obtenter_los_detalles_de_un_oficio,
     registrar_historial_db,
     actualizar_respuesta_oficio_db,
     eliminar_oficio_db,
@@ -27,6 +29,7 @@ from app.models.usuario import obtener_subdirector_por_area, buscar_usuario_por_
 from app.models.catalogo import obtener_nombre_del_area
 from app.services.email_service import (
     enviar_notificacion_de_nuevo_oficio,
+    enviar_notificacion_jud_termino_solicitud,
     enviar_notificacion_oficio_turnado,
     enviar_notificacion_correo_externo,
 )
@@ -247,7 +250,7 @@ class ServicioOficio:
             with conexion.cursor() as cursor:
                 # 1. Actualizar el oficio (Texto y Estatus a Finalizado)
                 actualizar_respuesta_oficio_db(cursor, id_oficio, texto_respuesta)
-   
+
                 # 2. Guardar Archivo de Respuesta (Si existe)
                 if archivo and archivo.filename != "":
                     if not self._archivo_es_permitido(archivo.filename):
@@ -271,6 +274,32 @@ class ServicioOficio:
                     4,
                     "Oficio atendido y finalizado por el JUD.",
                 )
+
+                # Envia mail de finalizado a gestor y subdirector
+                # Obtener los correos del gestor y subdirector
+                detalles_oficio = obtenter_los_detalles_de_un_oficio(id_oficio)
+                correo_gestor = detalles_oficio["correo_remitente"]
+
+                # Obtenemos al JUD actual para sacar su área y nombre completo
+                jud = buscar_usuario_por_id(id_usuario)
+                correo_subdirector = obtener_correo_subdirector_por_area(jud.id_area)
+
+                # Crear diccionario
+                datos_mail = {
+                    "folio_interno": detalles_oficio["folio_interno"],
+                    "asunto": detalles_oficio["asunto"],
+                    "nombre_jud": jud.nombre_completo,
+                    "texto_respuesta": texto_respuesta,
+                }
+
+                try:
+                    enviar_notificacion_jud_termino_solicitud(
+                        datos_mail, correo_subdirector, correo_gestor
+                    )
+                except Exception as e:
+                    print(
+                        f"La respuesta fue guardada, pero ocurrió un error al enviar el correo: {e}"
+                    )
 
             conexion.commit()
             return True, "Respuesta enviada correctamente."
@@ -312,14 +341,18 @@ class ServicioOficio:
         try:
             tipo_destinatario = formulario.get("tipo_destinatario")
             id_destinatario = None
-            
+
             if tipo_destinatario == "gestor":
                 id_destinatario = formulario.get("id_gestor")
             else:
                 # 1. Obtener destinatario (Subdirector del área)
                 subdirector = obtener_subdirector_por_area(usuario_jud.id_area)
                 if not subdirector:
-                    return False, "No se encontró un Subdirector activo en tu área.", None
+                    return (
+                        False,
+                        "No se encontró un Subdirector activo en tu área.",
+                        None,
+                    )
                 id_destinatario = subdirector["id_usuario"]
 
             conexion.begin()

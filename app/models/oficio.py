@@ -125,6 +125,7 @@ def obtenter_los_detalles_de_un_oficio(id_oficio):
             o.id_oficio,
             o.fecha_creacion,
             ur.nombre_completo AS remitente,
+            ur.correo_electronico AS correo_remitente,
             o.folio_interno,
             o.folio_consecutivo,
             o.asunto,
@@ -139,7 +140,7 @@ def obtenter_los_detalles_de_un_oficio(id_oficio):
             ce.nombre AS estatus
         FROM
             oficios o
-        JOIN usuarios ur ON 
+        JOIN usuarios ur ON
             o.id_usuario_creador = ur.id_usuario
         JOIN usuarios ud ON
             o.id_usuario_asignado = ud.id_usuario

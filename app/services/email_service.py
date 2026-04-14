@@ -166,6 +166,39 @@ def enviar_notificacion_oficio_turnado(datos, correo_jud, lista_rutas_adjuntos=N
     return True
 
 
+def enviar_notificacion_jud_termino_solicitud(datos, correo_subdirector, correo_gestor):
+    """Cuando el JUD termina un oficio que le fue asignado, se envia un mail
+    al subdirector y al gestor avisandole que el oficio fue completado"""
+
+    asunto = f"El oficio {datos['folio_interno']}, ha sido completado."
+
+    # Filtramos la lista para que no incluya valores nulos o vacíos
+    destinatarios = [correo for correo in [correo_subdirector, correo_gestor] if correo]
+
+    if not destinatarios:
+        return False
+
+    msg = Message(
+        subject=asunto,
+        sender=current_app.config["MAIL_USERNAME"],
+        recipients=destinatarios,
+    )
+    
+    msg.body = f"""
+    El JUD {datos['nombre_jud']} ha finalizado la atención de este oficio.
+    
+    DETALLES:
+    
+    Folio: {datos['folio_interno']}
+    Asunto: {datos['asunto']}
+    Respuesta: {datos['texto_respuesta']}
+
+    Por favor, ingrese al sistema para consultar los detalles completos y visualizar los anexos si los hubiera.
+    """
+
+    mail.send(msg)
+    return True
+
 def enviar_notificacion_peticion_jud(
     datos, correo_subdirector, lista_archivos_adjuntos=None
 ):
