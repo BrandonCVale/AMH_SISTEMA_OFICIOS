@@ -183,9 +183,9 @@ def enviar_notificacion_jud_termino_solicitud(datos, correo_subdirector, correo_
         sender=current_app.config["MAIL_USERNAME"],
         recipients=destinatarios,
     )
-    
+
     msg.body = f"""
-    El JUD {datos['nombre_jud']} ha finalizado la atención de este oficio.
+    El JUD {datos['nombre_jud']} ha finalizado este oficio.
     
     DETALLES:
     
@@ -198,6 +198,7 @@ def enviar_notificacion_jud_termino_solicitud(datos, correo_subdirector, correo_
 
     mail.send(msg)
     return True
+
 
 def enviar_notificacion_peticion_jud(
     datos, correo_subdirector, lista_archivos_adjuntos=None
@@ -372,5 +373,67 @@ def enviar_notificacion_peticion_subdirector(
                 print(
                     f"ERROR: No se encontró el archivo físico en la ruta: {ruta_absoluta}"
                 )
+    mail.send(msg)
+    return True
+
+
+def enviar_notificacion_respuesta_peticion_jud(datos, correo_destinatario_notificacion):
+    """Cuando un JUD realiza una petición y su subdirector le responde, esta funcion
+    envia un mail notificandole al JUD que su petición ha sido atendida y si es o no aprobatoria
+    """
+
+    asunto = f"Tu petición {datos['asunto']}, ha sido atendida"
+
+    msg = Message(
+        subject=asunto,
+        sender=current_app.config["MAIL_USERNAME"],
+        recipients=[correo_destinatario_notificacion],
+    )
+
+    msg.body = f"""
+    Tu petición ha obtenido la siguiente respuesta:
+    
+    DETALLES:
+    
+        FOLIO: {datos['folio_peticion']}
+        ESTATUS: {datos['estatus']}
+        RESPUESTA RECIBIDA: {datos['respuesta_recibida']}
+        
+    
+    Ingresa al sistema para ver los detalles.
+    """
+
+    mail.send(msg)
+    return True
+
+
+def enviar_notificacion_respuesta_peticion_subdirector(
+    datos, correo_destinatario_notificacion
+):
+    """Cuando un subdirector realiza una petición a un gestor y este le responde, se envia un mail
+    notificandole al subdirector que su petición ha sido atendida y si es o no aprobatoria
+    """
+
+    asunto = f"Tu petición {datos['asunto']}, ha sido atendida"
+
+    msg = Message(
+        subject=asunto,
+        sender=current_app.config["MAIL_USERNAME"],
+        recipients=[correo_destinatario_notificacion],
+    )
+
+    msg.body = f"""
+    Tu petición ha obtenido la siguiente respuesta:
+    
+    DETALLES:
+    
+        FOLIO: {datos['folio_peticion']}
+        ESTATUS: {datos['estatus']}
+        RESPUESTA RECIBIDA: {datos['respuesta_recibida']}
+        
+    
+    Ingresa al sistema para ver los detalles.
+    """
+
     mail.send(msg)
     return True

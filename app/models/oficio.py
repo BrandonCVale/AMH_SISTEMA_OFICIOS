@@ -687,6 +687,7 @@ def obtener_detalles_peticion(id_peticion):
             p.id_peticion ,
             p.respuesta_recibida ,
             p.folio_peticion ,
+            p.id_usuario_creador,
             u.nombre_completo AS solicitante,
             p.fecha_creacion ,
             p.asunto,

@@ -9,6 +9,8 @@ from app.services.email_service import (
     enviar_notificacion_peticion_jud,
     enviar_notificacion_peticion_subdirector,
     enviar_notificacion_peticion_jud_a_gestor,
+    enviar_notificacion_respuesta_peticion_jud,
+    enviar_notificacion_respuesta_peticion_subdirector,
 )
 from app.models.oficio import (
     obtener_oficios_del_gestor,
@@ -27,6 +29,7 @@ from app.models.oficio import (
     obtener_solicitudes_de_mis_juds,
     obtener_detalles_peticion,
     obtener_archivos_peticion,
+    obtener_correo_usuario_por_id,
     registrar_respuesta_peticion_db,
     obtener_kpis_jud,
     obtener_oficios_atendidos_del_subdirector,
@@ -460,10 +463,12 @@ def responder_peticion_de_jud(id_peticion):
         if decision_boton == "APROBADO":
             id_nuevo_estatus = 6
             mensaje = "Solicitud aprobada exitosamente"
+            estatus_str = "APROBADA"
             tipo = "success"
         else:
             id_nuevo_estatus = 5
             mensaje = "Solicitud rechazada exitosamente"
+            estatus_str = "RECHAZADA"
             tipo = "danger"
 
         # Guardar los cambios en la bd
@@ -472,6 +477,24 @@ def responder_peticion_de_jud(id_peticion):
             texto_respuesta=texto_respuesta,
             id_estatus_final=id_nuevo_estatus,
         )
+
+        # --- ENVÍO DE CORREO DE NOTIFICACIÓN AL JUD ---
+        try:
+            datos_email = {
+                "asunto": info_peticion["asunto"],
+                "folio_peticion": info_peticion["folio_peticion"],
+                "estatus": estatus_str,
+                "respuesta_recibida": texto_respuesta,
+            }
+            
+            info_jud = obtener_correo_usuario_por_id(info_peticion["id_usuario_creador"])
+            if info_jud:
+                correo_jud = info_jud[0]["correo_electronico"]
+                enviar_notificacion_respuesta_peticion_jud(datos_email, correo_jud)
+                
+        except Exception as e:
+            print(f"Error al enviar correo de respuesta a petición: {e}")
+        
         flash(mensaje, tipo)
         return redirect(url_for("oficios.panel_control"))
 
@@ -504,10 +527,12 @@ def responder_peticion_subdirector(id_peticion):
         if decision_boton == "ACEPTADA":
             id_nuevo_estatus = 6
             mensaje = "Solicitud aprobada exitosamente"
+            estatus_str = "APROBADA"
             tipo = "success"
         elif decision_boton == "RECHAZADO":
             id_nuevo_estatus = 5
             mensaje = "Solicitud rechazada exitosamente"
+            estatus_str = "RECHAZADA"
             tipo = "danger"
         else:
             flash(
@@ -520,20 +545,30 @@ def responder_peticion_subdirector(id_peticion):
                 )
             )
 
-        # --- CÁMARAS DE SEGURIDAD (Agrega estos prints) ---
-        print("\n" + "=" * 40)
-        print(f"🔍 DIAGNÓSTICO DE GUARDADO:")
-        print(f"1. Botón detectado: '{decision_boton}'")
-        print(f"2. ID Petición a afectar: {id_peticion}")
-        print(f"3. Estatus FINAL que se enviará a MySQL: {id_nuevo_estatus}")
-        print("=" * 40 + "\n")
-
         # Guardar los cambios en la bd
         registrar_respuesta_peticion_db(
             id_peticion=id_peticion,
             texto_respuesta=texto_respuesta,
             id_estatus_final=id_nuevo_estatus,
         )
+
+        # --- ENVÍO DE CORREO DE NOTIFICACIÓN AL SUBDIRECTOR ---
+        try:
+            datos_email = {
+                "asunto": info_peticion["asunto"],
+                "folio_peticion": info_peticion["folio_peticion"],
+                "estatus": estatus_str,
+                "respuesta_recibida": texto_respuesta,
+            }
+            
+            info_subdirector = obtener_correo_usuario_por_id(info_peticion["id_usuario_creador"])
+            if info_subdirector:
+                correo_subdirector = info_subdirector[0]["correo_electronico"]
+                enviar_notificacion_respuesta_peticion_subdirector(datos_email, correo_subdirector)
+                
+        except Exception as e:
+            print(f"Error al enviar correo de respuesta a petición de subdirector: {e}")
+
         flash(mensaje, tipo)
         return redirect(url_for("oficios.panel_control"))
 
