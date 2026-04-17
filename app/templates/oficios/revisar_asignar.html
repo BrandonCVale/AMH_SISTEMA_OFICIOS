@@ -18,11 +18,13 @@
                 </p>
             </div>
             <div>
-                <a href="{{ url_for('oficios.panel_control') }}" class="btn-gris">⬅ Volver al Tablero</a>
+                <a href="{{ url_for('oficios.panel_control') }}" class="btn-gris">Volver al Tablero</a>
             </div>
         </div>
+        {# --- DETALLES DEL OFICIO --- #}
         <div class="grid-detalle">
             <div class="columna-documento">
+                {# --- DETALLES DE LA SOLICITUD --- #}
                 <div class="tarjeta-blanca">
                     <h3 class="titulo-tarjeta">Detalles de la Solicitud</h3>
                     <div class="lista-detalles">
@@ -46,6 +48,8 @@
                         </div>
                     </div>
                 </div>
+                {# --- DETALLES DE LA SOLICITUD FIN --- #}
+                {# --- VISOR DE ARCHIVOS --- #}
                 <div class="tarjeta-blanca visor-documento">
                     <h3 class="titulo-tarjeta">Documentos Adjuntos</h3>
                     {% if archivos_del_oficio %}
@@ -83,8 +87,21 @@
                         <p class="fila-vacia">Este oficio no tiene archivos adjuntos.</p>
                     {% endif %}
                 </div>
+                {# --- VISOR DE ARCHIVOS FIN --- #}
             </div>
+            {# --- COLUMNA DE ACCIONES --- #}
             <div class="columna-acciones">
+                {# --- MARCAR OFICIO COMO OFICIO INFORMATIVO ---#}
+                <div class="tarjeta-blanca tarjeta-destacada">
+                    <h3 class="titulo-tarjeta">Marcar como oficio informativo</h3>
+                    <p class="texto-ayuda">Al marcar este oficio como informativo, se cierra el ciclo del oficio.</p>
+                    <form action="#" method="POST" id="form-informativo">
+                        <button type="submit" class="btn-primario btn-full">Marcar oficio como informativo</button>
+                    </form>
+
+                </div>
+                {# --- MARCAR OFICIO COMO OFICIO INFORMATIVO FIN ---#}
+                {# TURNAR A JUD#}
                 <div class="tarjeta-blanca tarjeta-destacada">
                     <h3 class="titulo-tarjeta">Turnar a JUD</h3>
                     <p class="texto-ayuda">Selecciona al responsable.</p>
@@ -123,6 +140,7 @@
                     {% endif %}
                 </div>
             </div>
+            {# --- COLUMNA DE ACCIONES FIN --- #}
         </div>
     </div>
 {% endblock contenido_principal %}
