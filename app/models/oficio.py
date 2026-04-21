@@ -94,6 +94,9 @@ def registrar_historial_db(cursor, id_oficio, id_usuario, id_estatus_nuevo, come
     """
     cursor.execute(sql, (id_oficio, id_usuario, id_estatus_nuevo, comentario))
 
+def registrar_historial_db_solo_informativo():
+    pass
+
 
 def obtener_documentos_de_un_oficio(id_oficio):
     """Recupera todos los documentos de un oficio"""

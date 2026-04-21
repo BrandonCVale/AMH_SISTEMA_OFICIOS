@@ -95,10 +95,9 @@
                 <div class="tarjeta-blanca tarjeta-destacada">
                     <h3 class="titulo-tarjeta">Marcar como oficio informativo</h3>
                     <p class="texto-ayuda">Al marcar este oficio como informativo, se cierra el ciclo del oficio.</p>
-                    <form action="#" method="POST" id="form-informativo">
+                    <form action="{{ url_for('oficios.marcar_oficio_como_informativo', id_oficio=oficio.id_oficio) }}" method="POST" id="form-informativo">
                         <button type="submit" class="btn-primario btn-full">Marcar oficio como informativo</button>
                     </form>
-
                 </div>
                 {# --- MARCAR OFICIO COMO OFICIO INFORMATIVO FIN ---#}
                 {# TURNAR A JUD#}

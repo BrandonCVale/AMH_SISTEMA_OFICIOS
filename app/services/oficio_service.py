@@ -528,3 +528,49 @@ class ServicioOficio:
         resultado = cursor.fetchone()
 
         return resultado["ultimo_folio"]
+
+    def marcar_oficio_como_informativo(self, id_oficio, id_sudbirector):
+        """SUBDIRECTOR: marca un oficio como informativo (db cambia a True en es_informativo)
+        y finaliza el oficio con estatus finalizado"""
+        conexion = obtener_conexion()
+        try:
+            with conexion.cursor() as c:
+                # 1. Actualizamos la columna es_informativo en la db y cambiamos el estatus a 4 (finalizado)
+                sql = """
+                UPDATE
+                    oficios o
+                SET
+                    o.es_informativo = TRUE,
+                    o.id_estatus_actual = 4
+                WHERE
+                    o.id_oficio = %s;
+                """
+                c.execute(sql, (id_oficio,))
+
+                # 2. Registramos en el historial que el subdirector lo cerro por ser informativo
+                registrar_historial_db(
+                    c,
+                    id_oficio,
+                    id_sudbirector,
+                    4,
+                    "El subdirector ha marcado este oficio como informativo.",
+                )
+
+                conexion.commit()
+                return (
+                    True,
+                    "Oficio marcado como informativo y finalizado correctamente.",
+                )
+
+        # 3. Si obtenemos error
+        except Exception as e:
+            conexion.rollback()
+            # REEMPLAZAR EL PRINT POR APP.LOGGER.ERROR PARA GUARDAR EL ERROR EN EL SERVIDOR
+            # print(f"Error al marcar oficio como informativo: {e}\nFunction: service>marcar_oficio_como_informativo")
+            current_app.logger.error(
+                f"Error al marcar el oficio {id_oficio} como informativo. Error: {e}"
+            )
+            return (
+                False,
+                f"Ocurrió un error interno al procesar el oficio como informativo",
+            )

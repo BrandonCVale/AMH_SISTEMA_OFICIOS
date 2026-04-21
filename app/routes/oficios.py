@@ -361,9 +361,11 @@ def nueva_peticion():
                     "asunto": formulario["asunto"],
                     "descripcion": formulario["descripcion_solicitud"],
                 }
-                
+
                 if formulario.get("tipo_destinatario") == "gestor":
-                    info_gestor = obtener_correo_usuario_por_id(formulario.get("id_gestor"))
+                    info_gestor = obtener_correo_usuario_por_id(
+                        formulario.get("id_gestor")
+                    )
                     if info_gestor:
                         correo_gestor = info_gestor[0]["correo_electronico"]
                         enviar_notificacion_peticion_jud_a_gestor(
@@ -486,15 +488,17 @@ def responder_peticion_de_jud(id_peticion):
                 "estatus": estatus_str,
                 "respuesta_recibida": texto_respuesta,
             }
-            
-            info_jud = obtener_correo_usuario_por_id(info_peticion["id_usuario_creador"])
+
+            info_jud = obtener_correo_usuario_por_id(
+                info_peticion["id_usuario_creador"]
+            )
             if info_jud:
                 correo_jud = info_jud[0]["correo_electronico"]
                 enviar_notificacion_respuesta_peticion_jud(datos_email, correo_jud)
-                
+
         except Exception as e:
             print(f"Error al enviar correo de respuesta a petición: {e}")
-        
+
         flash(mensaje, tipo)
         return redirect(url_for("oficios.panel_control"))
 
@@ -560,12 +564,16 @@ def responder_peticion_subdirector(id_peticion):
                 "estatus": estatus_str,
                 "respuesta_recibida": texto_respuesta,
             }
-            
-            info_subdirector = obtener_correo_usuario_por_id(info_peticion["id_usuario_creador"])
+
+            info_subdirector = obtener_correo_usuario_por_id(
+                info_peticion["id_usuario_creador"]
+            )
             if info_subdirector:
                 correo_subdirector = info_subdirector[0]["correo_electronico"]
-                enviar_notificacion_respuesta_peticion_subdirector(datos_email, correo_subdirector)
-                
+                enviar_notificacion_respuesta_peticion_subdirector(
+                    datos_email, correo_subdirector
+                )
+
         except Exception as e:
             print(f"Error al enviar correo de respuesta a petición de subdirector: {e}")
 
@@ -604,10 +612,19 @@ def api_obtener_subdirector(id_area):
         return jsonify({"encontrado": False})
 
 
-@bp_oficios.route("/marcar_oficio_como_informativo/<int:id_oficio>")
+@bp_oficios.route("/marcar_oficio_como_informativo/<int:id_oficio>", methods=["POST"])
 @login_required
 def marcar_oficio_como_informativo(id_oficio):
     """
     Agregar despues.
     """
-    pass
+
+    servicio = ServicioOficio()
+    exito, mensaje = servicio.marcar_oficio_como_informativo(id_oficio, current_user.id)
+
+    if exito:
+        flash(mensaje, "success")
+    else:
+        flash(mensaje, "error")
+
+    return redirect(url_for("oficios.panel_control"))
