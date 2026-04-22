@@ -95,7 +95,7 @@ def registrar_historial_db(cursor, id_oficio, id_usuario, id_estatus_nuevo, come
     cursor.execute(sql, (id_oficio, id_usuario, id_estatus_nuevo, comentario))
 
 def registrar_historial_db_solo_informativo():
-    pass
+    """"""
 
 
 def obtener_documentos_de_un_oficio(id_oficio):
@@ -162,24 +162,28 @@ def obtener_historial_de_un_oficio(id_oficio):
     conexion = obtener_conexion()
 
     sql = """
-        SELECT
-            h.id_historial,
-            h.id_oficio,
-            u.nombre_completo AS usuario_accion,
-            ce.nombre AS nuevo_estatus,
-            ce2.nombre AS estatus_anterior,
-            h.fecha_movimiento
-        FROM
-            historial_oficios h
-        JOIN usuarios u ON
-            h.id_usuario_accion = u.id_usuario
-        JOIN cat_estatus ce ON
-            ce.id_estatus = h.id_estatus_nuevo
-        LEFT JOIN cat_estatus ce2 ON
-            ce2.id_estatus = h.id_estatus_anterior
-        WHERE
-            h.id_oficio = %s
-        ORDER BY h.fecha_movimiento DESC;
+    SELECT
+        h.id_historial,
+        h.id_oficio,
+        o.es_informativo,
+        u.nombre_completo AS usuario_accion,
+        ce.nombre AS nuevo_estatus,
+        ce2.nombre AS estatus_anterior,
+        h.fecha_movimiento
+    FROM
+        historial_oficios h
+    JOIN usuarios u ON
+        h.id_usuario_accion = u.id_usuario
+    JOIN cat_estatus ce ON
+        ce.id_estatus = h.id_estatus_nuevo
+    LEFT JOIN cat_estatus ce2 ON
+        ce2.id_estatus = h.id_estatus_anterior
+    LEFT JOIN oficios o ON
+        h.id_oficio = o.id_oficio
+    WHERE
+        h.id_oficio = %s
+    ORDER BY
+        h.fecha_movimiento DESC;
     """
 
     with conexion.cursor() as cursor:

@@ -615,9 +615,6 @@ def api_obtener_subdirector(id_area):
 @bp_oficios.route("/marcar_oficio_como_informativo/<int:id_oficio>", methods=["POST"])
 @login_required
 def marcar_oficio_como_informativo(id_oficio):
-    """
-    Agregar despues.
-    """
 
     servicio = ServicioOficio()
     exito, mensaje = servicio.marcar_oficio_como_informativo(id_oficio, current_user.id)
