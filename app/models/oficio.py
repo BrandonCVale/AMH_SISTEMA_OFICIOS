@@ -1,5 +1,5 @@
 from app.db import obtener_conexion
-
+from flask import current_app
 
 """
 NOTA SOBRE EL USO DE 'CURSOR':
@@ -80,7 +80,7 @@ def marcar_oficio_como_visto(id_oficio, id_usuario):
             cursor.execute(sql, (id_oficio, id_usuario))
         conexion.commit()
     except Exception as e:
-        print(f"Error al marcar un oficio como visto: {e}")
+        current_app.logger.error(f"Error al marcar un oficio como visto: {e}")
 
 
 def registrar_historial_db(cursor, id_oficio, id_usuario, id_estatus_nuevo, comentario):
@@ -466,7 +466,7 @@ def asignar_oficio_a_jud_db(id_oficio, id_jud, id_subdirector, instrucciones):
         conexion.commit()
         return True
     except Exception as e:
-        print(f"Error al asignar oficio: {e}")
+        current_app.logger.error(f"Error al asignar oficio: {e}")
         conexion.rollback()
         return False
 
@@ -758,7 +758,7 @@ def registrar_respuesta_peticion_db(id_peticion, texto_respuesta, id_estatus_fin
             cursor.execute(sql, (texto_respuesta, id_estatus_final, id_peticion))
             conexion.commit()
     except Exception as e:
-        print(f"Error al actualizar petición: {e}")
+        current_app.logger.error(f"Error al actualizar petición: {e}")
         conexion.rollback()
         raise e
 
@@ -796,7 +796,7 @@ def obtener_a_todos_los_gestores():
             cursor.execute(sql)
             return cursor.fetchall()
     except Exception as e:
-        print(f"Error al obtener la lista de gestores: {e}")
+        current_app.logger.error(f"Error al obtener la lista de gestores: {e}")
         return None
 
 
@@ -819,7 +819,7 @@ def obtener_correo_usuario_por_id(id_usuario):
             cursor.execute(sql, (id_usuario,))
             return cursor.fetchall()
     except Exception as e:
-        print(
+        current_app.logger.error(
             f"Error al intentar obtener el correo de un usuario por su iden funcion obtener_correo_usuario_por_id. Error: {e}"
         )
         return None
@@ -846,4 +846,4 @@ def obtener_correo_subdirector_por_area(id_area):
             return None
 
     except Exception as e:
-        print(f"Error al obtener el correo del subdirector: {e}")
+        current_app.logger.error(f"Error al obtener el correo del subdirector: {e}")

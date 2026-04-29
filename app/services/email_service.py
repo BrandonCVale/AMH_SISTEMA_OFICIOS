@@ -233,7 +233,7 @@ def enviar_notificacion_peticion_jud(
             ruta_absoluta = os.path.join(current_app.static_folder, ruta_relativa)
 
             # 2. Imprimimos para asegurarnos de dónde lo está buscando (Ver terminal)
-            print(f"Intentando adjuntar archivo desde: {ruta_absoluta}")
+            current_app.logger.info(f"Intentando adjuntar archivo desde: {ruta_absoluta}")
 
             if os.path.exists(ruta_absoluta):
                 nombre_archivo = os.path.basename(ruta_absoluta)
@@ -248,10 +248,10 @@ def enviar_notificacion_peticion_jud(
                         content_type=mime_type,
                         data=archivo.read(),
                     )
-                print("¡Archivo adjuntado con éxito!")
+                current_app.logger.info("¡Archivo adjuntado con éxito!")
             else:
                 # 3. Si falla
-                print(
+                current_app.logger.error(
                     f"ERROR: No se encontró el archivo físico en la ruta: {ruta_absoluta}"
                 )
     mail.send(msg)
@@ -290,7 +290,7 @@ def enviar_notificacion_peticion_jud_a_gestor(
             ruta_absoluta = os.path.join(current_app.static_folder, ruta_relativa)
 
             # 2. Imprimimos para asegurarnos de dónde lo está buscando
-            print(f"Intentando adjuntar archivo desde: {ruta_absoluta}")
+            current_app.logger.info(f"Intentando adjuntar archivo desde: {ruta_absoluta}")
 
             if os.path.exists(ruta_absoluta):
                 nombre_archivo = os.path.basename(ruta_absoluta)
@@ -305,10 +305,10 @@ def enviar_notificacion_peticion_jud_a_gestor(
                         content_type=mime_type,
                         data=archivo.read(),
                     )
-                print("¡Archivo adjuntado con éxito!")
+                current_app.logger.info("¡Archivo adjuntado con éxito!")
             else:
                 # 3. Si falla
-                print(
+                current_app.logger.error(
                     f"ERROR: No se encontró el archivo físico en la ruta: {ruta_absoluta}"
                 )
     mail.send(msg)
@@ -352,7 +352,7 @@ def enviar_notificacion_peticion_subdirector(
             ruta_absoluta = os.path.join(current_app.static_folder, ruta_relativa)
 
             # 2. Imprimimos para asegurarnos de dónde lo está buscando
-            print(f"Intentando adjuntar archivo desde: {ruta_absoluta}")
+            current_app.logger.info(f"Intentando adjuntar archivo desde: {ruta_absoluta}")
 
             if os.path.exists(ruta_absoluta):
                 nombre_archivo = os.path.basename(ruta_absoluta)
@@ -367,10 +367,10 @@ def enviar_notificacion_peticion_subdirector(
                         content_type=mime_type,
                         data=archivo.read(),
                     )
-                print("¡Archivo adjuntado con éxito!")
+                current_app.logger.info("¡Archivo adjuntado con éxito!")
             else:
                 # 3. Si falla
-                print(
+                current_app.logger.error(
                     f"ERROR: No se encontró el archivo físico en la ruta: {ruta_absoluta}"
                 )
     mail.send(msg)

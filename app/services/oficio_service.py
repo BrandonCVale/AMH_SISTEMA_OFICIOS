@@ -125,7 +125,7 @@ class ServicioOficio:
                         )
 
                         if not exito_estampado:
-                            print(
+                            current_app.logger.warning(
                                 "Advertencia: No se pudo estampar el acuse en el PDF."
                             )
 
@@ -212,13 +212,13 @@ class ServicioOficio:
                         lista_archivos_adjuntos=rutas_para_correo,
                     )
                 else:
-                    print("El correo adicional no esta llegando")
+                    current_app.logger.warning("El correo adicional no esta llegando")
 
                 return True, f"Oficio {folio_manual} creado y notificado correctamente."
 
             except Exception as e_mail:
                 # Si falla el correo, NO hacemos rollback (el oficio ya se guardó y es válido)
-                print(f"Oficio guardado pero falló el envío del mail: {e_mail}")
+                current_app.logger.error(f"Oficio guardado pero falló el envío del mail: {e_mail}")
                 return (
                     True,
                     f"Oficio creado (Advertencia: No se pudo enviar el correo, verifique configuración).",
@@ -297,7 +297,7 @@ class ServicioOficio:
                         datos_mail, correo_subdirector, correo_gestor
                     )
                 except Exception as e:
-                    print(
+                    current_app.logger.error(
                         f"La respuesta fue guardada, pero ocurrió un error al enviar el correo: {e}"
                     )
 
@@ -445,7 +445,7 @@ class ServicioOficio:
 
         except IntegrityError as e:
             conexion.rollback()
-            print(f"Error {e}")
+            current_app.logger.error(f"Error de integridad en procesar_peticion_subdirector: {e}")
             return False, f"El folio '{formulario['folio']}' ya existe."
         except Exception as e:
             conexion.rollback()

@@ -78,7 +78,7 @@ def panel_control():
         # Obtener el historial de atendidos (Oficios que ya no están en estatus 1)
         mis_atendidos = obtener_oficios_atendidos_del_subdirector(current_user.id_area)
 
-        print(mis_kpis)
+        current_app.logger.debug(f"KPIs del subdirector (ID: {current_user.id}): {mis_kpis}")
 
         return render_template(
             "oficios/dashboard_subdirector.html",
@@ -285,7 +285,7 @@ def turnar_oficio_a_jud(id_oficio):
                 "Oficio asignado correctamente, pero hubo un error al notificar por correo al JUD.",
                 "error",
             )
-            print(f"Error al enviar correo al jud: {e}")
+            current_app.logger.error(f"Error al enviar correo al jud: {e}")
     else:
         flash("Ocurrió un error al intentar asignar el oficio.", "error")
 
@@ -382,7 +382,7 @@ def nueva_peticion():
                         )
 
             except Exception as e:
-                print(f"Error al enviar correo de petición: {e}")
+                current_app.logger.error(f"Error al enviar correo de petición: {e}")
 
             flash(mensaje, "success")
             return redirect(url_for("oficios.panel_control"))
@@ -497,7 +497,7 @@ def responder_peticion_de_jud(id_peticion):
                 enviar_notificacion_respuesta_peticion_jud(datos_email, correo_jud)
 
         except Exception as e:
-            print(f"Error al enviar correo de respuesta a petición: {e}")
+            current_app.logger.error(f"Error al enviar correo de respuesta a petición: {e}")
 
         flash(mensaje, tipo)
         return redirect(url_for("oficios.panel_control"))
@@ -575,7 +575,7 @@ def responder_peticion_subdirector(id_peticion):
                 )
 
         except Exception as e:
-            print(f"Error al enviar correo de respuesta a petición de subdirector: {e}")
+            current_app.logger.error(f"Error al enviar correo de respuesta a petición de subdirector: {e}")
 
         flash(mensaje, tipo)
         return redirect(url_for("oficios.panel_control"))
