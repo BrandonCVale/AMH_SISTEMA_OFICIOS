@@ -246,7 +246,9 @@ def enviar_notificacion_peticion_jud(
             ruta_absoluta = os.path.join(current_app.static_folder, ruta_relativa)
 
             # 2. Imprimimos para asegurarnos de dónde lo está buscando (Ver terminal)
-            current_app.logger.info(f"Intentando adjuntar archivo desde: {ruta_absoluta}")
+            current_app.logger.info(
+                f"Intentando adjuntar archivo desde: {ruta_absoluta}"
+            )
 
             if os.path.exists(ruta_absoluta):
                 nombre_archivo = os.path.basename(ruta_absoluta)
@@ -303,7 +305,9 @@ def enviar_notificacion_peticion_jud_a_gestor(
             ruta_absoluta = os.path.join(current_app.static_folder, ruta_relativa)
 
             # 2. Imprimimos para asegurarnos de dónde lo está buscando
-            current_app.logger.info(f"Intentando adjuntar archivo desde: {ruta_absoluta}")
+            current_app.logger.info(
+                f"Intentando adjuntar archivo desde: {ruta_absoluta}"
+            )
 
             if os.path.exists(ruta_absoluta):
                 nombre_archivo = os.path.basename(ruta_absoluta)
@@ -365,7 +369,9 @@ def enviar_notificacion_peticion_subdirector(
             ruta_absoluta = os.path.join(current_app.static_folder, ruta_relativa)
 
             # 2. Imprimimos para asegurarnos de dónde lo está buscando
-            current_app.logger.info(f"Intentando adjuntar archivo desde: {ruta_absoluta}")
+            current_app.logger.info(
+                f"Intentando adjuntar archivo desde: {ruta_absoluta}"
+            )
 
             if os.path.exists(ruta_absoluta):
                 nombre_archivo = os.path.basename(ruta_absoluta)
@@ -448,5 +454,29 @@ def enviar_notificacion_respuesta_peticion_subdirector(
     Ingresa al sistema para ver los detalles.
     """
 
+    mail.send(msg)
+    return True
+
+
+def enviar_notificacion_oficio_informativo(datos, correo_gestor):
+    """Envía un mail al gestor notificando que el subdirector marcó su oficio como informativo"""
+    asunto = f"El oficio {datos['folio_interno']} ha sido finalizado (Informativo)"
+
+    msg = Message(
+        subject=asunto,
+        sender=current_app.config["MAIL_USERNAME"],
+        recipients=[correo_gestor],
+    )
+
+    msg.body = f"""
+    El subdirector ha marcado el siguiente oficio como INFORMATIVO, por lo que ha sido finalizado sin requerir acción adicional.
+    
+    DETALLES:
+    
+    Folio: {datos['folio_interno']}
+    Asunto: {datos['asunto']}
+
+    Por favor, ingrese al sistema para consultar los detalles completos.
+    """
     mail.send(msg)
     return True

@@ -87,37 +87,37 @@ Detalle del Oficio {{ oficio.folio_interno }}
             <div class="tarjeta-blanca">
                 <h3 class="titulo-tarjeta">Archivos Adjuntos</h3>
                 {% if archivos_del_oficio %}
-                <ul class="lista-archivos">
+                <div class="lista-documentos-adjuntos">
                     {% for doc in archivos_del_oficio %}
-                    <li class="item-archivo">
-                        <div class="info-archivo">
-                            <span>
-                                {% if 'pdf' in doc.nombre_archivo_original %}
-                                🔴
-                                {% else %}
-                                🔵
-                                {% endif %}
+                    {% set nombre_doc = doc.nombre_archivo_original if doc.nombre_archivo_original else doc.nombre_archivo %}
+                    <div class="contenedor-archivo">
+                        <div class="encabezado-archivo">
+                            <span class="nombre-archivo">
+                                <strong>Documento:</strong> {{ nombre_doc }}
                             </span>
-                            {# Nombre del archivo #}
-                            <span>{{ doc.nombre_archivo_original }}</span>
                             {# Tipo de archivo #}
                             {% if doc.tipo_documento == 'SOLICITUD' %}
-                            <span class="badge badge-azul">Solicitud
-                                Original</span>
+                            <span class="badge badge-azul">Solicitud Original</span>
                             {% elif doc.tipo_documento == 'RESPUESTA_OFICIAL' %}
                             <span class="badge badge-verde">Respuesta</span>
                             {% elif doc.tipo_documento == 'ANEXO_SOLICITUD' %}
                             <span class="badge badge-gris">Anexo</span>
                             {% endif %}
                         </div>
-                        {# BTN DESCARGAR #}
-                        <a
-                            href="{{ url_for('static', filename=doc.ruta_almacenamiento) }}"
-                            class="btn-descargar"
-                            target="_blank">Descargar</a>
-                    </li>
+                        {% if nombre_doc.lower().endswith('.pdf') %}
+                        <div class="contenedor-pdf">
+                            <iframe src="{{ url_for('static', filename=doc.ruta_almacenamiento) }}" class="visor-pdf"></iframe>
+                        </div>
+                        {% else %}
+                        <div class="descarga-archivo">
+                            <p class="texto-descarga">Vista previa no disponible para este formato.</p>
+                            <a href="{{ url_for('static', filename=doc.ruta_almacenamiento) }}" class="btn-primario" download>Descargar Archivo ⬇</a>
+                        </div>
+                        {% endif %}
+                        <hr class="separador-archivos">
+                    </div>
                     {% endfor %}
-                </ul>
+                </div>
                 {% else %}
                 <p class="texto-gris-pequeno">
                     No se adjuntaron archivos a este

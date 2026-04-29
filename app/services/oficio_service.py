@@ -32,6 +32,7 @@ from app.services.email_service import (
     enviar_notificacion_jud_termino_solicitud,
     enviar_notificacion_oficio_turnado,
     enviar_notificacion_correo_externo,
+    enviar_notificacion_oficio_informativo,
 )
 
 
@@ -557,6 +558,22 @@ class ServicioOficio:
                 )
 
                 conexion.commit()
+
+                # --- Enviar notificación por correo al Gestor ---
+                try:
+                    detalles = obtenter_los_detalles_de_un_oficio(id_oficio)
+                    if detalles and detalles.get("correo_remitente"):
+                        datos_mail = {
+                            "folio_interno": detalles["folio_interno"],
+                            "asunto": detalles["asunto"]
+                        }
+                        enviar_notificacion_oficio_informativo(datos_mail, detalles["correo_remitente"])
+                except Exception as e_mail:
+                    current_app.logger.error(
+                        f"Oficio {id_oficio} marcado como informativo, pero falló el envío de correo al gestor: {e_mail}"
+                    )
+                # ------------------------------------------------
+
                 return (
                     True,
                     "Oficio marcado como informativo y finalizado correctamente.",

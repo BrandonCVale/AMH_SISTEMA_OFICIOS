@@ -84,8 +84,15 @@
     margin-bottom: 20px;
 }
 
-.nombre-archivo {
+.encabezado-archivo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+.nombre-archivo {
     color: #4f46e5;
     font-weight: 500;
 }
@@ -98,7 +105,7 @@
 /* Clase para controlar el iframe sin usar style inline */
 .visor-pdf {
     width: 100%;
-    height: 500px;
+    height: 600px;
     border: 1px solid #e5e7eb;
     border-radius: 8px;
     background-color: #f3f4f6;
@@ -110,6 +117,11 @@
     text-align: center;
     border-radius: 8px;
     border: 1px dashed #d1d5db;
+}
+
+.texto-descarga {
+    margin-bottom: 15px;
+    color: #6b7280;
 }
 
 .separador-archivos {
