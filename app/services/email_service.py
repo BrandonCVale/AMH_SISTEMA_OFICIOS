@@ -62,6 +62,10 @@ def enviar_notificacion_de_nuevo_oficio(
                         content_type=mime_type,
                         data=archivo.read(),
                     )
+            else:
+                current_app.logger.error(
+                    f"ERROR: No se encontró el archivo adjunto para el subdirector en: {ruta_archivo}"
+                )
 
     # 6. Enviamos (Si falla aquí, lanzará una excepción que capturará la otra función)
     mail.send(msg)
@@ -117,6 +121,10 @@ def enviar_notificacion_correo_externo(
                         content_type=mime_type,
                         data=archivo.read(),
                     )
+            else:
+                current_app.logger.error(
+                    f"ERROR: No se encontró el archivo adjunto externo en: {ruta_archivo}"
+                )
 
     mail.send(msg)
     return True
@@ -141,6 +149,7 @@ def enviar_notificacion_oficio_turnado(datos, correo_jud, lista_rutas_adjuntos=N
         
         Folio: {datos['folio_interno']}
         Asunto: {datos['asunto']}
+        Cuerpo original: {datos.get('descripcion', 'Sin descripción')}
         Instrucciones del subdirector: {datos['instrucciones_subdirector']}
         
                 
@@ -162,6 +171,10 @@ def enviar_notificacion_oficio_turnado(datos, correo_jud, lista_rutas_adjuntos=N
                         content_type=mime_type,
                         data=archivo.read(),
                     )
+            else:
+                current_app.logger.error(
+                    f"ERROR: No se encontró el archivo adjunto para el JUD en: {ruta}"
+                )
     mail.send(msg)
     return True
 

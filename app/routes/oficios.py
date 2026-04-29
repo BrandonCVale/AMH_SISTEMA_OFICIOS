@@ -428,11 +428,14 @@ def nueva_peticion_subdirector():
                     "descripcion": formulario["descripcion_solicitud"],
                 }
 
-                enviar_notificacion_peticion_subdirector(
-                    datos=datos_email,
-                    correo_gestor=correo_del_gestor[0]["correo_electronico"],
-                    lista_archivos_adjuntos=[ruta_archivo],
-                )
+                try:
+                    enviar_notificacion_peticion_subdirector(
+                        datos=datos_email,
+                        correo_gestor=correo_del_gestor[0]["correo_electronico"],
+                        lista_archivos_adjuntos=[ruta_archivo],
+                    )
+                except Exception as e:
+                    current_app.logger.error(f"Error al enviar correo de petición de subdirector: {e}")
 
                 flash(mensaje, "success")
                 return redirect(url_for("oficios.panel_control"))
@@ -467,11 +470,19 @@ def responder_peticion_de_jud(id_peticion):
             mensaje = "Solicitud aprobada exitosamente"
             estatus_str = "APROBADA"
             tipo = "success"
-        else:
+        elif decision_boton == "RECHAZADO":
             id_nuevo_estatus = 5
             mensaje = "Solicitud rechazada exitosamente"
             estatus_str = "RECHAZADA"
             tipo = "danger"
+        else:
+            flash(
+                "Debes hacer click en uno de los botones para enviar tu respuesta",
+                "warning",
+            )
+            return redirect(
+                url_for("oficios.responder_peticion_de_jud", id_peticion=id_peticion)
+            )
 
         # Guardar los cambios en la bd
         registrar_respuesta_peticion_db(
