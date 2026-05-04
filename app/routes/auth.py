@@ -18,7 +18,7 @@ def login():
         if usuario:
             login_user(usuario)
             flash("Has iniciado sesión correctamente.", "success")
-            return redirect(url_for("inicio"))  # Redirige al home
+            return redirect(url_for("main.inicio"))  # Redirige al home
         else:
             flash("Correo o contraseña incorrectos.", "error")
 

@@ -5,8 +5,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-class Config:
-    """Configuracion base"""
+class ConfiguracionBase:
+    """Configuración fundacional compartida por todos los entornos."""
 
     SECRET_KEY = os.getenv("SECRET_KEY")
 
@@ -26,5 +26,27 @@ class Config:
     MAIL_DEFAULT_SENDER = os.getenv("MAIL_DEFAULT_SENDER")
 
 
-# Diccionario que permite a __init__.py seleccionar la configuración
-config = {"default": Config}
+class ConfiguracionDesarrollo(ConfiguracionBase):
+    """
+    Configuración específica para el entorno de desarrollo local.
+    Habilita trazas de error y herramientas de depuración.
+    """
+
+    DEBUG = True
+
+
+class ConfiguracionProduccion(ConfiguracionBase):
+    """
+    Configuración estricta para el servidor de producción.
+    Desactiva explícitamente cualquier herramienta de depuración.
+    """
+
+    DEBUG = False
+
+
+# Diccionario de enrutamiento de configuración consumido por __init__.py
+config = {
+    "desarrollo": ConfiguracionDesarrollo,
+    "produccion": ConfiguracionProduccion,
+    "default": ConfiguracionDesarrollo,
+}
